@@ -1,0 +1,37 @@
+@reference "#reference.css";
+
+/* ============================================================================
+   Card fold — the animating body of an expandable card.
+
+   Structure:
+     .opal-fold                 (the animation; see components/fold/)
+       .opal-fold-inner
+         .opal-card-fold-body   (border minus its top edge, bottom rounding)
+
+   Shared by Card and SelectCard.
+============================================================================ */
+
+/* The background stays transparent so the page shows through the fold and
+   keeps it distinct from the header. */
+.opal-card-fold-body {
+  @apply w-full bg-transparent;
+}
+
+.opal-card-fold-body[data-content-height="80"] {
+  @apply max-h-80 overflow-y-auto;
+}
+
+/* "full" = no constraint; natural height, no scroll. */
+
+/* The top edge is the header's bottom border, so the body never draws one. */
+.opal-card-fold-body[data-border="none"] {
+  border: none;
+}
+
+.opal-card-fold-body[data-border="dashed"] {
+  @apply border border-t-0 border-dashed;
+}
+
+.opal-card-fold-body[data-border="solid"] {
+  @apply border border-t-0;
+}

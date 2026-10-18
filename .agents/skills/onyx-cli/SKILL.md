@@ -1,0 +1,1 @@
+../../../cli/internal/embedded/SKILL.md

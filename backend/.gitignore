@@ -1,0 +1,13 @@
+__pycache__/
+.mypy_cache
+.idea/
+site_crawls/
+.ipynb_checkpoints/
+api_keys.py
+*ipynb
+.env*
+dynamic_config_storage/
+celerybeat-schedule*
+onyx/connectors/salesforce/data/
+.test.env
+/generated
