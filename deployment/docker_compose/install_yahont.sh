@@ -3,8 +3,8 @@
 # Установщик Yahont CE.
 #
 # Скачивает репозиторий Yahont CE, создаёт файл .env с секретом входа и
-# запускает Yahont в Docker Compose. Образы собираются из исходного кода, поэтому
-# первая сборка занимает несколько минут.
+# запускает Yahont в Docker Compose. Образы скачиваются из Docker Hub, сборка не
+# нужна: время первого запуска зависит от канала связи.
 #
 #   curl -fsSL https://yahont.ai/install_yahont.sh | bash
 #   curl -fsSL https://yahont.ai/install_yahont.sh | bash -s -- --lite

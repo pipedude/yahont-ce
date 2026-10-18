@@ -1,8 +1,9 @@
 # Установщик Yahont CE для Windows.
 #
 # Скачивает репозиторий Yahont CE, создаёт файл .env с секретом входа и
-# запускает Yahont в Docker Compose. Образы собираются из исходного кода, поэтому
-# первая сборка занимает несколько минут. Требуется Docker Desktop для Windows.
+# запускает Yahont в Docker Compose. Образы скачиваются из Docker Hub, сборка не
+# нужна: время первого запуска зависит от канала связи. Требуется Docker Desktop
+# для Windows.
 #
 #   powershell -ExecutionPolicy Bypass -File install_yahont.ps1
 #   powershell -ExecutionPolicy Bypass -File install_yahont.ps1 -Lite
