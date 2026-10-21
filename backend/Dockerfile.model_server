@@ -120,7 +120,7 @@ COPY --chown=1001:1001 ./shared_configs /app/shared_configs
 COPY --chown=1001:1001 ./model_server /app/model_server
 
 # Default ONYX_VERSION, typically overriden during builds by GitHub Actions.
-ARG ONYX_VERSION=0.0.0-dev
+ARG ONYX_VERSION=v0.1.0
 ENV ONYX_VERSION=${ONYX_VERSION}
 
 USER onyx
