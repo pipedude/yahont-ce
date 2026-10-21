@@ -231,8 +231,10 @@ export function buildItems(
     items.push(item);
   }
 
+  // Plans exist only in the cloud: Community Edition has nothing to upgrade to.
   if (
     userCanAccess(Permission.FULL_ADMIN_PANEL_ACCESS) &&
+    flags.enableCloud &&
     !flags.hasSubscription
   ) {
     items.push({

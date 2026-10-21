@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from onyx.auth.permissions import require_permission
+from onyx.configs.app_configs import ENABLE_ONYX_NOTIFICATIONS
 from onyx.configs.constants import NotificationType
 from onyx.db.engine.sql_engine import get_session
 from onyx.db.enums import NotificationSeverity, Permission
@@ -71,6 +72,9 @@ def _check_for_notifications_to_create(
         logger.exception(
             "Failed to check for build mode intro in notifications endpoint"
         )
+
+    if not ENABLE_ONYX_NOTIFICATIONS:
+        return
 
     try:
         ensure_permissions_migration_notification(user, db_session)

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import JSON, cast, select, update
+from sqlalchemy import JSON, cast, or_, select, update
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
@@ -9,9 +9,14 @@ from sqlalchemy.sql import func
 from sqlalchemy.sql.elements import ColumnElement
 
 from onyx.auth.permissions import has_global_permission
+from onyx.configs.app_configs import ENABLE_ONYX_NOTIFICATIONS
 from onyx.configs.constants import NotificationType
 from onyx.db.enums import NotificationSeverity, Permission
 from onyx.db.models import Notification, User
+
+# Feature id of the Onyx permissions-migration notice, as created in
+# server/features/notifications/utils.py.
+_PERMISSIONS_MIGRATION_FEATURE = "permissions_migration_v1"
 
 
 def _notification_additional_data_key() -> ColumnElement[dict]:
@@ -38,6 +43,17 @@ def _notification_filters(
         filters.append(Notification.dismissed.is_(False))
     if notif_type:
         filters.append(Notification.notif_type == notif_type)
+    if not ENABLE_ONYX_NOTIFICATIONS:
+        # Onyx-authored rows created before the flag was off stay hidden.
+        filters.append(Notification.notif_type != NotificationType.RELEASE_NOTES)
+        filters.append(
+            or_(
+                Notification.notif_type != NotificationType.FEATURE_ANNOUNCEMENT,
+                Notification.additional_data["feature"].astext.is_distinct_from(
+                    _PERMISSIONS_MIGRATION_FEATURE
+                ),
+            )
+        )
     if min_severity is not None:
         ordered = list(NotificationSeverity)
         filters.append(

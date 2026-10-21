@@ -80,6 +80,7 @@ import {
   findProvider,
   findRegistryModel,
   isCloudBased,
+  pickableProviders,
   resolveProviderName,
 } from "@/lib/searchSettings";
 import {
@@ -1267,6 +1268,10 @@ export default function IndexSettingsPage() {
                 values.model_name !== initialFormValues.model_name &&
                 !!values.model_name;
               const stagedModelName = isModelStaged ? values.model_name : null;
+              const pickableSelfHostedProviders = pickableProviders(
+                filteredSelfHostedProviders,
+                [currentEmbeddingModel?.model_name, stagedModelName]
+              );
               // Block apply when Contextual Retrieval is on but no LLM is set.
               const contextualRagModelMissing =
                 values.enable_contextual_rag &&
@@ -1814,13 +1819,13 @@ export default function IndexSettingsPage() {
                                     </Tabs.Content>
 
                                     <Tabs.Content value={MODEL_TAB_SELF}>
-                                      {filteredSelfHostedProviders.length >
+                                      {pickableSelfHostedProviders.length >
                                       0 ? (
                                         <GeneralLayouts.Section
                                           gap={2}
                                           padding={2}
                                         >
-                                          {filteredSelfHostedProviders.map(
+                                          {pickableSelfHostedProviders.map(
                                             (shProvider) => (
                                               <ProviderGroup
                                                 key={shProvider.providerName}

@@ -2210,6 +2210,14 @@ INSTANCE_TYPE = (
     else "self_hosted"
 )
 
+# Notifications written by Onyx, not by Yahont: release notes from the public
+# Onyx changelog (a request to GitHub) and the permissions-migration notice.
+# They name Onyx versions and link to docs.onyx.app. While this is off they are
+# not created, and rows created earlier are hidden.
+ENABLE_ONYX_NOTIFICATIONS = (
+    os.environ.get("ENABLE_ONYX_NOTIFICATIONS", "").lower() == "true"
+)
+
 
 ## Discord Bot Configuration
 DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN")

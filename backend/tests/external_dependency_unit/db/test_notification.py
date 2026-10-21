@@ -322,6 +322,7 @@ def test_get_notifications_api_runs_ensure_checks_on_first_page(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     user = create_test_user(db_session, "notification_api_ensure_checks")
+    monkeypatch.setattr(notifications_api, "ENABLE_ONYX_NOTIFICATIONS", True)
     calls: list[str] = []
 
     def record_call(name: str) -> Callable[..., None]:
@@ -461,6 +462,7 @@ def test_notification_summary_runs_ensure_checks_before_counting(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     user = create_test_user(db_session, "notification_summary_no_checks")
+    monkeypatch.setattr(notifications_api, "ENABLE_ONYX_NOTIFICATIONS", True)
     calls: list[str] = []
 
     def record_call(name: str) -> Callable[..., None]:

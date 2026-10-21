@@ -9,6 +9,7 @@ import {
   isVoiceProviderHiddenInCloud,
   isWebSearchProviderHiddenInCloud,
   isConnectorSourceHidden,
+  isEmbeddingModelHidden,
 } from "@/lib/languageModels/cloudVisibility";
 import { LLMProviderName } from "@/lib/languageModels/types";
 
@@ -140,5 +141,25 @@ describe("isConnectorSourceHidden", () => {
     "file",
   ])("keeps %s in the catalog", (source) => {
     expect(isConnectorSourceHidden(source)).toBe(false);
+  });
+});
+
+describe("isEmbeddingModelHidden", () => {
+  test.each([
+    "nomic-ai/nomic-embed-text-v1",
+    "intfloat/e5-base-v2",
+    "intfloat/e5-small-v2",
+  ])("hides the English-only model %s", (modelName) => {
+    expect(isEmbeddingModelHidden(modelName)).toBe(true);
+  });
+
+  test.each([
+    "intfloat/multilingual-e5-small",
+    "intfloat/multilingual-e5-base",
+    "text-embedding-3-large",
+    "cohere/embed-v4.0",
+    "my-org/custom-model",
+  ])("keeps %s", (modelName) => {
+    expect(isEmbeddingModelHidden(modelName)).toBe(false);
   });
 });

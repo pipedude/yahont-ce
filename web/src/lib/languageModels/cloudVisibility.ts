@@ -87,3 +87,17 @@ const HIDDEN_CONNECTOR_SOURCES: ReadonlySet<string> = new Set([
 export function isConnectorSourceHidden(source: string): boolean {
   return HIDDEN_CONNECTOR_SOURCES.has(source);
 }
+
+// Self-hosted embedding models not offered in the model picker, in the cloud
+// and in Community Edition alike: nomic-embed-text-v1 and the E5 v2 models
+// are English-only, and Yahont targets Russian text. Only the picker hides
+// them: a deployment that already uses one keeps it as its current model.
+const HIDDEN_EMBEDDING_MODELS: ReadonlySet<string> = new Set([
+  "nomic-ai/nomic-embed-text-v1",
+  "intfloat/e5-base-v2",
+  "intfloat/e5-small-v2",
+]);
+
+export function isEmbeddingModelHidden(modelName: string): boolean {
+  return HIDDEN_EMBEDDING_MODELS.has(modelName);
+}

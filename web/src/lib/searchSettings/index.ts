@@ -1,3 +1,4 @@
+import { isEmbeddingModelHidden } from "@/lib/languageModels/cloudVisibility";
 import {
   CLOUD_BASED_PROVIDERS,
   CUSTOM_PROVIDER,
@@ -57,6 +58,28 @@ export function findRegistryModel(modelName: string): EmbeddingModel | null {
     if (m) return m;
   }
   return null;
+}
+
+/**
+ * Providers for the model picker: hidden models are left out, and a provider
+ * left without models is dropped. `keepModelNames` (the current and the
+ * staged model) stay visible. The registries themselves keep every model,
+ * so a deployment that uses a hidden one still resolves it.
+ */
+export function pickableProviders(
+  providers: readonly EmbeddingProvider[],
+  keepModelNames: readonly (string | null | undefined)[] = []
+): EmbeddingProvider[] {
+  return providers
+    .map((provider) => ({
+      ...provider,
+      embeddingModels: provider.embeddingModels.filter(
+        (model) =>
+          !isEmbeddingModelHidden(model.modelName) ||
+          keepModelNames.includes(model.modelName)
+      ),
+    }))
+    .filter((provider) => provider.embeddingModels.length > 0);
 }
 
 /** Translated registry description, undefined without a key. */
