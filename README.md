@@ -77,7 +77,7 @@ Yahont основан на открытом исходном коде проек
 
 ## 🎬 Демонстрация
 
-https://github.com/user-attachments/assets/f7a88b8b-080a-444a-b51d-a7447507aec0
+https://github.com/user-attachments/assets/942b912a-c223-40a5-b348-f611f1d4803b
 
 ---
 
@@ -259,6 +259,16 @@ flowchart LR
 - **Другие российские коннекторы.**
 
 Подробный список изменений — в [CHANGELOG.md](CHANGELOG.md).
+
+### 🧬 История и происхождение
+
+Yahont CE — производная от [Onyx](https://github.com/onyx-dot-app/onyx) (MIT). Базовый
+коммит Onyx указан в строке «Основа» каждой записи [CHANGELOG.md](CHANGELOG.md).
+Лицензия и авторские права Onyx сохранены. В CE нет Enterprise-кода и некоторых 
+других частей Onyx.
+
+Разработка Yahont ведётся в закрытом репозитории, здесь публикуются только выпуски CE:
+один выпуск — один коммит, тег `vX.Y.Z` и Release с описанием.
 
 ---
 
