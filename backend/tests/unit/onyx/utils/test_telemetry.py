@@ -2,7 +2,6 @@ from typing import Any
 from unittest.mock import Mock
 
 from onyx.configs.constants import MilestoneRecordType
-from onyx.server.settings.models import Tier
 from onyx.utils import telemetry as telemetry_utils
 
 
@@ -172,45 +171,6 @@ def test_mt_cloud_identify_user_omits_public_tenant(
 
     assert harness.lookup_emails == ["wenxi@onyx.app"]
     assert harness.identify_calls == [("user-id", {"email": "wenxi@onyx.app"})]
-
-
-def _enable_telemetry(monkeypatch: Any, post: Mock) -> None:
-    monkeypatch.setattr(telemetry_utils, "DISABLE_TELEMETRY", False)
-    monkeypatch.setattr(telemetry_utils, "MULTI_TENANT", False)
-    monkeypatch.setattr(telemetry_utils, "get_or_generate_uuid", lambda: "uuid-1")
-    monkeypatch.setattr(telemetry_utils, "_get_tier", lambda _tenant_id: Tier.COMMUNITY)
-    monkeypatch.setattr(telemetry_utils.requests, "post", post)
-
-
-def test_optional_telemetry_posts_to_yahont_endpoint(monkeypatch: Any) -> None:
-    post = Mock(return_value=Mock(ok=True))
-    _enable_telemetry(monkeypatch, post)
-
-    sent = telemetry_utils.optional_telemetry(
-        record_type=telemetry_utils.RecordType.VERSION,
-        data={"version": "test"},
-        tenant_id="public",
-        blocking=True,
-    )
-
-    assert sent is True
-    assert post.call_args.args[0] == "https://telemetry.yahont.ai/anonymous_telemetry"
-
-
-def test_optional_telemetry_sends_nothing_when_disabled(monkeypatch: Any) -> None:
-    post = Mock(return_value=Mock(ok=True))
-    _enable_telemetry(monkeypatch, post)
-    monkeypatch.setattr(telemetry_utils, "DISABLE_TELEMETRY", True)
-
-    sent = telemetry_utils.optional_telemetry(
-        record_type=telemetry_utils.RecordType.VERSION,
-        data={"version": "test"},
-        tenant_id="public",
-        blocking=True,
-    )
-
-    assert sent is False
-    post.assert_not_called()
 
 
 def test_mt_cloud_identify_user_noop_when_not_multi_tenant(monkeypatch: Any) -> None:

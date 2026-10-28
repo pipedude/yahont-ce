@@ -119,6 +119,7 @@ describe("isConnectorSourceHidden", () => {
     "fireflies",
     "highspot",
     "canvas",
+    "youtrack",
   ])("hides %s in every build", (source) => {
     expect(isConnectorSourceHidden(source)).toBe(true);
   });

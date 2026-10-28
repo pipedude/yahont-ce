@@ -14,8 +14,8 @@ from pydantic import BaseModel
 
 from onyx.llm.constants import LlmProviderNames
 from onyx.llm.model_capabilities import model_is_reasoning_model
+from onyx.llm.model_catalog import resolve_model_mode
 from onyx.server.manage.llm.utils import (
-    is_embedding_model,
     is_reasoning_model,
     strip_openrouter_vendor_prefix,
 )
@@ -100,7 +100,7 @@ def parse_gateway_models(
     for model in models:
         try:
             model_id = model.get("id") or ""
-            if not model_id or is_embedding_model(model_id):
+            if not model_id or resolve_model_mode(model_id) == "embedding":
                 continue
             if model.get("type", "chat") != "chat":
                 continue

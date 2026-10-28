@@ -51,9 +51,8 @@ import {
   SvgUnplug,
   SvgVector,
 } from "@opal/icons";
-import SwitchField from "@/refresh-components/form/SwitchField";
 import { InputSingleSelect } from "@opal/components";
-import { InputSingleSelectField } from "@opal/form";
+import { InputSingleSelectField, InputSwitchField } from "@opal/form";
 import { Disabled } from "@opal/core";
 import { ADMIN_ROUTES } from "@/lib/admin-routes";
 import { NEXT_PUBLIC_CLOUD_ENABLED } from "@/lib/constants";
@@ -118,6 +117,8 @@ import {
 import type { RichStr } from "@opal/types";
 import { ProviderCredentialsModal } from "@/views/admin/IndexSettingsPage/modals";
 import ReindexProgressBanner from "@/views/admin/IndexSettingsPage/ReindexProgressBanner";
+import CCPairIdsBackfillCard from "@/views/admin/IndexSettingsPage/CCPairIdsBackfillCard";
+import EmbeddingRateLimitCard from "@/views/admin/IndexSettingsPage/EmbeddingRateLimitCard";
 import { parseErrorDetail } from "@/lib/fetcher";
 
 const route = ADMIN_ROUTES.INDEX_SETTINGS;
@@ -167,7 +168,7 @@ function CloudDisabled({
     : tooltipProp;
 
   return (
-    <Disabled disabled={isDisabled} tooltip={tooltip} tooltipSide="right">
+    <Disabled disabled={isDisabled} tooltip={tooltip} tooltipSide="end">
       {children}
     </Disabled>
   );
@@ -235,9 +236,12 @@ interface ProviderGroupProps {
    * `LiteLLMProviderModal` can preload its model-spec fields on edit.
    */
   existingModel?: EmbeddingModel;
+  /** Spec of the staged model when it belongs to THIS provider. */
+  stagedModel?: EmbeddingModel;
   /**
    * `customModel` is set only for providers with no pre-registered models
-   * (LiteLLM / Azure), where the user defines the spec in the connect modal.
+   * (LiteLLM / Azure / Bifrost), where the user defines the spec in the
+   * connect modal.
    */
   onSelectModel: (
     modelName: string,
@@ -253,11 +257,23 @@ function ProviderGroup({
   isCloud = false,
   existingCredentials,
   existingModel,
+  stagedModel,
   onSelectModel,
   onDeselectModel,
 }: ProviderGroupProps) {
   const t = useTranslations("admin.indexSettings");
-  const models = provider.embeddingModels;
+  // Bring-your-own models are not in the registry, so list the current and
+  // staged specs too. The first entry for a name wins, so a staged spec
+  // replaces the current spec of the same name.
+  const isBringYourOwn = provider.embeddingModels.length === 0;
+  const models = [
+    ...provider.embeddingModels,
+    ...(stagedModel ? [stagedModel] : []),
+    ...(existingModel ? [existingModel] : []),
+  ].filter(
+    (model, index, all) =>
+      all.findIndex((m) => m.modelName === model.modelName) === index
+  );
   const isConfigured = isCloud ? !!existingCredentials : true;
   const disconnectModal = useCreateModal();
   const connectModal = useCreateModal();
@@ -299,9 +315,11 @@ function ProviderGroup({
 
   const getModelState = useCallback(
     (model: EmbeddingModel): EmbeddingModelState => {
-      if (isCloud && !isConfigured) return "unconnected";
+      // Before the credential check: a model just staged from the connect
+      // modal can render before the refreshed provider list arrives.
       if (model.modelName === selectedModelName) return "selected";
       if (model.modelName === currentModelName) return "current";
+      if (isCloud && !isConfigured) return "unconnected";
       return "connected";
     },
     [isCloud, isConfigured, selectedModelName, currentModelName]
@@ -456,7 +474,22 @@ function ProviderGroup({
           </GeneralLayouts.Section>
         </div>
 
-        {models.length === 0 ? (
+        {models.map((model) => {
+          const state = getModelState(model);
+          const isPrioritized =
+            state === "selected" || (state === "current" && !selectedModelName);
+          return (
+            <EmbeddingModelCard
+              key={model.modelName}
+              model={model}
+              provider={provider}
+              modelState={state}
+              cardState={isPrioritized ? "selected" : "filled"}
+              onSelect={() => handleModelSelect(model)}
+            />
+          );
+        })}
+        {isBringYourOwn && (
           <SelectCard
             state="filled"
             rounding={3}
@@ -483,23 +516,6 @@ function ProviderGroup({
               center
             />
           </SelectCard>
-        ) : (
-          models.map((model) => {
-            const state = getModelState(model);
-            const isPrioritized =
-              state === "selected" ||
-              (state === "current" && !selectedModelName);
-            return (
-              <EmbeddingModelCard
-                key={model.modelName}
-                model={model}
-                provider={provider}
-                modelState={state}
-                cardState={isPrioritized ? "selected" : "filled"}
-                onSelect={() => handleModelSelect(model)}
-              />
-            );
-          })
         )}
       </GeneralLayouts.Section>
     </>
@@ -649,6 +665,8 @@ interface IndexSettingsChanges {
   contextualToggleChanged: boolean;
   /** Contextual Retrieval goes from on to off. */
   contextualDisabled: boolean;
+  /** Contextual Retrieval goes from off to on with a model picked. */
+  contextualEnabled: boolean;
   /** Contextual Retrieval stays on and points at a different model. */
   contextualModelChanged: boolean;
   /** Part of the index mapping, so it always needs a re-index. */
@@ -678,6 +696,10 @@ function classifyChanges(
     values.enable_contextual_rag !== initialValues.enable_contextual_rag;
   const contextualDisabled: boolean =
     initialValues.enable_contextual_rag && !values.enable_contextual_rag;
+  const contextualEnabled: boolean =
+    !initialValues.enable_contextual_rag &&
+    values.enable_contextual_rag &&
+    values.contextual_rag_model_configuration_id !== null;
   const contextualModelChanged =
     values.enable_contextual_rag &&
     initialValues.enable_contextual_rag &&
@@ -690,6 +712,7 @@ function classifyChanges(
     embeddingChanged,
     contextualToggleChanged,
     contextualDisabled,
+    contextualEnabled,
     contextualModelChanged,
     quantizationChanged,
     imageChanged,
@@ -703,21 +726,41 @@ function classifyChanges(
 }
 
 /**
- * Which banner the staged changes get. Contextual Retrieval switched off, or
- * given a different model, can apply forward only. Image processing may skip
- * the re-index. Everything else needs one.
+ * Which banner the staged changes get. Contextual Retrieval switched off or
+ * on, or given a different model, can apply forward only. Image processing
+ * may skip the re-index. Everything else needs one.
  */
-type BannerMode =
-  | "reindex"
+type ContextualForwardMode =
   | "contextualDisableOnly"
-  | "contextualModelOnly"
-  | "imageOnly";
+  | "contextualEnableOnly"
+  | "contextualModelOnly";
+type BannerMode = "reindex" | ContextualForwardMode | "imageOnly";
+
+type ForwardModalKey =
+  | "disableForwardModal"
+  | "enableForwardModal"
+  | "forwardOnlyModal";
+
+/** The confirmation each forward-only mode opens. */
+const FORWARD_MODAL_KEYS: Record<ContextualForwardMode, ForwardModalKey> = {
+  contextualDisableOnly: "disableForwardModal",
+  contextualEnableOnly: "enableForwardModal",
+  contextualModelOnly: "forwardOnlyModal",
+};
+
+function isContextualForwardMode(
+  mode: BannerMode
+): mode is ContextualForwardMode {
+  return mode in FORWARD_MODAL_KEYS;
+}
 
 function bannerModeFor(changes: IndexSettingsChanges): BannerMode {
   if (changes.embeddingChanged || changes.quantizationChanged) {
     return "reindex";
   }
   if (changes.contextualDisabled) return "contextualDisableOnly";
+  if (changes.contextualEnabled) return "contextualEnableOnly";
+  // Switched on with no model yet: the banner asks for one.
   if (changes.contextualToggleChanged) return "reindex";
   if (changes.contextualModelChanged) return "contextualModelOnly";
   if (changes.imageChanged) return "imageOnly";
@@ -741,9 +784,9 @@ function resolveApplyStrategy(
 
 type BannerCopy =
   | "contextualModelMissing"
-  | "contextualDisableOnly"
-  | "contextualModelOnly"
+  | ContextualForwardMode
   | "doNotReindex"
+  | "quantizationOnly"
   | "reindex"
   | "default";
 
@@ -751,11 +794,15 @@ type BannerCopy =
 function bannerCopyFor(
   contextualRagModelMissing: boolean,
   mode: BannerMode,
-  strategyCopy: "doNotReindex" | "reindex" | null
+  strategyCopy: "doNotReindex" | "reindex" | null,
+  quantizationOnly: boolean
 ): BannerCopy {
   if (contextualRagModelMissing) return "contextualModelMissing";
-  if (mode === "contextualDisableOnly" || mode === "contextualModelOnly") {
-    return mode;
+  if (isContextualForwardMode(mode)) return mode;
+  // A quantization-only change copies the stored vectors instead of
+  // re-embedding, so it gets its own, faster wording.
+  if (strategyCopy === "reindex" && quantizationOnly) {
+    return "quantizationOnly";
   }
   return strategyCopy ?? "default";
 }
@@ -1054,19 +1101,25 @@ export default function IndexSettingsPage() {
       const modelConfigurationId = values.contextual_rag_model_configuration_id;
       if (!searchSettings) return false;
       if (!disabling && modelConfigurationId === null) return false;
+      const enabling: boolean =
+        !disabling && !searchSettings.enable_contextual_rag;
       // Image settings first: a failed save aborts before anything else moves.
       const image = await persistImageProcessing(values);
       if (image === "failed") return false;
 
       const failedToast = disabling
         ? t("toasts.contextualRetrievalDisableFailed")
-        : t("toasts.contextualModelUpdateFailed");
+        : enabling
+          ? t("toasts.contextualRetrievalEnableFailed")
+          : t("toasts.contextualModelUpdateFailed");
       try {
+        // Off keeps the stored model so turning it back on can reuse it.
         const response = await updateInferenceSettings(
           disabling
             ? { ...searchSettings, enable_contextual_rag: false }
             : {
                 ...searchSettings,
+                enable_contextual_rag: true,
                 contextual_rag_model_configuration_id: modelConfigurationId,
               }
         );
@@ -1081,7 +1134,9 @@ export default function IndexSettingsPage() {
         toast.success(
           disabling
             ? t("toasts.contextualRetrievalDisabled")
-            : t("toasts.contextualModelUpdated")
+            : enabling
+              ? t("toasts.contextualRetrievalEnabled")
+              : t("toasts.contextualModelUpdated")
         );
         return true;
       } catch (error) {
@@ -1272,6 +1327,25 @@ export default function IndexSettingsPage() {
                 filteredSelfHostedProviders,
                 [currentEmbeddingModel?.model_name, stagedModelName]
               );
+              const existingModelFor = (provider: EmbeddingProvider) =>
+                currentEmbeddingModel?.provider_type === provider.providerName
+                  ? (currentEmbeddingModelSpec ?? undefined)
+                  : undefined;
+              const stagedModelFor = (provider: EmbeddingProvider) =>
+                isModelStaged && values.model_provider === provider.providerName
+                  ? (values.model_spec ?? undefined)
+                  : undefined;
+              // The search also matches the current and staged bring-your-own
+              // models, which are not in the registry.
+              const needle = query.trim().toLowerCase();
+              const searchedCloudProviders = CLOUD_BASED_PROVIDERS.filter(
+                (provider) =>
+                  filteredCloudProviders.includes(provider) ||
+                  [existingModelFor(provider), stagedModelFor(provider)].some(
+                    (model) =>
+                      model?.modelName.toLowerCase().includes(needle) ?? false
+                  )
+              );
               // Block apply when Contextual Retrieval is on but no LLM is set.
               const contextualRagModelMissing =
                 values.enable_contextual_rag &&
@@ -1291,12 +1365,9 @@ export default function IndexSettingsPage() {
               // A change undone by hand leaves Formik dirty but stages nothing.
               const hasChanges = dirty && changes.any;
               const bannerMode = bannerModeFor(changes);
-              const contextualDisableOnlyChange =
-                bannerMode === "contextualDisableOnly";
-              // Both offer the forward-only apply beside the rebuild.
+              // Forward-only modes offer the in-place apply beside the rebuild.
               const contextualForwardChange =
-                contextualDisableOnlyChange ||
-                bannerMode === "contextualModelOnly";
+                isContextualForwardMode(bannerMode);
               const imageOnlyChange = bannerMode === "imageOnly";
               const effectiveStrategy = resolveApplyStrategy(
                 applyStrategy,
@@ -1314,13 +1385,32 @@ export default function IndexSettingsPage() {
               // them. Do Not Re-index touches no index, so it reads as info
               // rather than as the warning the re-index strategies carry.
               const stagedVariant = saveOnly ? "info" : "warning";
+              const quantizationOnlyChange: boolean =
+                changes.quantizationChanged &&
+                !changes.embeddingChanged &&
+                !changes.contextualToggleChanged &&
+                !changes.contextualModelChanged &&
+                !changes.imageChanged;
               const bannerCopy = bannerCopyFor(
                 contextualRagModelMissing,
                 bannerMode,
-                strategyCopy
+                strategyCopy,
+                quantizationOnlyChange
               );
-              const forwardModalKey = contextualDisableOnlyChange
-                ? "disableForwardModal"
+              // A staged embedding model is named, so the admin can see which
+              // model the re-index uses.
+              const bannerTitle =
+                bannerCopy === "reindex" && stagedModelName
+                  ? t("changesBanner.reindexModel.title", {
+                      provider: findProvider(
+                        values.model_provider ??
+                          resolveProviderName(stagedModelName, null)
+                      ).displayName,
+                      model: stagedModelName,
+                    })
+                  : t(`changesBanner.${bannerCopy}.title`);
+              const forwardModalKey = isContextualForwardMode(bannerMode)
+                ? FORWARD_MODAL_KEYS[bannerMode]
                 : "forwardOnlyModal";
               // The banner is reserved for indexing prompts: staged changes
               // and the contextual model a re-index needs. A captioning
@@ -1339,9 +1429,8 @@ export default function IndexSettingsPage() {
                 changes.contextualModelChanged
                   ? "warning"
                   : undefined;
-              const quantizationCardBorder = changes.quantizationChanged
-                ? "warning"
-                : undefined;
+              const quantizationCardBorder: "warning" | undefined =
+                changes.quantizationChanged ? "warning" : undefined;
               const imageCardBorder = captioningModelMissing
                 ? "warning"
                 : changes.imageChanged
@@ -1558,6 +1647,8 @@ export default function IndexSettingsPage() {
                     </ConfirmationModalLayout>
                   </wontPortConsentModal.Provider>
 
+                  <CCPairIdsBackfillCard />
+
                   {isReindexing ? (
                     secondarySearchSettings?.use_port_flow ||
                     isPortBackfilling ? (
@@ -1625,7 +1716,7 @@ export default function IndexSettingsPage() {
                       >
                         <MessageCard
                           variant={bannerVariant}
-                          title={t(`changesBanner.${bannerCopy}.title`)}
+                          title={bannerTitle}
                           description={markdown(
                             t(`changesBanner.${bannerCopy}.description`)
                           )}
@@ -1754,12 +1845,12 @@ export default function IndexSettingsPage() {
                                 expandedContent={
                                   <>
                                     <Tabs.Content value={MODEL_TAB_CLOUD}>
-                                      {filteredCloudProviders.length > 0 ? (
+                                      {searchedCloudProviders.length > 0 ? (
                                         <GeneralLayouts.Section
                                           gap={2}
                                           padding={2}
                                         >
-                                          {filteredCloudProviders.map(
+                                          {searchedCloudProviders.map(
                                             (provider) => (
                                               <ProviderGroup
                                                 key={provider.providerName}
@@ -1774,13 +1865,12 @@ export default function IndexSettingsPage() {
                                                 existingCredentials={configuredProviders?.get(
                                                   provider.providerName
                                                 )}
-                                                existingModel={
-                                                  currentEmbeddingModel?.provider_type ===
-                                                  provider.providerName
-                                                    ? (currentEmbeddingModelSpec ??
-                                                      undefined)
-                                                    : undefined
-                                                }
+                                                existingModel={existingModelFor(
+                                                  provider
+                                                )}
+                                                stagedModel={stagedModelFor(
+                                                  provider
+                                                )}
                                                 onSelectModel={(
                                                   name,
                                                   customModel
@@ -2169,7 +2259,7 @@ export default function IndexSettingsPage() {
                                 )}
                                 withLabel
                               >
-                                <SwitchField name="enable_contextual_rag" />
+                                <InputSwitchField name="enable_contextual_rag" />
                               </InputHorizontal>
 
                               <Disabled
@@ -2253,7 +2343,7 @@ export default function IndexSettingsPage() {
                                 withLabel
                               >
                                 <div className="flex flex-col items-end">
-                                  <SwitchField name="image_processing_enabled" />
+                                  <InputSwitchField name="image_processing_enabled" />
                                   {captioningModelMissing && (
                                     <Content
                                       icon={SvgAlertTriangle}
@@ -2353,6 +2443,10 @@ export default function IndexSettingsPage() {
                       </GeneralLayouts.Section>
                     </GeneralLayouts.Section>
                   </Disabled>
+
+                  {/* Outside the re-index lock: the limit matters most during a re-index. */}
+                  <Divider paddingParallel={0} paddingPerpendicular={0} />
+                  <EmbeddingRateLimitCard />
                 </>
               );
             }}

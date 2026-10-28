@@ -56,7 +56,8 @@ export function isWebSearchProviderHiddenInCloud(
 // hid them on 2026-10-18. Notion, Slack, Bitbucket, SharePoint, OneDrive,
 // Teams and Outlook are shown again by the owner's decision of the same day.
 // Confluence and Jira stay: they also connect to self-hosted Server/Data
-// Center.
+// Center. YouTrack is hidden by the owner's decision of 2026-10-23: JetBrains
+// does not serve YouTrack Cloud in Russia; the Server edition goes with it.
 const HIDDEN_CONNECTOR_SOURCES: ReadonlySet<string> = new Set([
   "linear",
   "document360",
@@ -82,6 +83,7 @@ const HIDDEN_CONNECTOR_SOURCES: ReadonlySet<string> = new Set([
   "fireflies",
   "highspot",
   "canvas",
+  "youtrack",
 ]);
 
 export function isConnectorSourceHidden(source: string): boolean {

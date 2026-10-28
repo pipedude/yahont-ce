@@ -117,8 +117,9 @@ export const PROVIDERS: Record<string, ProviderEntry> = {
   },
   [LLMProviderName.OPENAI_COMPATIBLE]: {
     icon: SvgPlug,
-    productName: "OpenAI-Compatible",
-    companyName: "OpenAI-Compatible",
+    productName: LLMProviderName.OPENAI_COMPATIBLE,
+    companyName: LLMProviderName.OPENAI_COMPATIBLE,
+    copyKey: "openAICompatible",
     Modal: OpenAICompatibleModal,
   },
   [LLMProviderName.NEBIUS_TOKENFACTORY]: {
@@ -163,8 +164,9 @@ export const PROVIDERS: Record<string, ProviderEntry> = {
   },
   [LLMProviderName.CUSTOM]: {
     icon: SvgServer,
-    productName: "Custom Models",
-    companyName: "models from other LiteLLM-compatible providers",
+    productName: LLMProviderName.CUSTOM,
+    companyName: LLMProviderName.CUSTOM,
+    copyKey: "custom",
     Modal: CustomModal,
   },
 };

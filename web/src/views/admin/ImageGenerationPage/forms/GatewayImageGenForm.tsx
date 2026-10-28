@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { InputPasswordTypeIn, InputSingleComboBox } from "@opal/components";
+import { InputPasswordTypeIn } from "@opal/components";
 import * as Yup from "yup";
 import { FormikField } from "@/refresh-components/form/FormikField";
 import { FormField } from "@/refresh-components/form/FormField";
@@ -14,7 +14,6 @@ import {
 } from "@/views/admin/ImageGenerationPage/forms/types";
 import { ImageGenerationCredentials } from "@/views/admin/ImageGenerationPage/svc";
 import { POLZA_URL, ROUTERAI_URL } from "@/lib/languageModels/gatewayLinks";
-import { LLMProviderView } from "@/lib/languageModels/types";
 
 /** Russian image gateways that take the tenant's own API key. */
 const GATEWAYS: Record<string, { name: string; url: string }> = {
@@ -22,8 +21,8 @@ const GATEWAYS: Record<string, { name: string; url: string }> = {
   polza: { name: "Polza.AI", url: POLZA_URL },
 };
 
-// api_base stays hidden. It carries the stored base through edits and clone
-// mode: with a stored key the backend requires the same api_base (MT mode).
+// api_base stays hidden. It carries the stored base through edits: with a
+// stored key the backend requires the same api_base (MT mode).
 interface GatewayFormValues {
   api_key: string;
   api_base: string;
@@ -34,8 +33,6 @@ const initialValues: GatewayFormValues = {
   api_base: "",
 };
 
-const EXISTING_PREFIX = "existing:";
-
 function GatewayFormFields(props: ImageGenFormChildProps<GatewayFormValues>) {
   const t = useTranslations("admin.imageGeneration");
   const {
@@ -44,7 +41,6 @@ function GatewayFormFields(props: ImageGenFormChildProps<GatewayFormValues>) {
     errorMessage,
     disabled,
     isLoadingCredentials,
-    apiKeyOptions,
     resetApiState,
     imageProvider,
   } = props;
@@ -53,7 +49,7 @@ function GatewayFormFields(props: ImageGenFormChildProps<GatewayFormValues>) {
   return (
     <FormikField<string>
       name="api_key"
-      render={(field, helper, meta, state) => (
+      render={(field, _helper, meta, state) => (
         <FormField
           name="api_key"
           state={apiStatus === "error" ? "error" : state}
@@ -61,44 +57,20 @@ function GatewayFormFields(props: ImageGenFormChildProps<GatewayFormValues>) {
         >
           <FormField.Label>{t("form.apiKey.label")}</FormField.Label>
           <FormField.Control>
-            {apiKeyOptions.length > 0 ? (
-              <InputSingleComboBox
-                mode="open"
-                value={field.value}
-                onChange={(e) => {
-                  helper.setValue(e.target.value);
-                  resetApiState();
-                }}
-                onValueChange={(value) => {
-                  helper.setValue(value);
-                  resetApiState();
-                }}
-                onBlur={field.onBlur}
-                options={apiKeyOptions}
-                placeholder={
-                  isLoadingCredentials
-                    ? t("form.loading.placeholder")
-                    : t("form.apiKey.comboPlaceholder")
-                }
-                disabled={disabled}
-                isError={apiStatus === "error"}
-              />
-            ) : (
-              <InputPasswordTypeIn
-                {...field}
-                onChange={(e) => {
-                  field.onChange(e);
-                  resetApiState();
-                }}
-                placeholder={
-                  isLoadingCredentials
-                    ? t("form.loading.placeholder")
-                    : t("form.apiKey.placeholder")
-                }
-                disabled={disabled}
-                error={apiStatus === "error"}
-              />
-            )}
+            <InputPasswordTypeIn
+              {...field}
+              onChange={(e) => {
+                field.onChange(e);
+                resetApiState();
+              }}
+              placeholder={
+                isLoadingCredentials
+                  ? t("form.loading.placeholder")
+                  : t("form.apiKey.placeholder")
+              }
+              disabled={disabled}
+              error={apiStatus === "error"}
+            />
           </FormField.Control>
           {showApiMessage ? (
             <FormField.APIMessage
@@ -146,23 +118,9 @@ function getInitialValuesFromCredentials(
   };
 }
 
-function resolveApiBase(
-  values: GatewayFormValues,
-  existingProviders: LLMProviderView[]
-): string | undefined {
-  // Clone mode reuses a connected RouterAI / Polza LLM provider: its api_base
-  // must be sent unchanged.
-  if (values.api_key.startsWith(EXISTING_PREFIX)) {
-    const sourceId = Number(values.api_key.split(":")[1]);
-    const source = existingProviders.find((p) => p.id === sourceId);
-    return source?.api_base || undefined;
-  }
-  return values.api_base || undefined;
-}
-
 export function GatewayImageGenForm(props: ImageGenFormBaseProps) {
   const t = useTranslations("admin.imageGeneration");
-  const { imageProvider, existingConfig, existingProviders } = props;
+  const { imageProvider, existingConfig } = props;
 
   const validationSchema = useMemo(
     () =>
@@ -178,7 +136,7 @@ export function GatewayImageGenForm(props: ImageGenFormBaseProps) {
       imageProviderId: imageProvider.image_provider_id,
       provider: imageProvider.provider_name,
       apiKey: values.api_key,
-      apiBase: resolveApiBase(values, existingProviders),
+      apiBase: values.api_base || undefined,
     };
   }
 

@@ -49,7 +49,8 @@ jest.mock("@opal/layouts/toast/store", () => {
   };
 });
 
-jest.mock("@/hooks/useTierAtLeast", () => ({
+jest.mock("@/lib/tiers/hooks", () => ({
+  ...jest.requireActual("@/lib/tiers/hooks"),
   useTierAtLeast: () => false,
 }));
 

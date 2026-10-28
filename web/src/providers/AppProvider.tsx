@@ -40,6 +40,7 @@ import {
 import { FullWidthChatProvider } from "@/providers/FullWidthChatProvider";
 import { IncognitoProvider } from "@/providers/IncognitoProvider";
 import { UnsavedChangesNavigationProvider } from "@/providers/UnsavedChangesNavigationProvider";
+import { CraftStreamingProvider } from "@/providers/CraftStreamingProvider";
 
 interface SidebarPersistenceProviderProps {
   children: React.ReactNode;
@@ -80,31 +81,33 @@ export default function AppProvider({ children }: AppProviderProps) {
   return (
     <SettingsProvider>
       <UserProvider>
-        <AppBackgroundProvider>
-          <ProviderContextProvider>
-            <ModalProvider>
-              <SidebarPersistenceProvider>
-                <QueryControllerProvider>
-                  <FullWidthChatProvider>
-                    <IncognitoProvider>
-                      <UnsavedChangesNavigationProvider>
-                        <ToastProvider
-                          errorAppendix={
-                            NEXT_PUBLIC_INCLUDE_ERROR_POPUP_SUPPORT_LINK
-                              ? `Need help? Join our community at ${COMMUNITY_URL} for support!`
-                              : undefined
-                          }
-                        >
-                          {children}
-                        </ToastProvider>
-                      </UnsavedChangesNavigationProvider>
-                    </IncognitoProvider>
-                  </FullWidthChatProvider>
-                </QueryControllerProvider>
-              </SidebarPersistenceProvider>
-            </ModalProvider>
-          </ProviderContextProvider>
-        </AppBackgroundProvider>
+        <CraftStreamingProvider>
+          <AppBackgroundProvider>
+            <ProviderContextProvider>
+              <ModalProvider>
+                <SidebarPersistenceProvider>
+                  <QueryControllerProvider>
+                    <FullWidthChatProvider>
+                      <IncognitoProvider>
+                        <UnsavedChangesNavigationProvider>
+                          <ToastProvider
+                            errorAppendix={
+                              NEXT_PUBLIC_INCLUDE_ERROR_POPUP_SUPPORT_LINK
+                                ? `Need help? Join our community at ${COMMUNITY_URL} for support!`
+                                : undefined
+                            }
+                          >
+                            {children}
+                          </ToastProvider>
+                        </UnsavedChangesNavigationProvider>
+                      </IncognitoProvider>
+                    </FullWidthChatProvider>
+                  </QueryControllerProvider>
+                </SidebarPersistenceProvider>
+              </ModalProvider>
+            </ProviderContextProvider>
+          </AppBackgroundProvider>
+        </CraftStreamingProvider>
       </UserProvider>
     </SettingsProvider>
   );

@@ -24,9 +24,10 @@ from onyx.connectors.capability_checks.models import (
     CapabilityCheckStatus,
     CredentialCapability,
     CredentialCapabilityReport,
+    check_error_kind,
     compute_capability_verdicts,
-    compute_connector_config_hash,
 )
+from onyx.connectors.config_hash import compute_connector_config_hash
 from onyx.connectors.exceptions import ConnectorValidationError
 from onyx.db.credential_capability import (
     upsert_completed_capability_report_unless_granular,
@@ -46,7 +47,7 @@ def _outcome_status(error: Exception | None) -> CapabilityCheckStatus:
         return CapabilityCheckStatus.FAILED
     # ``UnexpectedValidationError`` and unrecognized exceptions alike: never
     # proof of a broken credential.
-    return CapabilityCheckStatus.INDETERMINATE
+    return CapabilityCheckStatus.INCOMPLETE
 
 
 def _synthesize_results(
@@ -65,6 +66,7 @@ def _synthesize_results(
     status = _outcome_status(error)
     message = str(error) if error is not None else ""
     error_type = type(error).__name__ if error is not None else None
+    error_kind = check_error_kind(error) if error is not None else None
     results = [
         CapabilityCheckResult(
             capability=CredentialCapability.INDEXING,
@@ -74,6 +76,7 @@ def _synthesize_results(
             status=status,
             message=message,
             error_type=error_type,
+            error_kind=error_kind,
             is_fallback=True,
         )
     ]
@@ -87,6 +90,7 @@ def _synthesize_results(
                 status=status,
                 message=message,
                 error_type=error_type,
+                error_kind=error_kind,
                 is_fallback=True,
             )
             for capability in applicable - {CredentialCapability.INDEXING}

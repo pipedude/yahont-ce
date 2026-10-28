@@ -22,8 +22,11 @@ from onyx.connectors.exceptions import (
 )
 from onyx.connectors.zoom.client import ZoomClient
 from onyx.connectors.zoom.models import APPROVED_REGISTRANT_STATUS, ZoomRecordingEntry
-from onyx.connectors.zoom.recordings.access import session_is_gone
 from onyx.connectors.zoom.recordings.discovery import session_ids
+from onyx.connectors.zoom.recordings.models import (
+    definitely_absent,
+    zoom_cannot_reach_back,
+)
 from onyx.utils.logger import setup_logger
 
 logger = setup_logger()
@@ -57,7 +60,7 @@ def _probe(description: str, call: Callable[[], _T]) -> _T | None:
     except ValidationError:
         raise
     except requests.HTTPError as e:
-        if session_is_gone(e):
+        if definitely_absent(e) or zoom_cannot_reach_back(e):
             return None
         status = e.response.status_code if e.response is not None else None
         if status == 400:
@@ -102,7 +105,8 @@ def probe_recording_access_scopes(client: ZoomClient, sample: ProbeSample) -> No
     scope, so the two recording-bound scopes wait until a recording exists;
     this runs again before every attempt, so one that appears later is probed
     before anything is indexed. The owner lookup and the sign-in rules need
-    only a user.
+    only a user, and the group sync lists every user, so the listing is probed
+    whatever validation sampled.
     """
     if sample.recording_uuid is None:
         logger.warning(
@@ -122,10 +126,10 @@ def probe_recording_access_scopes(client: ZoomClient, sample: ProbeSample) -> No
             ),
         )
 
-    user_id = sample.user_id
-    if user_id is None:
-        page = _probe("the account's users", client.list_users)
-        user_id = next((u.id for u in (page.users if page else []) if u.id), None)
+    page = _probe("the account's users", client.list_users)
+    user_id = sample.user_id or next(
+        (u.id for u in (page.users if page else []) if u.id), None
+    )
     if user_id is not None:
         # A recording's owner is looked up one at a time, behind its own scope.
         _probe(f"user {user_id}", partial(client.get_user, user_id))

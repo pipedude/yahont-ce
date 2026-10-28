@@ -18,6 +18,41 @@ import type {
 // Indexing
 // ---------------------------------------------------------------------------
 
+/** POSTs `url`. Resolves to `null` once the server takes it, else to its error detail or `fallback`. */
+async function postForError(
+  url: string,
+  fallback: string
+): Promise<string | null> {
+  try {
+    const response = await fetch(url, { method: "POST" });
+    return response.ok ? null : await parseErrorDetail(response, fallback);
+  } catch {
+    return fallback;
+  }
+}
+
+/** Cancels one running or queued index attempt. Resolves to `null` or the error message. */
+export function cancelIndexAttempt(
+  indexAttemptId: number,
+  fallback: string
+): Promise<string | null> {
+  return postForError(
+    `/api/manage/admin/index-attempt/${indexAttemptId}/cancel`,
+    fallback
+  );
+}
+
+/** Starts a pair's first index attempt despite its failed checks. Resolves to `null` or the error message. */
+export function releaseIndexingHold(
+  ccPairId: number,
+  fallback: string
+): Promise<string | null> {
+  return postForError(
+    `/api/manage/admin/cc-pair/${ccPairId}/release-indexing-hold`,
+    fallback
+  );
+}
+
 export async function triggerIndexing(
   fromBeginning: boolean,
   connectorId: number,
@@ -43,6 +78,17 @@ export async function triggerIndexing(
       message: "Triggered connector run",
     };
   }
+}
+
+/** Starts a permission sync on a perm-synced pair. Resolves to `null` or the error message. */
+export function triggerPermissionSync(
+  ccPairId: number,
+  fallback: string
+): Promise<string | null> {
+  return postForError(
+    `/api/manage/admin/cc-pair/${ccPairId}/sync-permissions`,
+    fallback
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -154,7 +200,7 @@ export const submitGoogleSite = async (
   base_url: string,
   refreshFreq: number,
   pruneFreq: number,
-  indexingStart: Date,
+  indexingStart: string | null,
   access_type: AccessType,
   groups: number[],
   name?: string,
@@ -298,7 +344,10 @@ export async function getConnectorOauthRedirectUrl(
 
 const BINDING_CHECK_ERROR = "Unable to check the credential";
 
-/** Checks the credential-bound fields of an unsaved form against a credential. */
+/**
+ * Checks the credential-bound fields of an unsaved form against a saved
+ * credential or the user's draft. Sends no credential values.
+ */
 export async function checkCredentialBinding(
   credentialId: number,
   request: CredentialBindingCheckRequest

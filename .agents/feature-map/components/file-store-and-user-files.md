@@ -152,7 +152,9 @@ misses the main store falls back to the legacy store. The copy tool
 `python -m onyx.file_store.legacy_copy [--retire | --replay]` (`legacy_copy.py`) copies the
 objects that file records point at into the main store. After `--retire`, a marker object
 (`LEGACY_RETIRED_MARKER_KEY`) makes writes and deletes skip the legacy store. Reads still fall
-back to it.
+back to it. When the s3 backend still points at the bundled MinIO (`_runs_on_legacy_minio`, an
+upgrade whose `.env` was never switched), `app_configs.py` logs a warning at import that names
+the `.env` settings to change, so both `api_server` and the copy tool show it.
 
 `file_store.py:content_byte_size` computes the stored size at save time;
 `FILE_SIZE_MISSING_SENTINEL` (-1) marks a row whose backing object was
@@ -191,7 +193,9 @@ Synchronous, inside the request:
 Asynchronous, in `PROCESS_SINGLE_USER_FILE`
 (`tasks.py:process_user_file_impl`): loads the blob back through
 `LocalFileConnector` (`tasks.py:_load_user_file_documents`), then dispatches
-to one of the two consumption paths (§4.4).
+to one of the two consumption paths (§4.4). The loader sets the connector's
+`skip_spreadsheet_content` to False, so `SKIP_SPREADSHEET_CONTENT` never replaces
+a user file's spreadsheet content.
 
 ### 4.3 Extraction
 
@@ -307,7 +311,7 @@ Computed **at upload time**, before any chat turn runs:
 `projects_file_utils.py:categorize_uploaded_files` resolves a tokenizer via
 `natural_language_processing/utils.py:get_tokenizer(model_name, provider_type)`
 from the workspace's default LLM model
-(`db/llm.py:fetch_default_llm_model`), falling back to
+(`db/llm.py:fetch_default_model(..., LLMModelFlowType.CHAT)`), falling back to
 `_get_default_tokenizer()` (`HuggingFaceTokenizer(DOCUMENT_ENCODER_MODEL)`)
 when the provider type is unrecognized. Text/document files are counted with
 `natural_language_processing/utils.py:count_tokens` against the extracted

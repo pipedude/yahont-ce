@@ -314,7 +314,9 @@ export class OnyxApiClient {
     groups: number[] = []
   ): Promise<number> {
     const response = await this.post(
-      "/manage/admin/connector-with-mock-credential",
+      // Created paused: an index attempt on the empty file list fails, and the
+      // repeated-error alert toast then covers the page for later tests.
+      "/manage/admin/connector-with-mock-credential?paused=true",
       {
         name: connectorName,
         source: "file",
@@ -337,11 +339,8 @@ export class OnyxApiClient {
 
     const ccPairId = responseData.data;
     this.log(
-      `Created file connector: ${connectorName} (CC Pair ID: ${ccPairId})`
+      `Created paused file connector: ${connectorName} (CC Pair ID: ${ccPairId})`
     );
-
-    // Pause the connector immediately to prevent indexing during tests
-    await this.pauseConnector(ccPairId);
 
     return ccPairId;
   }
@@ -1364,7 +1363,7 @@ export class OnyxApiClient {
   /**
    * Create (or update, via `existing_server_id`) an MCP server with its auth
    * configuration in a single call. Covers admin shared-key, per-user template,
-   * and OAuth-stub servers. Mirrors the frontend `upsertMCPServer` payload.
+   * and OAuth-stub servers. Uses the legacy server-creation API for fixture setup.
    * Returns the new server id.
    */
   async createMcpServerWithAuth(
@@ -1518,13 +1517,12 @@ export class OnyxApiClient {
 
   /**
    * Add the given tool ids to the default assistant (preserving existing ones).
-   * The PATCH endpoint expects the full replacement list, so we read-merge-write.
+   * Sends only the change, so parallel specs cannot overwrite each other.
    */
   async addToolsToDefaultAssistant(toolIds: number[]): Promise<void> {
-    const { tool_ids: current } = await this.getDefaultAssistantConfig();
-    const merged = Array.from(new Set([...current, ...toolIds]));
-    const response = await this.patch("/admin/default-assistant", {
-      tool_ids: merged,
+    const response = await this.patch("/admin/default-assistant/tools", {
+      tool_ids: toolIds,
+      enabled: true,
     });
     await this.handleResponse(
       response,
@@ -1983,6 +1981,24 @@ export class OnyxApiClient {
       `Failed to delete chat session ${chatId}`
     );
     this.log(`Deleted chat session: ${chatId}`);
+  }
+
+  /** Creates the worker user's empty Craft session through the real backend. */
+  async createCraftSession(name: string): Promise<string> {
+    const response = await this.post("/build/sessions", { name });
+    const session = await this.handleResponse<{ id: string }>(
+      response,
+      "Failed to create Craft session"
+    );
+    return session.id;
+  }
+
+  /** Removes the isolated Craft fixture session. */
+  async deleteCraftSession(sessionId: string): Promise<void> {
+    await this.handleResponseSoft(
+      await this.delete(`/build/sessions/${sessionId}`),
+      `Failed to delete Craft session ${sessionId}`
+    );
   }
 
   // === Project Methods ===
