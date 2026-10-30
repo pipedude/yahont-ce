@@ -3233,6 +3233,7 @@
           "label": "실행 유형",
           "all": "모든 유형",
           "indexing": "문서 인덱스",
+          "backfill": "문서 백필",
           "doc_permission_sync": "권한 동기화",
           "group_sync": "그룹 멤버십 동기화",
           "pruning": "문서 정리",
@@ -7084,6 +7085,10 @@
           "description": "가장 정밀한 편집을 위한 OpenAI의 프리미엄 이미지 생성 모델입니다."
         }
       },
+      "retiredModelWarning": {
+        "description": "다른 모델을 연결하고 기본값으로 설정한 다음 {title} 연결을 해제하세요.",
+        "title": "{title}은(는) 더 이상 사용할 수 없습니다"
+      },
       "setDefaultError": {
         "message": "기본값 설정에 실패했습니다"
       },
@@ -9963,6 +9968,8 @@
         "deleting": "삭제 중",
         "failed": "실패",
         "indexed": "인덱싱됨",
+        "backfilling": "백필 중",
+        "backfilled": "백필됨",
         "indexing": "인덱싱 중",
         "initialIndexing": "초기 인덱싱",
         "interrupted": "중단됨",

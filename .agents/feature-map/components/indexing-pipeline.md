@@ -208,7 +208,9 @@ That function computes the poll window (`window_start`/`window_end`), decides
 whether to resume from a checkpoint or start clean
 (`get_latest_valid_checkpoint`, §4.6), and drives the connector's generator
 (`ConnectorRunner.run(checkpoint)`, [[connectors]]) inside `_timed_connector_runs`,
-which records one `CONNECTOR_FETCH` timing event per yielded batch. For every
+which records one `CONNECTOR_FETCH` timing event per document or hierarchy
+batch. Failure and checkpoint-only yields do not count as batches: their wait
+time goes into the next batch of the same checkpoint step. For every
 yielded `(document_batch, hierarchy_node_batch, failure, next_checkpoint)`:
 
 - a connector-level `failure` becomes an `IndexAttemptError`
@@ -447,6 +449,13 @@ writer of the attempt's aggregate counters:
   (`targeted_reindex_job_id` set) is explicitly excluded from this check and may run
   concurrently with a full crawl, relying instead on the per-document row locks in
   §4.4.
+- The creators in `docfetching/task_creation_utils.py` (new attempt, pending
+  backfill, dispatch of a waiting attempt) take the tenant-wide Redis creation
+  lock, then the cc-pair's row lock (`lock_connector_credential_pair_row`), check
+  the pair's status under it, and hold it until the attempt commits. The pause
+  and deletion routes take the same row lock before they read the attempts to
+  cancel, so a pause or delete never misses an attempt created at the same time.
+  Lock order: Redis creation lock, then the cc-pair row, then its attempt rows.
 - `update_batch_completion_and_docs` increments `completed_batches`,
   `total_docs_indexed`, `new_docs_indexed`, `total_chunks` under a
   `SELECT ... FOR UPDATE` on the `IndexAttempt` row. Each `docprocessing_task` also
@@ -540,7 +549,17 @@ connector's listing filters by the same date as indexing
 starts at `indexing_start`. The prune then also removes documents that still
 exist at the source but were last updated before the start. A dated listing
 omits unchanged folders, so `pruning/tasks.py:_get_live_hierarchy_node_ids`
-keeps the hierarchy nodes above each kept document.
+keeps the hierarchy nodes above each kept document. A generator that starts for a
+pair that is gone, `PAUSED` or `DELETING` does not enumerate. Like the other paths
+that abandon a prune on purpose (the deletion beat's stop timeout, a pause), it
+calls `reset_prune_and_cancel_sync_record`: the `PRUNING` sync record ends
+`CANCELED` and the fence is reset. Fence validation and startup reset a lost
+prune's fence through `fail_orphaned_prune_records`, which ends its record `FAILED`. The generator checks the status and marks
+its start under the pair's row lock, and a pause drops a queued prune under the
+same lock. A generator whose fence now holds a different prune, or whose fence
+names another Celery task, exits without a reset. A manual prune of a `PAUSED`
+pair is refused with `CONFLICT`, and `try_creating_prune_generator_task` does not
+dispatch one.
 
 **`document_by_cc_pair_cleanup_task`** (`background/celery/tasks/shared/tasks.py`) is
 the actual removal path, shared by both pruning and connector deletion. It reads

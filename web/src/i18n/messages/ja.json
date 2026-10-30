@@ -3233,6 +3233,7 @@
           "label": "実行の種類",
           "all": "すべての種類",
           "indexing": "ドキュメントインデックス",
+          "backfill": "ドキュメントのバックフィル",
           "doc_permission_sync": "権限の同期",
           "group_sync": "グループメンバーシップの同期",
           "pruning": "ドキュメントのプルーニング",
@@ -7084,6 +7085,10 @@
           "description": "最も精密な編集に対応する、OpenAI のプレミアム画像生成モデルです。"
         }
       },
+      "retiredModelWarning": {
+        "description": "別のモデルを接続してデフォルトに設定してから、{title} の接続を解除してください。",
+        "title": "{title} は利用できなくなりました"
+      },
       "setDefaultError": {
         "message": "デフォルトに設定できませんでした"
       },
@@ -9963,6 +9968,8 @@
         "deleting": "削除中",
         "failed": "失敗",
         "indexed": "インデックス済み",
+        "backfilling": "バックフィル中",
+        "backfilled": "バックフィル済み",
         "indexing": "インデックス作成中",
         "initialIndexing": "初回インデックス作成",
         "interrupted": "中断",

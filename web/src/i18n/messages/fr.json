@@ -3233,6 +3233,7 @@
           "label": "Type d'exécution",
           "all": "Tous les types",
           "indexing": "Index des documents",
+          "backfill": "Rattrapage des documents",
           "doc_permission_sync": "Synchronisation des autorisations",
           "group_sync": "Synchronisation des membres des groupes",
           "pruning": "Élagage des documents",
@@ -7084,6 +7085,10 @@
           "description": "Modèle premium de génération d'images d'OpenAI, pour les retouches les plus précises."
         }
       },
+      "retiredModelWarning": {
+        "description": "Connectez un autre modèle, définissez-le par défaut, puis déconnectez {title}.",
+        "title": "{title} n'est plus disponible"
+      },
       "setDefaultError": {
         "message": "Échec de la définition du modèle par défaut"
       },
@@ -9963,6 +9968,8 @@
         "deleting": "Suppression",
         "failed": "Échec",
         "indexed": "Indexé",
+        "backfilling": "Rattrapage",
+        "backfilled": "Rattrapé",
         "indexing": "Indexation",
         "initialIndexing": "Indexation initiale",
         "interrupted": "Interrompu",

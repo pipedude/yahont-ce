@@ -3233,6 +3233,7 @@
           "label": "Tipo de ejecución",
           "all": "Todos los tipos",
           "indexing": "Índice de documentos",
+          "backfill": "Relleno de documentos",
           "doc_permission_sync": "Sincronización de permisos",
           "group_sync": "Sincronización de miembros de grupos",
           "pruning": "Depuración de documentos",
@@ -7084,6 +7085,10 @@
           "description": "El modelo premium de generación de imágenes de OpenAI, para las ediciones más precisas."
         }
       },
+      "retiredModelWarning": {
+        "description": "Conecta otro modelo, establécelo como predeterminado y luego desconecta {title}.",
+        "title": "{title} ya no está disponible"
+      },
       "setDefaultError": {
         "message": "No se pudo establecer como predeterminado"
       },
@@ -9963,6 +9968,8 @@
         "deleting": "Eliminando",
         "failed": "Fallido",
         "indexed": "Indexado",
+        "backfilling": "Rellenando",
+        "backfilled": "Rellenado",
         "indexing": "Indexando",
         "initialIndexing": "Indexación inicial",
         "interrupted": "Interrumpido",

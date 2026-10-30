@@ -177,7 +177,7 @@ ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=${SENTRY_RELEASE}
 
 # Default ONYX_VERSION, typically overridden during builds by GitHub Actions.
-ARG ONYX_VERSION=v0.2.0
+ARG ONYX_VERSION=v0.2.1
 ENV ONYX_VERSION=${ONYX_VERSION}
 
 # Note: Don't expose ports here, Compose will handle that for us if necessary.

@@ -3233,6 +3233,7 @@
           "label": "Run type",
           "all": "All Types",
           "indexing": "Document Index",
+          "backfill": "Document Backfill",
           "doc_permission_sync": "Permissions Sync",
           "group_sync": "Group Membership Sync",
           "pruning": "Document Pruning",
@@ -7084,6 +7085,10 @@
           "description": "OpenAI's premium Image Generation model for the most precise edits."
         }
       },
+      "retiredModelWarning": {
+        "description": "Connect another model and set it as the default, then disconnect {title}.",
+        "title": "{title} is no longer available"
+      },
       "setDefaultError": {
         "message": "Failed to set default"
       },
@@ -9963,6 +9968,8 @@
         "deleting": "Deleting",
         "failed": "Failed",
         "indexed": "Indexed",
+        "backfilling": "Backfilling",
+        "backfilled": "Backfilled",
         "indexing": "Indexing",
         "initialIndexing": "Initial Indexing",
         "interrupted": "Interrupted",

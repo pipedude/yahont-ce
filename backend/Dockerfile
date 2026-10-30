@@ -180,7 +180,7 @@ COPY --chown=onyx:onyx ./assets /app/assets
 ENV PYTHONPATH=/app
 
 # Default ONYX_VERSION, typically overriden during builds by GitHub Actions.
-ARG ONYX_VERSION=v0.2.0
+ARG ONYX_VERSION=v0.2.1
 ENV ONYX_VERSION=${ONYX_VERSION}
 
 # Use jemalloc instead of glibc malloc to reduce memory fragmentation
