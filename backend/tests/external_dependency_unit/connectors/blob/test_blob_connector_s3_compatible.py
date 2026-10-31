@@ -16,7 +16,7 @@ import pytest
 from onyx.configs.app_configs import S3_ENDPOINT_URL
 from onyx.configs.constants import BlobType, DocumentSource
 from onyx.connectors.blob.connector import BlobStorageConnector
-from onyx.connectors.models import Document
+from onyx.connectors.models import Document, SlimDocument
 from onyx.server.security.models import SSRFProtectionLevel
 
 if not S3_ENDPOINT_URL:
@@ -109,3 +109,25 @@ def test_the_uploaded_file_is_indexed_with_the_right_source(
         document.sections[0].link
         == f"{S3_ENDPOINT_URL}/{bucket_name}/reports/invoice.txt"
     )  # type: ignore[union-attr]
+
+
+@pytest.mark.usefixtures("no_unstructured_api_key")
+def test_the_slim_listing_returns_the_indexed_ids(bucket_name: str) -> None:
+    # Pruning deletes indexed ids the slim listing does not return.
+    connector = _make_connector(bucket_name)
+    indexed_ids = {
+        document.id
+        for batch in connector.load_from_state()
+        for document in batch
+        if isinstance(document, Document)
+    }
+
+    slim_ids = {
+        document.id
+        for batch in connector.retrieve_all_slim_docs()
+        for document in batch
+        if isinstance(document, SlimDocument)
+    }
+
+    assert slim_ids == indexed_ids
+    assert len(slim_ids) == 1

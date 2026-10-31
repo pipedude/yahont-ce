@@ -20,6 +20,11 @@ _BITBUCKET_WORKSPACE = {"workspace": "onyx"}
 _DRUPAL_SITE = {"base_url": "https://wiki.example.com"}
 _ASANA_WORKSPACE = {"asana_workspace_id": "w"}
 _JIRA_SITE = {"jira_base_url": "https://example.atlassian.net"}
+_S3_COMPATIBLE_BUCKET = {
+    "bucket_type": "s3_compatible",
+    "bucket_name": "b",
+    "endpoint_url": "https://s3.example.ru",
+}
 
 
 def _classify(
@@ -347,6 +352,52 @@ def test_every_rule_reads_the_config_class_of_its_source() -> None:
             {"base_url": "https://a.example.com/threads/1/"},
             {"base_url": "https://a.example.com/threads/2/"},
             {"base_url": ScopeDirection.UNKNOWN},
+        ),
+        # Blob storage: the prefix is a folder (the connector adds "/"); a
+        # longer prefix narrows, a shorter one widens, an unrelated one both.
+        (
+            DocumentSource.S3_COMPATIBLE,
+            {**_S3_COMPATIBLE_BUCKET, "prefix": ""},
+            {**_S3_COMPATIBLE_BUCKET, "prefix": "docs"},
+            {"prefix": ScopeDirection.NARROW},
+        ),
+        (
+            DocumentSource.S3_COMPATIBLE,
+            {**_S3_COMPATIBLE_BUCKET, "prefix": "docs/"},
+            {**_S3_COMPATIBLE_BUCKET, "prefix": "docs/2026"},
+            {"prefix": ScopeDirection.NARROW},
+        ),
+        (
+            DocumentSource.S3_COMPATIBLE,
+            {**_S3_COMPATIBLE_BUCKET, "prefix": "docs/2026"},
+            {**_S3_COMPATIBLE_BUCKET, "prefix": "docs"},
+            {"prefix": ScopeDirection.WIDEN},
+        ),
+        (
+            DocumentSource.S3_COMPATIBLE,
+            {**_S3_COMPATIBLE_BUCKET, "prefix": "docs"},
+            {**_S3_COMPATIBLE_BUCKET, "prefix": ""},
+            {"prefix": ScopeDirection.WIDEN},
+        ),
+        (
+            DocumentSource.S3_COMPATIBLE,
+            {**_S3_COMPATIBLE_BUCKET, "prefix": "docs"},
+            {**_S3_COMPATIBLE_BUCKET, "prefix": "docs/"},
+            {},
+        ),
+        # "docs2/" is not inside "docs/": the keys of the two do not overlap.
+        (
+            DocumentSource.S3_COMPATIBLE,
+            {**_S3_COMPATIBLE_BUCKET, "prefix": "docs"},
+            {**_S3_COMPATIBLE_BUCKET, "prefix": "docs2"},
+            {"prefix": ScopeDirection.BOTH},
+        ),
+        # Every bucket type shares the config class, so the rule.
+        (
+            DocumentSource.S3,
+            {"bucket_type": "s3", "bucket_name": "b", "prefix": "reports"},
+            {"bucket_type": "s3", "bucket_name": "b", "prefix": "reports/q3"},
+            {"prefix": ScopeDirection.NARROW},
         ),
     ],
 )

@@ -12,6 +12,7 @@ from onyx.connectors.bitbucket.config import (
     BitbucketConnectorConfig,
     bitbucket_planning_rule,
 )
+from onyx.connectors.blob.config import BlobStorageConnectorConfig, blob_planning_rule
 from onyx.connectors.clickup.config import (
     ClickupConnectorConfig,
     clickup_planning_rule,
@@ -56,6 +57,9 @@ from onyx.connectors.slack.config import SlackConnectorConfig, slack_planning_ru
 from onyx.connectors.teams.config import TeamsConnectorConfig, teams_planning_rule
 from onyx.connectors.zoom.config import ZoomConnectorConfig, zoom_planning_rule
 
+# Every bucket type shares `BlobStorageConnectorConfig`.
+_BLOB_STORAGE_RULE = planning_rule(BlobStorageConnectorConfig, blob_planning_rule)
+
 PLANNING_RULES: dict[DocumentSource, PlanningRule] = {
     DocumentSource.ASANA: planning_rule(AsanaConnectorConfig, asana_planning_rule),
     DocumentSource.BITBUCKET: planning_rule(
@@ -76,14 +80,19 @@ PLANNING_RULES: dict[DocumentSource, PlanningRule] = {
         load_file_planning_data,
         file_planning_rule,
     ),
+    DocumentSource.GOOGLE_CLOUD_STORAGE: _BLOB_STORAGE_RULE,
     DocumentSource.GOOGLE_DRIVE: planning_rule(
         GoogleDriveConnectorConfig, google_drive_planning_rule
     ),
     DocumentSource.JIRA: planning_rule(JiraConnectorConfig, jira_planning_rule),
     DocumentSource.NOTION: planning_rule(NotionConnectorConfig, notion_planning_rule),
+    DocumentSource.OCI_STORAGE: _BLOB_STORAGE_RULE,
     DocumentSource.OUTLOOK: planning_rule(
         OutlookConnectorConfig, outlook_planning_rule
     ),
+    DocumentSource.R2: _BLOB_STORAGE_RULE,
+    DocumentSource.S3: _BLOB_STORAGE_RULE,
+    DocumentSource.S3_COMPATIBLE: _BLOB_STORAGE_RULE,
     DocumentSource.SALESFORCE: planning_rule(
         SalesforceConnectorConfig, salesforce_planning_rule
     ),

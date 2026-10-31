@@ -17,6 +17,13 @@ from pydantic import BaseModel
 
 from onyx.access.models import ExternalAccess
 from onyx.configs.constants import DocumentSource
+from onyx.connectors.exceptions import (
+    ConnectorValidationError,
+    CredentialInvalidError,
+    RateLimitedValidationError,
+    UnexpectedValidationError,
+    UnreachableValidationError,
+)
 from onyx.connectors.imap.config import DEFAULT_IMAP_PORT_NUMBER
 from onyx.connectors.imap.models import EmailHeaders
 from onyx.connectors.interfaces import (
@@ -55,6 +62,18 @@ _BODY_CONTENT_TYPES = ("text/plain", "text/html")
 _JUNK_AND_TRASH_ATTRIBUTES = {"\\junk", "\\spam", "\\trash"}
 _USERNAME_KEY = "imap_username"
 _PASSWORD_KEY = "imap_password"
+# RFC 5530 response codes of a LOGIN refusal that a later try can clear. Any
+# other refusal is a rejected account.
+_TEMPORARY_LOGIN_REFUSALS: dict[str, type[UnexpectedValidationError]] = {
+    "UNAVAILABLE": UnreachableValidationError,
+    "INUSE": RateLimitedValidationError,
+    "LIMIT": RateLimitedValidationError,
+    "SERVERBUG": UnexpectedValidationError,
+}
+
+
+class LoginRefusedError(imaplib.IMAP4.error):
+    """The server answered LOGIN with NO or BAD. The message is the server's text."""
 
 
 class CurrentMailbox(BaseModel):
@@ -250,7 +269,48 @@ class ImapConnector(
         raise NotImplementedError("Use `set_credentials_provider` instead")
 
     def validate_connector_settings(self) -> None:
-        _logout(self._get_mail_client())
+        # Every index attempt runs this, and an error that is not an
+        # `UnexpectedValidationError` pauses the pair (`run_docfetching.py`),
+        # so only a rejected account or a missing mailbox stops indexing.
+        server = f"{self._host}:{self._port}"
+        try:
+            mail_client = self._get_mail_client()
+            try:
+                self._check_configured_mailboxes(mail_client)
+            finally:
+                _logout(mail_client)
+        except LoginRefusedError as e:
+            code = re.match(r"\[([A-Za-z]+)", str(e))
+            temporary = (
+                _TEMPORARY_LOGIN_REFUSALS.get(code.group(1).upper()) if code else None
+            )
+            if temporary:
+                raise temporary(
+                    f"The IMAP server {server} refused the login for now: {e}"
+                ) from e
+            raise CredentialInvalidError(
+                f"The IMAP server {server} rejected the login: {e}"
+            ) from e
+        except imaplib.IMAP4.error as e:
+            # Includes `IMAP4.abort` after every retry.
+            raise UnreachableValidationError(
+                f"The server {server} did not answer as an IMAP server: {e}"
+            ) from e
+        except OSError as e:
+            raise UnreachableValidationError(
+                f"Cannot connect to the IMAP server {server}: {e}"
+            ) from e
+
+    def _check_configured_mailboxes(self, mail_client: imaplib.IMAP4_SSL) -> None:
+        """A typed mailbox the server does not have fails here, when the
+        connector is created, instead of failing every index run."""
+        names = [name for name in self._mailboxes or [] if name]
+        for name, quoted in zip(names, _sanitize_mailbox_names(names), strict=True):
+            status, _data = mail_client.select(mailbox=quoted, readonly=True)
+            if status != _IMAP_OKAY_STATUS:
+                raise ConnectorValidationError(
+                    f"The mail account has no mailbox named {name!r}"
+                )
 
     # impls for SlimConnector
 
@@ -429,8 +489,8 @@ class _FetchedEmail(NamedTuple):
     delay=2,
     max_delay=10,
     # A server that drops the session (seen: Yandex answering CAPABILITY with
-    # "problems with connection") or a network blip. A rejected login is
-    # `IMAP4.error`, not `IMAP4.abort`, and is not retried.
+    # "problems with connection") or a network blip. A refused login is
+    # `LoginRefusedError`, not `IMAP4.abort`, and is not retried.
     exceptions=(imaplib.IMAP4.abort, ConnectionError, TimeoutError),
 )
 def _connect_and_login(
@@ -447,8 +507,12 @@ def _connect_and_login(
         status, _data = mail_client.login(user=username, password=password)
         if status != _IMAP_OKAY_STATUS:
             raise RuntimeError(f"Failed to log into imap server; {status=}")
-    except Exception:
+    except Exception as e:
         _logout(mail_client)
+        if isinstance(e, imaplib.IMAP4.error) and not isinstance(
+            e, imaplib.IMAP4.abort
+        ):
+            raise LoginRefusedError(str(e)) from e
         raise
     return mail_client
 

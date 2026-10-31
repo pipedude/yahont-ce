@@ -20,7 +20,7 @@ from onyx.configs.app_configs import (
     SKIP_SPREADSHEET_CONTENT,
 )
 from onyx.configs.constants import BlobType, DocumentSource, FileOrigin
-from onyx.connectors.blob.config import AddressingStyle
+from onyx.connectors.blob.config import AddressingStyle, normalize_prefix
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import (
     process_onyx_metadata,
 )
@@ -36,21 +36,25 @@ from onyx.connectors.exceptions import (
 )
 from onyx.connectors.interfaces import (
     GenerateDocumentsOutput,
+    GenerateSlimDocumentOutput,
     LoadConnector,
     PollConnector,
     SecondsSinceUnixEpoch,
+    SlimConnector,
 )
 from onyx.connectors.models import (
     ConnectorMissingCredentialError,
     Document,
     HierarchyNode,
     ImageSection,
+    SlimDocument,
     TabularSection,
     TextSection,
 )
 from onyx.file_processing.extract_file_text import extract_text_and_images, get_file_ext
 from onyx.file_processing.file_types import OnyxFileExtensions
 from onyx.file_processing.image_utils import store_image_and_create_section
+from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.server.security.models import outbound_ssrf_params
 from onyx.server.security.store import get_security_settings
 from onyx.utils.logger import setup_logger
@@ -64,9 +68,11 @@ logger = setup_logger()
 
 DOWNLOAD_CHUNK_SIZE = 1024 * 1024
 SIZE_THRESHOLD_BUFFER = 64
+# Ids per batch of the slim (pruning) listing: one `list_objects_v2` page.
+_SLIM_BATCH_SIZE = 1000
 
 
-class BlobStorageConnector(LoadConnector, PollConnector):
+class BlobStorageConnector(LoadConnector, PollConnector, SlimConnector):
     def __init__(
         self,
         bucket_type: str,
@@ -80,7 +86,7 @@ class BlobStorageConnector(LoadConnector, PollConnector):
     ) -> None:
         self.bucket_type: BlobType = BlobType(bucket_type)
         self.bucket_name = bucket_name.strip()
-        self.prefix = prefix if not prefix or prefix.endswith("/") else prefix + "/"
+        self.prefix = normalize_prefix(prefix)
         self.batch_size = batch_size
         self.s3_client: Optional["S3Client"] = None
         self._allow_images: bool | None = None
@@ -539,7 +545,7 @@ class BlobStorageConnector(LoadConnector, PollConnector):
 
                         batch.append(
                             Document(
-                                id=f"{self.bucket_type}:{self.bucket_name}:{key}",
+                                id=self._document_id(key),
                                 sections=[image_section],
                                 source=DocumentSource(self.bucket_type.value),
                                 semantic_identifier=file_name,
@@ -590,7 +596,7 @@ class BlobStorageConnector(LoadConnector, PollConnector):
                             continue
                         batch.append(
                             Document(
-                                id=f"{self.bucket_type}:{self.bucket_name}:{key}",
+                                id=self._document_id(key),
                                 sections=tabular_sections,
                                 source=DocumentSource(self.bucket_type.value),
                                 semantic_identifier=file_name,
@@ -641,7 +647,7 @@ class BlobStorageConnector(LoadConnector, PollConnector):
 
                     batch.append(
                         Document(
-                            id=f"{self.bucket_type}:{self.bucket_name}:{key}",
+                            id=self._document_id(key),
                             sections=(sections or [TextSection(link=link, text="")]),
                             source=source_type,
                             semantic_identifier=file_display_name,
@@ -680,6 +686,60 @@ class BlobStorageConnector(LoadConnector, PollConnector):
             yield batch
 
         return None
+
+    def _document_id(self, key: str) -> str:
+        return f"{self.bucket_type}:{self.bucket_name}:{key}"
+
+    def _listed_as_document(self, obj: Mapping[str, Any]) -> bool:
+        """The skips of `_yield_blob_objects` that need no download: a folder
+        marker, a file over the size limit, an image while images are off."""
+        key = obj["Key"]
+        if key.endswith("/"):
+            return False
+        size_bytes = self._extract_size_bytes(obj)
+        if (
+            self.size_threshold is not None
+            and isinstance(size_bytes, int)
+            and size_bytes > self.size_threshold
+        ):
+            return False
+        is_image = (
+            get_file_ext(os.path.basename(key)) in OnyxFileExtensions.IMAGE_EXTENSIONS
+        )
+        return self._allow_images or not is_image
+
+    def retrieve_all_slim_docs(
+        self,
+        start: SecondsSinceUnixEpoch | None = None,  # noqa: ARG002
+        end: SecondsSinceUnixEpoch | None = None,  # noqa: ARG002
+        callback: IndexingHeartbeatInterface | None = None,
+    ) -> GenerateSlimDocumentOutput:
+        """The ids a full run yields, from the object listing alone, so pruning
+        downloads nothing. Like `load_from_state`, it lists every object under
+        the prefix (`slim_listing_honors_indexing_start` stays False). An object
+        that a full run skips after its download (a read or parse error) stays
+        listed: one failed read must not prune its document."""
+        if self.s3_client is None:
+            raise ConnectorMissingCredentialError("Blob storage")
+
+        paginator = self.s3_client.get_paginator("list_objects_v2")
+        batch: list[SlimDocument | HierarchyNode] = []
+        for page in paginator.paginate(Bucket=self.bucket_name, Prefix=self.prefix):
+            for obj in page.get("Contents", []):
+                if not self._listed_as_document(obj):
+                    continue
+                batch.append(SlimDocument(id=self._document_id(obj["Key"])))
+                if len(batch) >= _SLIM_BATCH_SIZE:
+                    yield batch
+                    batch = []
+            if callback:
+                if callback.should_stop():
+                    raise RuntimeError(
+                        "Blob storage slim retrieval: stop signal detected"
+                    )
+                callback.progress("blob_storage_slim_retrieval", 1)
+        if batch:
+            yield batch
 
     def validate_connector_settings(self) -> None:
         if self.s3_client is None:

@@ -7,13 +7,20 @@ SEARCH, FETCH of `(INTERNALDATE RFC822)` and of the Message-ID header, LOGOUT.
 import email
 import imaplib
 import re
+import socket
 from collections.abc import Callable, Iterator
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from onyx.configs.constants import DocumentSource
+from onyx.connectors.capability_checks.models import CheckErrorKind, check_error_kind
 from onyx.connectors.credentials_provider import OnyxStaticCredentialsProvider
+from onyx.connectors.exceptions import (
+    ConnectorValidationError,
+    CredentialInvalidError,
+    UnexpectedValidationError,
+)
 from onyx.connectors.imap.connector import ImapCheckpoint, ImapConnector
 from onyx.connectors.models import Document, SlimDocument
 from onyx.connectors.ru_mail.connector import YandexMailConnector
@@ -81,6 +88,8 @@ class _FakeImap:
 
     def select(self, mailbox: str, readonly: bool) -> _Response:
         assert readonly
+        if mailbox.strip('"') not in self._account:
+            return "NO", [b"[NONEXISTENT] No such folder"]
         self._selected = self._account[mailbox.strip('"')][1]
         return _OK, [str(len(self._selected)).encode()]
 
@@ -110,8 +119,17 @@ class _FakeImap:
 
 
 class _RejectingImap(_FakeImap):
+    def __init__(
+        self,
+        account: _Account,
+        refusal: str = "[AUTHENTICATIONFAILED] LOGIN invalid credentials",
+    ) -> None:
+        super().__init__(account)
+        self._refusal = refusal
+
     def login(self, user: str, password: str) -> _Response:  # noqa: ARG002
-        raise imaplib.IMAP4.error("[AUTHENTICATIONFAILED] LOGIN invalid credentials")
+        # What `IMAP4.login` raises on a NO answer: the server's text.
+        raise imaplib.IMAP4.error(self._refusal)
 
 
 class _Server:
@@ -282,11 +300,93 @@ def test_a_wrong_password_is_not_retried(
     session = _RejectingImap(_account())
     mock_imap4_ssl.return_value = session
 
-    with pytest.raises(imaplib.IMAP4.error):
+    with pytest.raises(CredentialInvalidError) as raised:
         _with_credentials(YandexMailConnector()).validate_connector_settings()
 
+    # A check shows a rejected account, not an unexpected error, and an
+    # index attempt pauses the pair until the password is fixed.
+    assert check_error_kind(raised.value) == CheckErrorKind.REJECTED
+    assert "AUTHENTICATIONFAILED" in str(raised.value)
     assert mock_imap4_ssl.call_count == 1
     assert session.logged_out
+
+
+@pytest.mark.parametrize(
+    "refusal, kind",
+    [
+        ("[UNAVAILABLE] Backend is down", CheckErrorKind.UNREACHABLE),
+        ("[LIMIT] Too many connections", CheckErrorKind.RATE_LIMITED),
+        ("[INUSE] Mailbox is busy", CheckErrorKind.RATE_LIMITED),
+        ("[SERVERBUG] Internal error", CheckErrorKind.UNEXPECTED),
+    ],
+)
+@patch("onyx.connectors.imap.connector.imaplib.IMAP4_SSL")
+def test_a_temporary_login_refusal_is_not_a_rejection(
+    mock_imap4_ssl: MagicMock, refusal: str, kind: CheckErrorKind
+) -> None:
+    # RFC 5530 codes a later try can clear: an index attempt must not pause.
+    mock_imap4_ssl.return_value = _RejectingImap(_account(), refusal=refusal)
+
+    with pytest.raises(UnexpectedValidationError) as raised:
+        _with_credentials(YandexMailConnector()).validate_connector_settings()
+
+    assert check_error_kind(raised.value) == kind
+
+
+@patch("onyx.connectors.imap.connector.imaplib.IMAP4_SSL")
+def test_an_unknown_host_is_unreachable(mock_imap4_ssl: MagicMock) -> None:
+    mock_imap4_ssl.side_effect = socket.gaierror(-2, "Name or service not known")
+
+    with pytest.raises(UnexpectedValidationError) as raised:
+        _with_credentials(
+            ImapConnector(host="imap.example.invalid")
+        ).validate_connector_settings()
+
+    assert check_error_kind(raised.value) == CheckErrorKind.UNREACHABLE
+    assert "imap.example.invalid" in str(raised.value)
+
+
+@patch("time.sleep")
+@patch("onyx.connectors.imap.connector.imaplib.IMAP4_SSL")
+def test_a_connection_dropped_on_every_try_is_unreachable(
+    mock_imap4_ssl: MagicMock, _mock_sleep: MagicMock
+) -> None:
+    mock_imap4_ssl.side_effect = imaplib.IMAP4.abort("problems with connection")
+
+    with pytest.raises(UnexpectedValidationError) as raised:
+        _with_credentials(YandexMailConnector()).validate_connector_settings()
+
+    assert check_error_kind(raised.value) == CheckErrorKind.UNREACHABLE
+    assert mock_imap4_ssl.call_count == 4
+
+
+@patch("onyx.connectors.imap.connector.imaplib.IMAP4_SSL")
+def test_a_missing_configured_mailbox_fails_validation(
+    mock_imap4_ssl: MagicMock,
+) -> None:
+    server = _Server(_account())
+    mock_imap4_ssl.side_effect = server
+
+    with pytest.raises(ConnectorValidationError) as raised:
+        _with_credentials(
+            YandexMailConnector(mailboxes=["INBOX", "Счета"])
+        ).validate_connector_settings()
+
+    # The admin sees the name as typed, not its modified UTF-7 form.
+    assert "Счета" in str(raised.value)
+    assert check_error_kind(raised.value) == CheckErrorKind.INVALID
+    assert [session.logged_out for session in server.sessions] == [True]
+
+
+@patch("onyx.connectors.imap.connector.imaplib.IMAP4_SSL")
+def test_configured_mailboxes_that_exist_pass_validation(
+    mock_imap4_ssl: MagicMock,
+) -> None:
+    mock_imap4_ssl.side_effect = _Server(_account())
+
+    _with_credentials(
+        YandexMailConnector(mailboxes=["INBOX", "Отправленные"])
+    ).validate_connector_settings()
 
 
 @patch("onyx.connectors.imap.connector.imaplib.IMAP4_SSL")

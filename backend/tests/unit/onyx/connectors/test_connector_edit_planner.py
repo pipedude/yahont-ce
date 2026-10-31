@@ -282,6 +282,32 @@ def test_opaque_and_directed_changes_together() -> None:
     assert plan.reconciliation_choice is not None
 
 
+_BUCKET: dict[str, Any] = {
+    "bucket_type": "s3_compatible",
+    "bucket_name": "b",
+    "endpoint_url": "https://s3.example.ru",
+}
+
+
+@pytest.mark.parametrize(
+    "old_prefix, new_prefix, kinds",
+    [
+        # Whole bucket to one folder: only clean up, no choice to make.
+        ("", "yahont-test/", [EditStepKind.PRUNE]),
+        ("docs/2026", "docs", [EditStepKind.FULL_REINDEX]),
+        ("docs", "archive", [EditStepKind.FULL_REINDEX_THEN_PRUNE]),
+    ],
+)
+def test_blob_prefix_change_needs_no_reconciliation_choice(
+    old_prefix: str, new_prefix: str, kinds: list[EditStepKind]
+) -> None:
+    current = _current(DocumentSource.S3_COMPATIBLE, _BUCKET | {"prefix": old_prefix})
+    plan = _plan(current, connector_specific_config=_BUCKET | {"prefix": new_prefix})
+
+    assert plan.reconciliation_choice is None
+    assert _kinds(plan) == kinds
+
+
 # indexing_start
 
 
