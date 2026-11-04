@@ -33,6 +33,9 @@ from onyx.tools.tool_implementations.web_search.clients.srezai_client import (
 from onyx.tools.tool_implementations.web_search.clients.tavily_client import (
     TavilyClient,
 )
+from onyx.tools.tool_implementations.web_search.clients.yandex_client import (
+    YandexSearchClient,
+)
 from onyx.tools.tool_implementations.web_search.models import (
     DEFAULT_MAX_RESULTS,
     WebContentProviderConfig,
@@ -141,6 +144,8 @@ def build_search_provider_from_config(
         )
     if provider_type == WebSearchProviderType.SREZAI:
         return SrezaiSearchClient(api_key=api_key, num_results=num_results)
+    if provider_type == WebSearchProviderType.YANDEX:
+        return YandexSearchClient(api_key=api_key, num_results=num_results)
     if provider_type == WebSearchProviderType.GOOGLE_PSE:
         search_engine_id = (
             config.get("search_engine_id")

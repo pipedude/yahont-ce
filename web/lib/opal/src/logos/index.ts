@@ -100,6 +100,7 @@ export { default as SvgVoyage } from "@opal/logos/voyage";
 export { default as SvgWikipedia } from "@opal/logos/wikipedia";
 export { default as SvgXAI } from "@opal/logos/xai";
 export { default as SvgXenForo } from "@opal/logos/xenforo";
+export { default as SvgYandex } from "@opal/logos/yandex";
 export { default as SvgYandexDisk } from "@opal/logos/yandex-disk";
 export { default as SvgYandexMail } from "@opal/logos/yandex-mail";
 export { default as SvgYouTrack } from "@opal/logos/youtrack";

@@ -7,6 +7,7 @@ import {
   SvgSerper,
   SvgSrezai,
   SvgTavily,
+  SvgYandex,
 } from "@opal/logos";
 import { markdown } from "@opal/utils";
 import type {
@@ -28,7 +29,14 @@ export const SEARCH_PROVIDER_DETAILS: Record<
   WebSearchProviderType,
   SearchProviderDetail
 > = {
-  // First in the list: a Russian provider for the Yahont cloud.
+  // First in the list: the Russian providers for the Yahont cloud.
+  // A service account API key from Yandex Cloud (search-api.webSearch.user).
+  yandex: {
+    label: "Яндекс",
+    subtitle: "Yandex Search API",
+    logo: SvgYandex,
+    apiKeyUrl: "https://console.yandex.cloud/",
+  },
   srezai: {
     label: "Srezai",
     subtitle: "srezai.ru",
@@ -118,6 +126,8 @@ const SEARCH_PROVIDER_CAPABILITIES: Record<
   SearchProviderCapabilities
 > = {
   srezai: { requiresApiKey: true, requiredConfigKeys: [] },
+  // The key of a service account needs no folder id (checked live).
+  yandex: { requiresApiKey: true, requiredConfigKeys: [] },
   exa: { requiresApiKey: true, requiredConfigKeys: [] },
   serper: { requiresApiKey: true, requiredConfigKeys: [] },
   brave: { requiresApiKey: true, requiredConfigKeys: [] },

@@ -65,6 +65,24 @@ describe("WebSearchPage in the cloud build", () => {
     }
   });
 
+  test("offers Yandex Search API as a search provider only", () => {
+    render(<WebSearchPage />);
+
+    // Yandex has no page reading, so there is no crawler card.
+    expect(cardTitles("Яндекс")).toHaveLength(1);
+    expect(screen.getByText("Yandex Search API")).toBeInTheDocument();
+  });
+
+  test("lists Yandex first among the search providers", () => {
+    render(<WebSearchPage />);
+
+    const titles = screen
+      .queryAllByText(/.+/, { selector: "[data-opal-content-title]" })
+      .map((element) => element.textContent);
+    expect(titles.indexOf("Яндекс")).toBeGreaterThanOrEqual(0);
+    expect(titles.indexOf("Яндекс")).toBeLessThan(titles.indexOf("Srezai"));
+  });
+
   test("keeps both Exa cards while one side is configured", () => {
     mockContentProviders = [
       {

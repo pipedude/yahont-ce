@@ -17,7 +17,8 @@ export type WebSearchProviderType =
   | "brave"
   | "tavily"
   | "firecrawl"
-  | "srezai";
+  | "srezai"
+  | "yandex";
 
 export type WebContentProviderType =
   | "firecrawl"
