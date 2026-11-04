@@ -57,6 +57,7 @@ Use the `run_python` tool to execute Python code in an isolated sandbox. The too
 Any files uploaded to the chat will be automatically be available in the execution environment's current directory. \
 The current directory in the file system can be used to save and persist user files. Files written to the current directory will be returned with a `file_link`. \
 Use this to give the user a way to download the file OR to display generated images.
+Name saved files with Latin letters, digits, `_` and `-` only (for example `report.pdf`): a file with a Cyrillic name cannot be returned.
 Internet access for this session is disabled. Do not make external web requests or API calls as they will fail.
 Use `openpyxl` to read and write Excel files. You have access to libraries like numpy, pandas, scipy, matplotlib, and PIL.
 Write chart titles, axis labels, legends, and other text rendered into images in the language you reply in. \

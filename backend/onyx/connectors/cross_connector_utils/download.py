@@ -8,9 +8,16 @@ _DOWNLOAD_CHUNK_SIZE = 1024 * 1024
 
 
 def download_file(
-    url: str, *, max_size_bytes: int, timeout_seconds: float
+    url: str,
+    *,
+    max_size_bytes: int,
+    timeout_seconds: float,
+    headers: dict[str, str] | None = None,
 ) -> bytes | None:
-    with requests.get(url, timeout=timeout_seconds, stream=True) as response:
+    # requests drops an Authorization header on a redirect to another host.
+    with requests.get(
+        url, headers=headers, timeout=timeout_seconds, stream=True
+    ) as response:
         response.raise_for_status()
         chunks: list[bytes] = []
         downloaded: int = 0

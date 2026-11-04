@@ -1465,6 +1465,9 @@
         "yandexMail": {
           "description": "Yandex Mail e Yandex 360"
         },
+        "yandexDisk": {
+          "description": "Arquivos do Yandex Disk, incluindo pastas compartilhadas com você"
+        },
         "mailruMail": {
           "description": "E-mail do Mail.ru"
         },
@@ -4855,6 +4858,20 @@
             }
           }
         },
+        "yandex_disk": {
+          "description": "Configurar conector do Yandex Disk",
+          "fields": {
+            "root_path": {
+              "label": "Pasta",
+              "description": "O caminho da pasta a partir da raiz do Disk, como ela se chama no Disk, por exemplo Documentos/Contratos. Você pode colar o endereço da pasta do navegador. Deixe vazio para indexar todo o Disk, incluindo pastas compartilhadas com você.",
+              "placeholder": "Documentos/Contratos"
+            },
+            "max_file_size_mb": {
+              "label": "Tamanho máximo do arquivo, MB",
+              "description": "Arquivos maiores são ignorados. De 1 a 100 MB."
+            }
+          }
+        },
         "mailru_mail": {
           "description": "Configurar conector do Mail.ru",
           "fields": {
@@ -5477,6 +5494,7 @@
         "username": "Nome de usuário do {source}",
         "apiUsername": "Nome de usuário da API do {source}",
         "mailLogin": "Login",
+        "oauthToken": "Token OAuth",
         "appPassword": "Senha de app",
         "userEmail": "E-mail do usuário do {source}",
         "accountEmail": "E-mail da conta do {source}",
@@ -5509,6 +5527,7 @@
         "boxUserEmail": "Opcional. O usuário do Box a ser representado.",
         "yandexMailLogin": "Para um endereço @yandex.ru, a parte antes do @. Para e-mail no seu próprio domínio, o endereço completo.",
         "yandexMailAppPassword": "Crie em Yandex ID → Senhas de app → E-mail. Nas configurações do Yandex Mail, em Clientes de e-mail, permita o acesso IMAP e as senhas de app.",
+        "yandexDiskToken": "Registre um app em oauth.yandex.ru com a permissão “Read all of Disk” (cloud_api:disk.read) e emita um token OAuth para ele. Se o Yandex recusar o token, emita um novo.",
         "mailruMailLogin": "O endereço completo, por exemplo name@mail.ru.",
         "mailruMailAppPassword": "Crie em Configurações → Todas as configurações → Segurança → Senhas para apps externos. A senha normal do e-mail não funciona.",
         "githubBaseUrl": "Opcional. Defina o host do seu servidor, como https://github.example.com. Deixe em branco para github.com.",

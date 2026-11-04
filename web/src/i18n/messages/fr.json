@@ -1465,6 +1465,9 @@
         "yandexMail": {
           "description": "Yandex Mail et Yandex 360"
         },
+        "yandexDisk": {
+          "description": "Fichiers Yandex Disk, y compris les dossiers partagés avec vous"
+        },
         "mailruMail": {
           "description": "Messagerie Mail.ru"
         },
@@ -4855,6 +4858,20 @@
             }
           }
         },
+        "yandex_disk": {
+          "description": "Configurer le connecteur Yandex Disk",
+          "fields": {
+            "root_path": {
+              "label": "Dossier",
+              "description": "Le chemin du dossier depuis la racine du Disk, tel qu’il s’appelle sur le Disk, par exemple Documents/Contrats. Vous pouvez coller l’adresse du dossier depuis le navigateur. Laissez vide pour indexer tout le Disk, y compris les dossiers partagés avec vous.",
+              "placeholder": "Documents/Contrats"
+            },
+            "max_file_size_mb": {
+              "label": "Taille maximale de fichier, Mo",
+              "description": "Les fichiers plus volumineux sont ignorés. De 1 à 100 Mo."
+            }
+          }
+        },
         "mailru_mail": {
           "description": "Configurer le connecteur Mail.ru",
           "fields": {
@@ -5477,6 +5494,7 @@
         "username": "Nom d'utilisateur {source}",
         "apiUsername": "Nom d'utilisateur de l'API {source}",
         "mailLogin": "Identifiant",
+        "oauthToken": "Jeton OAuth",
         "appPassword": "Mot de passe d'application",
         "userEmail": "E-mail de l'utilisateur {source}",
         "accountEmail": "E-mail du compte {source}",
@@ -5509,6 +5527,7 @@
         "boxUserEmail": "Facultatif. L'utilisateur Box à usurper.",
         "yandexMailLogin": "Pour une adresse @yandex.ru, la partie avant le @. Pour une messagerie sur votre propre domaine, l'adresse complète.",
         "yandexMailAppPassword": "Créez-le dans Yandex ID → Mots de passe d'application → Mail. Dans les paramètres de Yandex Mail, sous Clients de messagerie, autorisez l'accès IMAP et les mots de passe d'application.",
+        "yandexDiskToken": "Enregistrez une application sur oauth.yandex.ru avec l’autorisation « Read all of Disk » (cloud_api:disk.read), puis émettez un jeton OAuth pour elle. Si Yandex refuse le jeton, émettez-en un nouveau.",
         "mailruMailLogin": "L'adresse complète, par exemple name@mail.ru.",
         "mailruMailAppPassword": "Créez-le dans Paramètres → Tous les paramètres → Sécurité → Mots de passe pour applications externes. Votre mot de passe habituel ne fonctionne pas.",
         "githubBaseUrl": "Facultatif. Indiquez l'hôte de votre serveur, par exemple https://github.example.com. Laissez vide pour github.com.",

@@ -335,6 +335,7 @@ class DocumentSource(str, Enum):
     IMAP = "imap"
     YANDEX_MAIL = "yandex_mail"
     MAILRU_MAIL = "mailru_mail"
+    YANDEX_DISK = "yandex_disk"
     BITBUCKET = "bitbucket"
     TESTRAIL = "testrail"
     BRAINTRUST = "braintrust"
@@ -862,6 +863,7 @@ DocumentSourceDescription: dict[DocumentSource, str] = {
     DocumentSource.IMAP: "Email messages and threads",
     DocumentSource.YANDEX_MAIL: "Yandex Mail messages and threads",
     DocumentSource.MAILRU_MAIL: "Mail.ru messages and threads",
+    DocumentSource.YANDEX_DISK: "Files and folders from Yandex Disk",
     DocumentSource.TESTRAIL: "Test cases and QA management",
     DocumentSource.BRAINTRUST: "LLM eval experiments, datasets, and prompts",
     DocumentSource.LUMAPPS: "Intranet pages, news, and content",

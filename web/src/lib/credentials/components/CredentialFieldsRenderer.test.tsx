@@ -37,4 +37,10 @@ describe("CredentialFieldsRenderer hints", () => {
     expect(screen.getByText(hints.mailruMailLogin)).toBeInTheDocument();
     expect(screen.getByText(hints.mailruMailAppPassword)).toBeInTheDocument();
   });
+
+  it("shows how to get the Yandex Disk token", () => {
+    renderFields(ValidSources.YandexDisk);
+
+    expect(screen.getByText(hints.yandexDiskToken)).toBeInTheDocument();
+  });
 });

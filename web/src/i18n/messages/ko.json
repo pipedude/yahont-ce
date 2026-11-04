@@ -1465,6 +1465,9 @@
         "yandexMail": {
           "description": "Yandex Mail 및 Yandex 360"
         },
+        "yandexDisk": {
+          "description": "공유 폴더를 포함한 Yandex Disk 파일"
+        },
         "mailruMail": {
           "description": "Mail.ru 이메일"
         },
@@ -4855,6 +4858,20 @@
             }
           }
         },
+        "yandex_disk": {
+          "description": "Yandex Disk 커넥터 구성",
+          "fields": {
+            "root_path": {
+              "label": "폴더",
+              "description": "Disk 루트부터의 폴더 경로로, Disk에 표시된 이름 그대로 입력합니다(예: Documents/Contracts). 브라우저의 폴더 주소를 붙여 넣어도 됩니다. 비워 두면 공유 폴더를 포함해 Disk 전체를 인덱싱합니다.",
+              "placeholder": "Documents/Contracts"
+            },
+            "max_file_size_mb": {
+              "label": "최대 파일 크기(MB)",
+              "description": "이보다 큰 파일은 건너뜁니다. 1~100MB."
+            }
+          }
+        },
         "mailru_mail": {
           "description": "Mail.ru 커넥터 구성",
           "fields": {
@@ -5477,6 +5494,7 @@
         "username": "{source} 사용자 이름",
         "apiUsername": "{source} API 사용자 이름",
         "mailLogin": "로그인",
+        "oauthToken": "OAuth 토큰",
         "appPassword": "앱 비밀번호",
         "userEmail": "{source} 사용자 이메일",
         "accountEmail": "{source} 계정 이메일",
@@ -5509,6 +5527,7 @@
         "boxUserEmail": "선택 사항입니다. 대신 접근할 Box 사용자입니다.",
         "yandexMailLogin": "@yandex.ru 주소는 @ 앞부분을 입력합니다. 자체 도메인 메일은 전체 주소를 입력합니다.",
         "yandexMailAppPassword": "Yandex ID → 앱 비밀번호 → 메일에서 만듭니다. Yandex Mail 설정의 메일 클라이언트에서 IMAP 접근과 앱 비밀번호를 허용하세요.",
+        "yandexDiskToken": "oauth.yandex.ru에서 \"Read all of Disk\"(cloud_api:disk.read) 권한으로 앱을 등록한 뒤 그 앱의 OAuth 토큰을 발급하세요. Yandex가 토큰을 거부하면 새 토큰을 발급하세요.",
         "mailruMailLogin": "전체 주소입니다(예: name@mail.ru).",
         "mailruMailAppPassword": "설정 → 모든 설정 → 보안 → 외부 앱용 비밀번호에서 만듭니다. 일반 메일 비밀번호는 사용할 수 없습니다.",
         "githubBaseUrl": "선택 사항입니다. 서버 호스트를 입력하세요(예: https://github.example.com). github.com을 사용하려면 비워 두세요.",

@@ -55,6 +55,10 @@ from onyx.connectors.salesforce.config import (
 )
 from onyx.connectors.slack.config import SlackConnectorConfig, slack_planning_rule
 from onyx.connectors.teams.config import TeamsConnectorConfig, teams_planning_rule
+from onyx.connectors.yandex_disk.config import (
+    YandexDiskConnectorConfig,
+    yandex_disk_planning_rule,
+)
 from onyx.connectors.zoom.config import ZoomConnectorConfig, zoom_planning_rule
 
 # Every bucket type shares `BlobStorageConnectorConfig`.
@@ -98,6 +102,9 @@ PLANNING_RULES: dict[DocumentSource, PlanningRule] = {
     ),
     DocumentSource.SLACK: planning_rule(SlackConnectorConfig, slack_planning_rule),
     DocumentSource.TEAMS: planning_rule(TeamsConnectorConfig, teams_planning_rule),
+    DocumentSource.YANDEX_DISK: planning_rule(
+        YandexDiskConnectorConfig, yandex_disk_planning_rule
+    ),
     DocumentSource.ZOOM: planning_rule(ZoomConnectorConfig, zoom_planning_rule),
 }
 

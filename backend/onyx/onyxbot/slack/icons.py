@@ -62,6 +62,7 @@ _SOURCE_IMAGE_FILENAMES: Mapping[DocumentSource, str] = {
     DocumentSource.IMAP: "Mail.png",
     DocumentSource.YANDEX_MAIL: "Mail.png",
     DocumentSource.MAILRU_MAIL: "Mail.png",
+    DocumentSource.YANDEX_DISK: _DEFAULT_SOURCE_IMAGE_FILENAME,
     DocumentSource.OUTLOOK: "Mail.png",
     DocumentSource.BITBUCKET: "Bitbucket.png",
     DocumentSource.TESTRAIL: "Testrail.png",

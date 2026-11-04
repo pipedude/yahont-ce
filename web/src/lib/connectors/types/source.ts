@@ -66,6 +66,7 @@ export enum ValidSources {
   Imap = "imap",
   YandexMail = "yandex_mail",
   MailruMail = "mailru_mail",
+  YandexDisk = "yandex_disk",
   Bitbucket = "bitbucket",
   TestRail = "testrail",
   Braintrust = "braintrust",

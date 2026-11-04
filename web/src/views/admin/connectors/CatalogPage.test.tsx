@@ -78,4 +78,13 @@ describe("Add Connector catalog (cloud and Community Edition)", () => {
     expect(screen.getAllByText("Mail.ru").length).toBeGreaterThan(0);
     expect(screen.getByText("Mail.ru email")).toBeInTheDocument();
   });
+
+  test("shows the Yandex Disk card", () => {
+    render(<ConnectorsPage />);
+
+    expect(screen.getAllByText("Яндекс Диск").length).toBeGreaterThan(0);
+    expect(
+      screen.getByText("Yandex Disk files, including folders shared with you")
+    ).toBeInTheDocument();
+  });
 });

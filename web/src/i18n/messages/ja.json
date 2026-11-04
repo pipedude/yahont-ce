@@ -1465,6 +1465,9 @@
         "yandexMail": {
           "description": "Yandex Mail と Yandex 360"
         },
+        "yandexDisk": {
+          "description": "共有フォルダーを含む Yandex Disk のファイル"
+        },
         "mailruMail": {
           "description": "Mail.ru メール"
         },
@@ -4855,6 +4858,20 @@
             }
           }
         },
+        "yandex_disk": {
+          "description": "Yandex Disk コネクターを設定",
+          "fields": {
+            "root_path": {
+              "label": "フォルダー",
+              "description": "Disk のルートからのフォルダーのパス。Disk 上の名前のとおりに入力します（例: Documents/Contracts）。ブラウザーのフォルダーのアドレスを貼り付けることもできます。空のままにすると、共有フォルダーを含む Disk 全体をインデックスします。",
+              "placeholder": "Documents/Contracts"
+            },
+            "max_file_size_mb": {
+              "label": "最大ファイルサイズ（MB）",
+              "description": "これより大きいファイルはスキップされます。1〜100 MB。"
+            }
+          }
+        },
         "mailru_mail": {
           "description": "Mail.ru コネクターを設定",
           "fields": {
@@ -5477,6 +5494,7 @@
         "username": "{source} ユーザー名",
         "apiUsername": "{source} API ユーザー名",
         "mailLogin": "ログイン",
+        "oauthToken": "OAuth トークン",
         "appPassword": "アプリパスワード",
         "userEmail": "{source} ユーザーのメールアドレス",
         "accountEmail": "{source} アカウントのメールアドレス",
@@ -5509,6 +5527,7 @@
         "boxUserEmail": "任意。なりすます Box ユーザーを指定します。",
         "yandexMailLogin": "@yandex.ru のアドレスでは @ より前の部分を入力します。独自ドメインのメールではアドレス全体を入力します。",
         "yandexMailAppPassword": "Yandex ID → アプリパスワード → メール で作成します。Yandex Mail の設定の「メールクライアント」で IMAP アクセスとアプリパスワードを許可してください。",
+        "yandexDiskToken": "oauth.yandex.ru で「Read all of Disk」(cloud_api:disk.read) 権限を持つアプリを登録し、そのアプリの OAuth トークンを発行します。Yandex がトークンを拒否した場合は、新しいトークンを発行してください。",
         "mailruMailLogin": "アドレス全体（例: name@mail.ru）。",
         "mailruMailAppPassword": "設定 → すべての設定 → セキュリティ → 外部アプリ用パスワード で作成します。通常のメールパスワードは使用できません。",
         "githubBaseUrl": "任意。https://github.example.com のようにサーバーのホストを指定します。github.com を使う場合は空欄のままにします。",

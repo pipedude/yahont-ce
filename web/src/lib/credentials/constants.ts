@@ -606,6 +606,14 @@ export const CREDENTIAL_SPECS = {
       }),
     },
   }),
+  yandex_disk: defineCredentialSpec({
+    brandName: "Яндекс Диск",
+    fields: {
+      yandex_disk_access_token: secret("oauthToken", {
+        hint: { key: "yandexDiskToken" },
+      }),
+    },
+  }),
   testrail: defineCredentialSpec({
     brandName: "TestRail",
     fields: {

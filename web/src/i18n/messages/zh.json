@@ -1465,6 +1465,9 @@
         "yandexMail": {
           "description": "Yandex Mail 和 Yandex 360"
         },
+        "yandexDisk": {
+          "description": "Yandex Disk 文件，包括与你共享的文件夹"
+        },
         "mailruMail": {
           "description": "Mail.ru 邮箱"
         },
@@ -4855,6 +4858,20 @@
             }
           }
         },
+        "yandex_disk": {
+          "description": "配置 Yandex Disk 连接器",
+          "fields": {
+            "root_path": {
+              "label": "文件夹",
+              "description": "从 Disk 根目录开始的文件夹路径，按其在 Disk 上的名称填写，例如 Documents/Contracts。也可以粘贴浏览器中的文件夹地址。留空则索引整个 Disk，包括与你共享的文件夹。",
+              "placeholder": "Documents/Contracts"
+            },
+            "max_file_size_mb": {
+              "label": "最大文件大小（MB）",
+              "description": "更大的文件将被跳过。范围为 1 到 100 MB。"
+            }
+          }
+        },
         "mailru_mail": {
           "description": "配置 Mail.ru 连接器",
           "fields": {
@@ -5477,6 +5494,7 @@
         "username": "{source} 用户名",
         "apiUsername": "{source} API 用户名",
         "mailLogin": "登录名",
+        "oauthToken": "OAuth 令牌",
         "appPassword": "应用专用密码",
         "userEmail": "{source} 用户邮箱",
         "accountEmail": "{source} 账号邮箱",
@@ -5509,6 +5527,7 @@
         "boxUserEmail": "可选。要模拟的 Box 用户。",
         "yandexMailLogin": "@yandex.ru 地址填写 @ 之前的部分。自有域名的邮箱填写完整地址。",
         "yandexMailAppPassword": "在 Yandex ID → 应用专用密码 → 邮件 中创建。在 Yandex Mail 设置的“邮件客户端”中允许 IMAP 访问和应用专用密码。",
+        "yandexDiskToken": "在 oauth.yandex.ru 注册一个具有“Read all of Disk”（cloud_api:disk.read）权限的应用，然后为其签发 OAuth 令牌。如果 Yandex 拒绝该令牌，请签发新的令牌。",
         "mailruMailLogin": "完整地址，例如 name@mail.ru。",
         "mailruMailAppPassword": "在 设置 → 所有设置 → 安全 → 外部应用密码 中创建。普通邮箱密码无法使用。",
         "githubBaseUrl": "可选。设置你的服务器主机，例如 https://github.example.com。使用 github.com 时请留空。",

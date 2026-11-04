@@ -62,6 +62,7 @@ import {
   SvgTestRail,
   SvgWikipedia,
   SvgXenForo,
+  SvgYandexDisk,
   SvgYandexMail,
   SvgZendesk,
   SvgZoom,
@@ -151,6 +152,7 @@ export const SOURCE_DESCRIPTION_KEYS = {
   [ValidSources.Imap]: "sources.imap.description",
   [ValidSources.YandexMail]: "sources.yandexMail.description",
   [ValidSources.MailruMail]: "sources.mailruMail.description",
+  [ValidSources.YandexDisk]: "sources.yandexDisk.description",
   [ValidSources.Bitbucket]: "sources.bitbucket.description",
   [ValidSources.TestRail]: "sources.testrail.description",
   [ValidSources.Braintrust]: "sources.braintrust.description",
@@ -368,6 +370,11 @@ export const SOURCE_METADATA_MAP: SourceMap = {
     // The connect page and the credential form put this name into a sentence
     // as is ("Подключитесь к …"), so it must read in any grammatical case.
     displayName: "S3 (совместимые хранилища)",
+    category: SourceCategory.Storage,
+  },
+  yandex_disk: {
+    icon: SvgYandexDisk,
+    displayName: "Яндекс Диск",
     category: SourceCategory.Storage,
   },
 

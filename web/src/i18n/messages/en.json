@@ -1465,6 +1465,9 @@
         "yandexMail": {
           "description": "Yandex Mail and Yandex 360"
         },
+        "yandexDisk": {
+          "description": "Yandex Disk files, including folders shared with you"
+        },
         "mailruMail": {
           "description": "Mail.ru email"
         },
@@ -4855,6 +4858,20 @@
             }
           }
         },
+        "yandex_disk": {
+          "description": "Configure Yandex Disk connector",
+          "fields": {
+            "root_path": {
+              "label": "Folder",
+              "description": "The folder's path from the Disk root, as it is named on the Disk, for example Documents/Contracts. You can paste the folder's address from the browser. Leave empty to index the whole Disk, including folders shared with you.",
+              "placeholder": "Documents/Contracts"
+            },
+            "max_file_size_mb": {
+              "label": "Maximum file size, MB",
+              "description": "Larger files are skipped. From 1 to 100 MB."
+            }
+          }
+        },
         "mailru_mail": {
           "description": "Configure Mail.ru connector",
           "fields": {
@@ -5477,6 +5494,7 @@
         "username": "{source} Username",
         "apiUsername": "{source} API Username",
         "mailLogin": "Login",
+        "oauthToken": "OAuth token",
         "appPassword": "App password",
         "userEmail": "{source} User Email",
         "accountEmail": "{source} Account Email",
@@ -5509,6 +5527,7 @@
         "boxUserEmail": "Optional. The Box user to impersonate.",
         "yandexMailLogin": "For an @yandex.ru address, the part before @. For mail on your own domain, the full address.",
         "yandexMailAppPassword": "Create it in Yandex ID → App passwords → Mail. In Yandex Mail settings, under Email clients, allow IMAP access and app passwords.",
+        "yandexDiskToken": "Register an app at oauth.yandex.ru with the \"Read all of Disk\" permission (cloud_api:disk.read), then issue an OAuth token for it. If Yandex rejects the token, issue a new one.",
         "mailruMailLogin": "The full address, like name@mail.ru.",
         "mailruMailAppPassword": "Create it in Settings → All settings → Security → Passwords for external apps. Your regular mail password does not work.",
         "githubBaseUrl": "Optional. Set your server host, like https://github.example.com. Leave blank for github.com.",

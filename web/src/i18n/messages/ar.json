@@ -1465,6 +1465,9 @@
         "yandexMail": {
           "description": "Yandex Mail وYandex 360"
         },
+        "yandexDisk": {
+          "description": "ملفات Yandex Disk، بما في ذلك المجلدات المشتركة معك"
+        },
         "mailruMail": {
           "description": "بريد Mail.ru"
         },
@@ -4855,6 +4858,20 @@
             }
           }
         },
+        "yandex_disk": {
+          "description": "تهيئة موصل Yandex Disk",
+          "fields": {
+            "root_path": {
+              "label": "المجلد",
+              "description": "مسار المجلد من جذر Disk كما يُسمّى على Disk، مثل Documents/Contracts. يمكنك لصق عنوان المجلد من المتصفح. اتركه فارغًا لفهرسة Disk بالكامل، بما في ذلك المجلدات المشتركة معك.",
+              "placeholder": "Documents/Contracts"
+            },
+            "max_file_size_mb": {
+              "label": "الحد الأقصى لحجم الملف، ميغابايت",
+              "description": "يتم تخطي الملفات الأكبر. من 1 إلى 100 ميغابايت."
+            }
+          }
+        },
         "mailru_mail": {
           "description": "تهيئة موصل Mail.ru",
           "fields": {
@@ -5477,6 +5494,7 @@
         "username": "اسم مستخدم {source}",
         "apiUsername": "اسم مستخدم API لـ {source}",
         "mailLogin": "اسم الدخول",
+        "oauthToken": "رمز OAuth",
         "appPassword": "كلمة مرور التطبيق",
         "userEmail": "بريد مستخدم {source} الإلكتروني",
         "accountEmail": "بريد حساب {source} الإلكتروني",
@@ -5509,6 +5527,7 @@
         "boxUserEmail": "اختياري. مستخدم Box الذي يتم انتحال هويته.",
         "yandexMailLogin": "لعنوان @yandex.ru، الجزء الذي يسبق @. لبريد نطاقك الخاص، العنوان الكامل.",
         "yandexMailAppPassword": "أنشئها في Yandex ID ← كلمات مرور التطبيقات ← البريد. في إعدادات Yandex Mail، ضمن برامج البريد، اسمح بالوصول عبر IMAP وبكلمات مرور التطبيقات.",
+        "yandexDiskToken": "سجّل تطبيقًا على oauth.yandex.ru بإذن \"Read all of Disk\" (cloud_api:disk.read)، ثم أصدر له رمز OAuth. إذا رفض Yandex الرمز، فأصدر رمزًا جديدًا.",
         "mailruMailLogin": "العنوان الكامل، مثل name@mail.ru.",
         "mailruMailAppPassword": "أنشئها في الإعدادات ← كل الإعدادات ← الأمان ← كلمات المرور للتطبيقات الخارجية. كلمة مرور البريد العادية لا تعمل.",
         "githubBaseUrl": "اختياري. حدد مضيف الخادم لديك، مثل https://github.example.com. اتركه فارغًا لاستخدام github.com.",

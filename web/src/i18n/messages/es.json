@@ -1465,6 +1465,9 @@
         "yandexMail": {
           "description": "Yandex Mail y Yandex 360"
         },
+        "yandexDisk": {
+          "description": "Archivos de Yandex Disk, incluidas las carpetas compartidas con usted"
+        },
         "mailruMail": {
           "description": "Correo de Mail.ru"
         },
@@ -4855,6 +4858,20 @@
             }
           }
         },
+        "yandex_disk": {
+          "description": "Configurar conector de Yandex Disk",
+          "fields": {
+            "root_path": {
+              "label": "Carpeta",
+              "description": "La ruta de la carpeta desde la raíz del Disk, tal como se llama en el Disk, por ejemplo Documentos/Contratos. Puede pegar la dirección de la carpeta desde el navegador. Déjelo vacío para indexar todo el Disk, incluidas las carpetas compartidas con usted.",
+              "placeholder": "Documentos/Contratos"
+            },
+            "max_file_size_mb": {
+              "label": "Tamaño máximo de archivo, MB",
+              "description": "Los archivos más grandes se omiten. De 1 a 100 MB."
+            }
+          }
+        },
         "mailru_mail": {
           "description": "Configurar conector de Mail.ru",
           "fields": {
@@ -5477,6 +5494,7 @@
         "username": "Nombre de usuario de {source}",
         "apiUsername": "Nombre de usuario de API de {source}",
         "mailLogin": "Usuario",
+        "oauthToken": "Token OAuth",
         "appPassword": "Contraseña de aplicación",
         "userEmail": "Correo del usuario de {source}",
         "accountEmail": "Correo de la cuenta de {source}",
@@ -5509,6 +5527,7 @@
         "boxUserEmail": "Opcional. El usuario de Box al que suplantar.",
         "yandexMailLogin": "Para una dirección @yandex.ru, la parte antes de @. Para el correo de su propio dominio, la dirección completa.",
         "yandexMailAppPassword": "Créela en Yandex ID → Contraseñas de aplicaciones → Correo. En la configuración de Yandex Mail, en Clientes de correo, permita el acceso IMAP y las contraseñas de aplicaciones.",
+        "yandexDiskToken": "Registre una aplicación en oauth.yandex.ru con el permiso «Read all of Disk» (cloud_api:disk.read) y emita un token OAuth para ella. Si Yandex rechaza el token, emita uno nuevo.",
         "mailruMailLogin": "La dirección completa, por ejemplo name@mail.ru.",
         "mailruMailAppPassword": "Créela en Configuración → Toda la configuración → Seguridad → Contraseñas para aplicaciones externas. La contraseña habitual del correo no funciona.",
         "githubBaseUrl": "Opcional. Indica el host de tu servidor, como https://github.example.com. Déjalo en blanco para github.com.",

@@ -57,6 +57,7 @@ from onyx.connectors.testrail.config import TestRailConnectorConfig
 from onyx.connectors.web.config import WebConnectorConfig
 from onyx.connectors.wikipedia.config import WikipediaConnectorConfig
 from onyx.connectors.xenforo.config import XenforoConnectorConfig
+from onyx.connectors.yandex_disk.config import YandexDiskConnectorConfig
 from onyx.connectors.youtrack.config import YouTrackConnectorConfig
 from onyx.connectors.zendesk.config import ZendeskConnectorConfig
 from onyx.connectors.zoom.config import ZoomConnectorConfig
@@ -350,6 +351,11 @@ CONNECTOR_CLASS_MAP = {
         module_path="onyx.connectors.ru_mail.connector",
         class_name="MailruMailConnector",
         config_class=RuMailConnectorConfig,
+    ),
+    DocumentSource.YANDEX_DISK: ConnectorMapping(
+        module_path="onyx.connectors.yandex_disk.connector",
+        class_name="YandexDiskConnector",
+        config_class=YandexDiskConnectorConfig,
     ),
     DocumentSource.BITBUCKET: ConnectorMapping(
         module_path="onyx.connectors.bitbucket.connector",

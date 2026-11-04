@@ -2372,6 +2372,30 @@ export const connectorConfigs: Record<
     ],
     advanced_values: [],
   },
+  yandex_disk: {
+    description: "connectors.yandex_disk.description",
+    values: [
+      {
+        type: "text",
+        label: "connectors.yandex_disk.fields.root_path.label",
+        name: "root_path",
+        optional: true,
+        placeholder: "connectors.yandex_disk.fields.root_path.placeholder",
+        description: "connectors.yandex_disk.fields.root_path.description",
+      },
+    ],
+    advanced_values: [
+      {
+        type: "number",
+        label: "connectors.yandex_disk.fields.max_file_size_mb.label",
+        name: "max_file_size_mb",
+        optional: true,
+        default: 20,
+        description:
+          "connectors.yandex_disk.fields.max_file_size_mb.description",
+      },
+    ],
+  },
 };
 export const defaultRefreshFreqMinutes = 30; // 30 minutes
 // Match the backend minimums in Connector.validate_refresh_freq / validate_prune_freq.
