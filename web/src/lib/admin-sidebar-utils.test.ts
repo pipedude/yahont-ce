@@ -35,6 +35,26 @@ test("omits Plugins without action management access", () => {
   expect(links).toEqual(["/admin/agents"]);
 });
 
+// Yahont hides Decision Models (DECISION_MODELS_HIDDEN), its only beta entry.
+test("hides Decision Models from an LLM manager", () => {
+  const links = buildItems([Permission.MANAGE_LLMS], flags, null).map(
+    (item) => item.link
+  );
+  expect(links).toContain("/admin/language-models");
+  expect(links).not.toContain("/admin/decision-models");
+});
+
+test("shows no beta entry while Decision Models is hidden", () => {
+  const betaLinks = buildItems(
+    [Permission.FULL_ADMIN_PANEL_ACCESS],
+    flags,
+    null
+  )
+    .filter((item) => item.beta)
+    .map((item) => item.link);
+  expect(betaLinks).toEqual([]);
+});
+
 test("full admins see the canonical link and no legacy action links", () => {
   const actionLinks = buildItems(
     [Permission.FULL_ADMIN_PANEL_ACCESS],
@@ -120,4 +140,18 @@ describe("buildItems upgrade plan entry", () => {
       "upgradePlan"
     );
   });
+});
+
+test("shows Skills only to full admins when Craft is available", () => {
+  const craftFlags = { ...flags, craftAvailable: true };
+  expect(
+    buildItems([Permission.FULL_ADMIN_PANEL_ACCESS], craftFlags, null).map(
+      (item) => item.link
+    )
+  ).toContain("/admin/skills");
+  expect(
+    buildItems([Permission.MANAGE_SKILLS], craftFlags, null).map(
+      (item) => item.link
+    )
+  ).not.toContain("/admin/skills");
 });

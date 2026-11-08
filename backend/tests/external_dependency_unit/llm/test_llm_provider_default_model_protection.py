@@ -51,10 +51,10 @@ def _create_test_provider(
     if models is None:
         models = [
             ModelConfigurationUpsertRequest(
-                name="gpt-4o", is_visible=True, supports_image_input=True
+                name="gpt-6-sol", is_visible=True, supports_image_input=True
             ),
             ModelConfigurationUpsertRequest(
-                name="gpt-4o-mini", is_visible=True, supports_image_input=False
+                name="gpt-6-luna", is_visible=True, supports_image_input=False
             ),
         ]
     return upsert_llm_provider(
@@ -107,7 +107,7 @@ class TestDefaultModelProtection:
         provider = _create_test_provider(db_session, provider_name)
         update_default_model(
             provider_id=provider.id,
-            model="gpt-4o",
+            model="gpt-6-sol",
             db_session=db_session,
             flow_type=LLMModelFlowType.CHAT,
         )
@@ -123,7 +123,7 @@ class TestDefaultModelProtection:
                     api_key_changed=True,
                     model_configurations=[
                         ModelConfigurationUpsertRequest(
-                            name="gpt-4o-mini", is_visible=True
+                            name="gpt-6-luna", is_visible=True
                         ),
                     ],
                 ),
@@ -139,7 +139,7 @@ class TestDefaultModelProtection:
         provider = _create_test_provider(db_session, provider_name)
         update_default_model(
             provider_id=provider.id,
-            model="gpt-4o",
+            model="gpt-6-sol",
             db_session=db_session,
             flow_type=LLMModelFlowType.CHAT,
         )
@@ -155,10 +155,10 @@ class TestDefaultModelProtection:
                     api_key_changed=True,
                     model_configurations=[
                         ModelConfigurationUpsertRequest(
-                            name="gpt-4o", is_visible=False
+                            name="gpt-6-sol", is_visible=False
                         ),
                         ModelConfigurationUpsertRequest(
-                            name="gpt-4o-mini", is_visible=True
+                            name="gpt-6-luna", is_visible=True
                         ),
                     ],
                 ),
@@ -172,14 +172,14 @@ class TestDefaultModelProtection:
     ) -> None:
         """Removing the default vision model from a provider should raise ValueError."""
         provider = _create_test_provider(db_session, provider_name)
-        # Set gpt-4o as both the text and vision default
+        # Set gpt-6-sol as both the text and vision default
         update_default_model(
             provider_id=provider.id,
-            model="gpt-4o",
+            model="gpt-6-sol",
             db_session=db_session,
             flow_type=LLMModelFlowType.CHAT,
         )
-        update_default_vision_provider(provider.id, "gpt-4o", db_session)
+        update_default_vision_provider(provider.id, "gpt-6-sol", db_session)
 
         # Try to remove the default vision model
         with pytest.raises(ValueError, match="Cannot remove the default model"):
@@ -192,7 +192,7 @@ class TestDefaultModelProtection:
                     api_key_changed=True,
                     model_configurations=[
                         ModelConfigurationUpsertRequest(
-                            name="gpt-4o-mini", is_visible=True
+                            name="gpt-6-luna", is_visible=True
                         ),
                     ],
                 ),
@@ -208,12 +208,12 @@ class TestDefaultModelProtection:
         provider = _create_test_provider(db_session, provider_name)
         update_default_model(
             provider_id=provider.id,
-            model="gpt-4o",
+            model="gpt-6-sol",
             db_session=db_session,
             flow_type=LLMModelFlowType.CHAT,
         )
 
-        # Remove gpt-4o-mini (not default) — should succeed
+        # Remove gpt-6-luna (not default) — should succeed
         updated = upsert_llm_provider(
             LLMProviderUpsertRequest(
                 id=provider.id,
@@ -223,7 +223,7 @@ class TestDefaultModelProtection:
                 api_key_changed=True,
                 model_configurations=[
                     ModelConfigurationUpsertRequest(
-                        name="gpt-4o", is_visible=True, supports_image_input=True
+                        name="gpt-6-sol", is_visible=True, supports_image_input=True
                     ),
                 ],
             ),
@@ -231,8 +231,8 @@ class TestDefaultModelProtection:
         )
 
         model_names = {mc.name for mc in updated.model_configurations}
-        assert "gpt-4o" in model_names
-        assert "gpt-4o-mini" not in model_names
+        assert "gpt-6-sol" in model_names
+        assert "gpt-6-luna" not in model_names
 
     def test_can_hide_non_default_model(
         self,
@@ -243,12 +243,12 @@ class TestDefaultModelProtection:
         provider = _create_test_provider(db_session, provider_name)
         update_default_model(
             provider_id=provider.id,
-            model="gpt-4o",
+            model="gpt-6-sol",
             db_session=db_session,
             flow_type=LLMModelFlowType.CHAT,
         )
 
-        # Hide gpt-4o-mini (not default) — should succeed
+        # Hide gpt-6-luna (not default) — should succeed
         updated = upsert_llm_provider(
             LLMProviderUpsertRequest(
                 id=provider.id,
@@ -258,10 +258,10 @@ class TestDefaultModelProtection:
                 api_key_changed=True,
                 model_configurations=[
                     ModelConfigurationUpsertRequest(
-                        name="gpt-4o", is_visible=True, supports_image_input=True
+                        name="gpt-6-sol", is_visible=True, supports_image_input=True
                     ),
                     ModelConfigurationUpsertRequest(
-                        name="gpt-4o-mini", is_visible=False
+                        name="gpt-6-luna", is_visible=False
                     ),
                 ],
             ),
@@ -271,8 +271,8 @@ class TestDefaultModelProtection:
         model_visibility = {
             mc.name: mc.is_visible for mc in updated.model_configurations
         }
-        assert model_visibility["gpt-4o"] is True
-        assert model_visibility["gpt-4o-mini"] is False
+        assert model_visibility["gpt-6-sol"] is True
+        assert model_visibility["gpt-6-luna"] is False
 
 
 class TestPointerFlowDefaultsSurviveAProviderUpdate:
@@ -295,10 +295,10 @@ class TestPointerFlowDefaultsSurviveAProviderUpdate:
                 api_key_changed=True,
                 model_configurations=[
                     ModelConfigurationUpsertRequest(
-                        name="gpt-4o", is_visible=True, supports_image_input=True
+                        name="gpt-6-sol", is_visible=True, supports_image_input=True
                     ),
                     ModelConfigurationUpsertRequest(
-                        name="gpt-4o-mini", is_visible=True, supports_image_input=False
+                        name="gpt-6-luna", is_visible=True, supports_image_input=False
                     ),
                 ],
             ),
@@ -313,7 +313,7 @@ class TestPointerFlowDefaultsSurviveAProviderUpdate:
         provider = _create_test_provider(db_session, provider_name)
         update_default_pointer_model(
             provider_id=provider.id,
-            model_name="gpt-4o-mini",
+            model_name="gpt-6-luna",
             db_session=db_session,
             flow_type=LLMModelFlowType.CRAFT,
         )
@@ -323,7 +323,7 @@ class TestPointerFlowDefaultsSurviveAProviderUpdate:
 
         default_craft = fetch_default_model(db_session, LLMModelFlowType.CRAFT)
         assert default_craft is not None
-        assert default_craft.name == "gpt-4o-mini"
+        assert default_craft.name == "gpt-6-luna"
 
     def test_contextual_rag_default_survives(
         self,
@@ -332,7 +332,7 @@ class TestPointerFlowDefaultsSurviveAProviderUpdate:
     ) -> None:
         provider = _create_test_provider(db_session, provider_name)
         model_config = next(
-            mc for mc in provider.model_configurations if mc.name == "gpt-4o-mini"
+            mc for mc in provider.model_configurations if mc.name == "gpt-6-luna"
         )
         update_default_contextual_model(
             db_session=db_session,
@@ -350,7 +350,7 @@ class TestPointerFlowDefaultsSurviveAProviderUpdate:
             db_session, LLMModelFlowType.CONTEXTUAL_RAG
         )
         assert default_contextual is not None
-        assert default_contextual.name == "gpt-4o-mini"
+        assert default_contextual.name == "gpt-6-luna"
 
     def _hide_mini(self, db_session: Session, provider_id: int, name: str) -> None:
         upsert_llm_provider(
@@ -362,10 +362,10 @@ class TestPointerFlowDefaultsSurviveAProviderUpdate:
                 api_key_changed=True,
                 model_configurations=[
                     ModelConfigurationUpsertRequest(
-                        name="gpt-4o", is_visible=True, supports_image_input=True
+                        name="gpt-6-sol", is_visible=True, supports_image_input=True
                     ),
                     ModelConfigurationUpsertRequest(
-                        name="gpt-4o-mini", is_visible=False, supports_image_input=False
+                        name="gpt-6-luna", is_visible=False, supports_image_input=False
                     ),
                 ],
             ),
@@ -382,7 +382,7 @@ class TestPointerFlowDefaultsSurviveAProviderUpdate:
         provider = _create_test_provider(db_session, provider_name)
         update_default_pointer_model(
             provider_id=provider.id,
-            model_name="gpt-4o-mini",
+            model_name="gpt-6-luna",
             db_session=db_session,
             flow_type=LLMModelFlowType.CRAFT,
         )
@@ -397,7 +397,7 @@ class TestPointerFlowDefaultsSurviveAProviderUpdate:
     ) -> None:
         provider = _create_test_provider(db_session, provider_name)
         model_config = next(
-            mc for mc in provider.model_configurations if mc.name == "gpt-4o-mini"
+            mc for mc in provider.model_configurations if mc.name == "gpt-6-luna"
         )
         update_default_contextual_model(
             db_session=db_session,
@@ -424,7 +424,7 @@ class TestPointerFlowDefaultsSurviveAProviderUpdate:
         """
         provider = _create_test_provider(db_session, provider_name)
         model_config = next(
-            mc for mc in provider.model_configurations if mc.name == "gpt-4o-mini"
+            mc for mc in provider.model_configurations if mc.name == "gpt-6-luna"
         )
         assert model_config.id is not None
         add_model_to_flow(
@@ -447,7 +447,7 @@ class TestPointerFlowDefaultsSurviveAProviderUpdate:
 
         default_naming = fetch_default_model(db_session, LLMModelFlowType.CHAT_NAMING)
         assert default_naming is not None
-        assert default_naming.name == "gpt-4o-mini"
+        assert default_naming.name == "gpt-6-luna"
 
 
 class TestEveryFlowDefaultIsGuarded:
@@ -483,11 +483,11 @@ class TestEveryFlowDefaultIsGuarded:
         provider = _create_test_provider(db_session, provider_name)
         update_default_model(
             provider_id=provider.id,
-            model="gpt-4o-mini",
+            model="gpt-6-luna",
             db_session=db_session,
             flow_type=LLMModelFlowType.CHAT,
         )
-        update_default_vision_provider(provider.id, "gpt-4o", db_session)
+        update_default_vision_provider(provider.id, "gpt-6-sol", db_session)
 
         with pytest.raises(ValueError, match="default for: vision"):
             self._upsert(
@@ -496,10 +496,10 @@ class TestEveryFlowDefaultIsGuarded:
                 provider_name,
                 [
                     ModelConfigurationUpsertRequest(
-                        name="gpt-4o", is_visible=False, supports_image_input=True
+                        name="gpt-6-sol", is_visible=False, supports_image_input=True
                     ),
                     ModelConfigurationUpsertRequest(
-                        name="gpt-4o-mini", is_visible=True, supports_image_input=False
+                        name="gpt-6-luna", is_visible=True, supports_image_input=False
                     ),
                 ],
             )
@@ -512,7 +512,7 @@ class TestEveryFlowDefaultIsGuarded:
         provider = _create_test_provider(db_session, provider_name)
         update_default_pointer_model(
             provider_id=provider.id,
-            model_name="gpt-4o-mini",
+            model_name="gpt-6-luna",
             db_session=db_session,
             flow_type=LLMModelFlowType.CRAFT,
         )
@@ -524,7 +524,7 @@ class TestEveryFlowDefaultIsGuarded:
                 provider_name,
                 [
                     ModelConfigurationUpsertRequest(
-                        name="gpt-4o", is_visible=True, supports_image_input=True
+                        name="gpt-6-sol", is_visible=True, supports_image_input=True
                     )
                 ],
             )
@@ -541,16 +541,16 @@ class TestEveryFlowDefaultIsGuarded:
         provider = _create_test_provider(db_session, provider_name)
         update_default_model(
             provider_id=provider.id,
-            model="gpt-4o-mini",
+            model="gpt-6-luna",
             db_session=db_session,
             flow_type=LLMModelFlowType.CHAT,
         )
-        update_default_vision_provider(provider.id, "gpt-4o", db_session)
+        update_default_vision_provider(provider.id, "gpt-6-sol", db_session)
 
         hidden = db_session.scalar(
             select(ModelConfiguration).where(
                 ModelConfiguration.llm_provider_id == provider.id,
-                ModelConfiguration.name == "gpt-4o",
+                ModelConfiguration.name == "gpt-6-sol",
             )
         )
         assert hidden is not None
@@ -563,17 +563,17 @@ class TestEveryFlowDefaultIsGuarded:
             provider_name,
             [
                 ModelConfigurationUpsertRequest(
-                    name="gpt-4o", is_visible=False, supports_image_input=True
+                    name="gpt-6-sol", is_visible=False, supports_image_input=True
                 ),
                 ModelConfigurationUpsertRequest(
-                    name="gpt-4o-mini", is_visible=True, supports_image_input=False
+                    name="gpt-6-luna", is_visible=True, supports_image_input=False
                 ),
             ],
         )
 
         default_vision = fetch_default_model(db_session, LLMModelFlowType.VISION)
         assert default_vision is not None
-        assert default_vision.name == "gpt-4o"
+        assert default_vision.name == "gpt-6-sol"
 
     def test_capability_change_still_removes_the_vision_flow(
         self,
@@ -585,7 +585,7 @@ class TestEveryFlowDefaultIsGuarded:
         provider = _create_test_provider(db_session, provider_name)
         update_default_pointer_model(
             provider_id=provider.id,
-            model_name="gpt-4o",
+            model_name="gpt-6-sol",
             db_session=db_session,
             flow_type=LLMModelFlowType.CRAFT,
         )
@@ -596,10 +596,10 @@ class TestEveryFlowDefaultIsGuarded:
             provider_name,
             [
                 ModelConfigurationUpsertRequest(
-                    name="gpt-4o", is_visible=True, supports_image_input=False
+                    name="gpt-6-sol", is_visible=True, supports_image_input=False
                 ),
                 ModelConfigurationUpsertRequest(
-                    name="gpt-4o-mini", is_visible=True, supports_image_input=False
+                    name="gpt-6-luna", is_visible=True, supports_image_input=False
                 ),
             ],
         )
@@ -607,7 +607,7 @@ class TestEveryFlowDefaultIsGuarded:
         model_config = db_session.scalar(
             select(ModelConfiguration).where(
                 ModelConfiguration.llm_provider_id == provider.id,
-                ModelConfiguration.name == "gpt-4o",
+                ModelConfiguration.name == "gpt-6-sol",
             )
         )
         assert model_config is not None
@@ -618,7 +618,7 @@ class TestEveryFlowDefaultIsGuarded:
 
         default_craft = fetch_default_model(db_session, LLMModelFlowType.CRAFT)
         assert default_craft is not None
-        assert default_craft.name == "gpt-4o"
+        assert default_craft.name == "gpt-6-sol"
 
 
 class TestCapabilityChangesCannotEraseADefault:
@@ -631,7 +631,7 @@ class TestCapabilityChangesCannotEraseADefault:
         provider_name: str,
     ) -> None:
         provider = _create_test_provider(db_session, provider_name)
-        update_default_vision_provider(provider.id, "gpt-4o", db_session)
+        update_default_vision_provider(provider.id, "gpt-6-sol", db_session)
 
         with pytest.raises(ValueError, match=r"Cannot disable vision support"):
             upsert_llm_provider(
@@ -643,12 +643,12 @@ class TestCapabilityChangesCannotEraseADefault:
                     api_key_changed=True,
                     model_configurations=[
                         ModelConfigurationUpsertRequest(
-                            name="gpt-4o",
+                            name="gpt-6-sol",
                             is_visible=True,
                             supports_image_input=False,
                         ),
                         ModelConfigurationUpsertRequest(
-                            name="gpt-4o-mini", is_visible=True
+                            name="gpt-6-luna", is_visible=True
                         ),
                     ],
                 ),
@@ -665,7 +665,7 @@ class TestCapabilityChangesCannotEraseADefault:
         """supports_image_input is optional. An omitted one used to read as false
         and silently drop the vision flow, taking the default with it."""
         provider = _create_test_provider(db_session, provider_name)
-        update_default_vision_provider(provider.id, "gpt-4o", db_session)
+        update_default_vision_provider(provider.id, "gpt-6-sol", db_session)
 
         upsert_llm_provider(
             LLMProviderUpsertRequest(
@@ -676,10 +676,8 @@ class TestCapabilityChangesCannotEraseADefault:
                 api_key_changed=True,
                 model_configurations=[
                     # no supports_image_input, as a partial client would send
-                    ModelConfigurationUpsertRequest(name="gpt-4o", is_visible=True),
-                    ModelConfigurationUpsertRequest(
-                        name="gpt-4o-mini", is_visible=True
-                    ),
+                    ModelConfigurationUpsertRequest(name="gpt-6-sol", is_visible=True),
+                    ModelConfigurationUpsertRequest(name="gpt-6-luna", is_visible=True),
                 ],
             ),
             db_session=db_session,
@@ -687,7 +685,7 @@ class TestCapabilityChangesCannotEraseADefault:
 
         default_vision = fetch_default_model(db_session, LLMModelFlowType.VISION)
         assert default_vision is not None
-        assert default_vision.name == "gpt-4o"
+        assert default_vision.name == "gpt-6-sol"
 
     def test_disabling_vision_is_caught_when_one_model_holds_several_defaults(
         self,
@@ -700,11 +698,11 @@ class TestCapabilityChangesCannotEraseADefault:
         provider = _create_test_provider(db_session, provider_name)
         update_default_model(
             provider_id=provider.id,
-            model="gpt-4o",
+            model="gpt-6-sol",
             db_session=db_session,
             flow_type=LLMModelFlowType.CHAT,
         )
-        update_default_vision_provider(provider.id, "gpt-4o", db_session)
+        update_default_vision_provider(provider.id, "gpt-6-sol", db_session)
 
         with pytest.raises(ValueError, match=r"Cannot disable vision support"):
             upsert_llm_provider(
@@ -716,12 +714,12 @@ class TestCapabilityChangesCannotEraseADefault:
                     api_key_changed=True,
                     model_configurations=[
                         ModelConfigurationUpsertRequest(
-                            name="gpt-4o",
+                            name="gpt-6-sol",
                             is_visible=True,
                             supports_image_input=False,
                         ),
                         ModelConfigurationUpsertRequest(
-                            name="gpt-4o-mini", is_visible=True
+                            name="gpt-6-luna", is_visible=True
                         ),
                     ],
                 ),

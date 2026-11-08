@@ -35,11 +35,8 @@ INDEXING_MODEL_SERVER_PORT = int(
 CONNECTOR_CLASSIFIER_MODEL_REPO = "Danswer/filter-extraction-model"
 CONNECTOR_CLASSIFIER_MODEL_TAG = "1.0.0"
 INTENT_MODEL_VERSION = "onyx-dot-app/hybrid-intent-token-classifier"
-# Yahont default local embedding model: multilingual, 384 dims, 512-token context.
-# Replaces the English-only nomic-ai/nomic-embed-text-v1. Its weights are
-# baked into the model server image (Dockerfile.model_server), its tokenizer into
-# the backend image (Dockerfile). https://huggingface.co/intfloat/multilingual-e5-small
-DEFAULT_DOCUMENT_ENCODER_MODEL = "intfloat/multilingual-e5-small"
+# Fresh-install default self-hosted model, baked into the model-server image.
+DEFAULT_DOCUMENT_ENCODER_MODEL = "ibm-granite/granite-embedding-97m-multilingual-r2"
 # INTENT_MODEL_TAG = "v1.0.3"
 INTENT_MODEL_TAG: str | None = None
 # Bi-Encoder, other details

@@ -102,6 +102,7 @@ class TestSecret(StrEnum):
     BOX_ENTERPRISE_ID = "box-enterprise-id"
     BOX_USER_EMAIL = "box-user-email"
     BOX_COLLABORATOR_EMAIL = "box-collaborator-email"
+    LINEAR_API_KEY = "linear-api-key"
 
     # Billing Control Plane / ЮKassa. Member names match the env var that the
     # control plane and tests read directly; values match the AWS Secrets Manager key

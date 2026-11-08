@@ -154,7 +154,7 @@
         "title": "Contrôle d’accès",
         "description": "Choisissez qui peut utiliser ce MCP.",
         "public": {
-          "label": "Public",
+          "label": "Organisation",
           "description": "Toute personne de votre organisation peut utiliser ce MCP"
         },
         "groups": {
@@ -327,8 +327,6 @@
         "saveAuthFailed": "Échec de l'enregistrement de la configuration d'authentification",
         "saveConfigFailed": "Échec de l'enregistrement de la configuration du serveur",
         "saveStage": "Impossible d’enregistrer les paramètres de connexion",
-        "oauthStage": "Impossible de lancer la connexion",
-        "discoveryStage": "Impossible de charger les outils du serveur",
         "loadStage": "Impossible de charger les paramètres de connexion",
         "clientRegistrationFailed": "L’enregistrement automatique du client a échoué. Utilisez votre propre client OAuth ou vérifiez les exigences de configuration du fournisseur.",
         "clientMetadataRejected": "Le fournisseur n’a pas pu utiliser le document de métadonnées du client. Si cette instance n’est pas accessible depuis Internet, désactivez « Utiliser le document de métadonnées client » et reconnectez-vous.",
@@ -1117,18 +1115,6 @@
         "openapi": "Ajouter un plugin OpenAPI"
       },
       "catalog": {
-        "slack": {
-          "summary": "Recherchez des conversations et envoyez des messages",
-          "description": "Recherchez des conversations et envoyez des messages. Nécessite une application Slack enregistrée."
-        },
-        "hubspot": {
-          "summary": "Gérez les contacts et les transactions",
-          "description": "Gérez les contacts et les transactions. Nécessite un connecteur MCP HubSpot."
-        },
-        "asana": {
-          "summary": "Gérez les tâches et les projets",
-          "description": "Gérez les tâches et les projets. Nécessite un client OAuth enregistré."
-        },
         "linear": {
           "summary": "Gérez les tickets, les projets et les équipes",
           "description": "Gérez les tickets, les projets et les équipes."
@@ -1220,6 +1206,10 @@
       "blocked": "Cette URL est bloquée par vos paramètres de sécurité sortante.",
       "publicDetected": "Aucune authentification requise",
       "oauthDetected": "OAuth détecté",
+      "clientMetadata": "Document de métadonnées client",
+      "clientMetadataSupported": "Pris en charge",
+      "clientMetadataUnsupported": "Non pris en charge",
+      "clientMetadataUnknown": "Non vérifié",
       "manualRequired": "Choisir l’authentification manuellement",
       "chooseAuthentication": "Nous n’avons pas pu déterminer la méthode d’authentification de ce serveur. Choisissez une méthode ci-dessous.",
       "connect": "Connecter",
@@ -1251,6 +1241,36 @@
     }
   },
   "admin": {
+    "decisionModels": {
+      "sharedModelSettings": "Gérer les paramètres de discussion dans Modèles de langage",
+      "decisionModel": {
+        "title": "Modèle de décision",
+        "openAiDecisionsModelName": "Décisions OpenAI (GPT-6 Luna)",
+        "description": "Sélectionnez un modèle pour les futures fonctions de classification et de révision. Yahont n’utilise pas encore ce modèle.",
+        "clear": "Effacer",
+        "notConfigured": "Non configuré",
+        "saveFailed": "Impossible de mettre à jour le modèle de décision"
+      },
+      "header": {
+        "title": "Modèles de décision",
+        "description": "Gérez les fournisseurs et choisissez un modèle de décision facultatif."
+      },
+      "providers": {
+        "title": "Fournisseurs",
+        "description": "Connectez un fournisseur ou gérez ses modèles de décision.",
+        "clearBeforeRemoval": "Effacez le modèle de décision sélectionné avant de supprimer ce fournisseur.",
+        "connect": "Connecter"
+      },
+      "loadFailed": "Impossible de charger les modèles de décision.",
+      "retry": "Réessayer",
+      "zoom": {
+        "title": "Connecter Zoom AI Services",
+        "description": "Utilisez une connexion pour Zoom Scribe et Zoom AI Decisions. Les modifications s’appliquent aux deux.",
+        "connection": "Connexion Zoom",
+        "selectConnection": "Sélectionner une connexion Zoom",
+        "removeDescription": "Cela supprime la connexion Zoom partagée de Voix et Modèles de décision."
+      }
+    },
     "addConnector": {
       "categories": {
         "codeRepository": {
@@ -1630,7 +1650,7 @@
             "label": "Privé"
           },
           "public": {
-            "label": "Public"
+            "label": "Organisation"
           },
           "shared": {
             "label": "Partagé"
@@ -1908,7 +1928,7 @@
             "text": "Les contrôles d'accès sont supprimés de ce déploiement. **Cela lance une réindexation** pour que les résultats de recherche reflètent le changement, ce qui peut prendre du temps sur un grand index."
           },
           "madePublic": {
-            "text": "**Rendus publics :** tous les connecteurs, ainsi que les agents, ensembles de documents, fournisseurs LLM, serveurs MCP et compétences partagés avec un groupe d'utilisateurs ;"
+            "text": "**Ouverts à votre organisation :** tous les connecteurs, ainsi que les agents, ensembles de documents, fournisseurs LLM, serveurs MCP et compétences partagés avec un groupe d'utilisateurs ;"
           },
           "reset": {
             "text": "**Réinitialisés :** personnalisation de la marque et politique de conservation des conversations."
@@ -2456,43 +2476,30 @@
     },
     "chatPreferences": {
       "chatNaming": {
-        "description": "Modèle utilisé pour nommer les discussions. Utilise par défaut le modèle de chaque session.",
-        "resetButton": {
-          "label": "Réinitialiser"
-        },
-        "sessionModel": {
-          "label": "Utiliser le modèle par défaut"
-        },
-        "title": "Modèle pour nommer les discussions"
+        "description": "Génère les titres des sessions. Un modèle rapide et peu coûteux convient bien.",
+        "title": "Modèle de nommage des chats"
       },
       "searchSelectionModel": {
-        "description": "Sélectionne et vérifie les documents récupérés. Un modèle moins coûteux peut réduire les coûts de recherche, mais peut affecter la qualité des réponses.",
-        "resetButton": {
-          "label": "Réinitialiser"
-        },
-        "sessionModel": {
-          "label": "Utiliser le modèle par défaut"
-        },
-        "title": "Modèle de sélection pour la recherche"
+        "description": "Sélectionne et vérifie les documents récupérés. Un modèle rapide et peu coûteux peut réduire les coûts de recherche, mais peut affecter la qualité des réponses.",
+        "title": "Modèle de sélection de recherche"
       },
       "taskModels": {
-        "title": "Sélection des modèles",
         "loadFailed": "Impossible de charger les modèles de tâches",
         "retry": {
           "label": "Réessayer"
         },
-        "noProviders": {
-          "title": "Connectez un fournisseur de modèles de langage"
-        },
         "addProvider": {
           "label": "Ajouter un fournisseur"
+        },
+        "chatDefault": {
+          "label": "Par défaut du chat"
         }
       },
       "advanced": {
         "title": "Options avancées"
       },
       "anonymousUsers": {
-        "description": "Autorisez tout le monde à démarrer des discussions sans se connecter. Ces personnes ne voient aucune autre discussion et ne peuvent ni créer des agents ni modifier les paramètres.",
+        "description": "Permettre à tous de démarrer des chats **sans se connecter**. Ils ne voient aucun autre chat et ne peuvent ni créer d'agents ni modifier les paramètres.",
         "title": "Autoriser les utilisateurs anonymes"
       },
       "autoDetectFilters": {
@@ -2502,9 +2509,6 @@
       "autoScroll": {
         "description": "Faites défiler automatiquement vers le nouveau contenu pendant que le chat génère une réponse. Les utilisateurs peuvent modifier ce réglage dans leurs paramètres personnels.",
         "title": "Défilement automatique du chat"
-      },
-      "betaTag": {
-        "label": "bêta"
       },
       "connectors": {
         "description": "Sources utilisées par la recherche interne dans le chat. Ajoutez-les ou modifiez-les sur la page d'état de l'indexation.",
@@ -2521,12 +2525,12 @@
         "title": "Recherche approfondie"
       },
       "defaultLanguage": {
-        "description": "La langue de l'interface pour les utilisateurs qui n'en ont pas choisi une dans leurs paramètres.",
+        "description": "Langue de l'interface pour les utilisateurs qui n'en ont pas défini dans leurs propres paramètres.",
         "title": "Langue par défaut"
       },
       "disableDefaultChat": {
-        "description": "Cette option oblige les utilisateurs à toujours démarrer dans un agent. Les nouvelles discussions seront créées dans leur premier agent épinglé. Mettez des agents en avant pour aider les nouveaux utilisateurs à démarrer.",
-        "title": "Désactiver la discussion par défaut"
+        "description": "Cela supprime le chat par défaut. Les utilisateurs commenceront toujours dans un agent, et les nouveaux chats seront créés dans leur dernier agent actif. Définissez des [agents mis en avant](/admin/agents) pour aider les nouveaux utilisateurs à démarrer.",
+        "title": "Toujours commencer avec un agent"
       },
       "fileLimits": {
         "default": {
@@ -2584,10 +2588,6 @@
           "label": "Afficher avec les informations utilisateur"
         },
         "title": "Visibilité de l'historique des requêtes"
-      },
-      "reasoning": {
-        "description": "Permettez aux utilisateurs d'ajuster le niveau de raisonnement du modèle avant sa réponse, depuis le sélecteur de modèle dans la discussion.",
-        "title": "Contrôle du raisonnement"
       },
       "retention": {
         "custom": {
@@ -2659,26 +2659,13 @@
         "placeholder": "Saisissez le nom de l'équipe",
         "title": "Nom de l'équipe"
       },
-      "temperature": {
-        "description": "Permettez aux utilisateurs d'ajuster la température (créativité) des réponses du modèle depuis le sélecteur de modèle dans la discussion.",
-        "title": "Contrôle de la température"
-      },
       "toasts": {
-        "chatNamingUpdated": "Modèle de nommage des discussions mis à jour",
-        "chatNamingReset": "Modèle de nommage des discussions réinitialisé sur le modèle par défaut",
         "chatNamingUpdateFailed": "Échec de la mise à jour du modèle de nommage des discussions",
-        "chatNamingResetFailed": "Échec de la réinitialisation du modèle de nommage des discussions",
         "providerResolveFailed": "Impossible de résoudre le fournisseur",
-        "searchSelectionReset": "Modèle de sélection pour la recherche réinitialisé sur le modèle par défaut",
-        "searchSelectionResetFailed": "Échec de la réinitialisation du modèle de sélection pour la recherche",
         "searchSelectionUpdateFailed": "Échec de la mise à jour du modèle de sélection pour la recherche",
-        "searchSelectionUpdated": "Modèle de sélection pour la recherche mis à jour",
         "settingsUpdateFailed": "Échec de la mise à jour des paramètres",
-        "settingsUpdated": "Paramètres mis à jour",
         "systemPromptUpdateFailed": "Échec de la mise à jour du prompt système",
-        "systemPromptUpdated": "Prompt système mis à jour",
         "toolsUpdateFailed": "Échec de la mise à jour des outils",
-        "toolsUpdated": "Outils mis à jour",
         "unknownError": "Une erreur inconnue est survenue"
       },
       "tools": {
@@ -3115,15 +3102,14 @@
         "indexingStartUnexpectedError": "Une erreur inattendue est survenue lors du démarrage de l'indexation",
         "indexingUpdateStarted": "Mise à jour de l'indexation démarrée avec succès",
         "nameUpdateFailed": "Échec de la mise à jour du nom du connecteur",
-        "nameUpdated": "Nom du connecteur mis à jour avec succès",
         "noUnresolvedErrors": "Aucune erreur non résolue à réessayer.",
         "pruningFrequencyUpdateFailed": "Échec de la mise à jour de la fréquence d'élagage du connecteur",
-        "pruningFrequencyUpdated": "Fréquence d'élagage du connecteur mise à jour avec succès",
         "refreshFrequencyUpdateFailed": "Échec de la mise à jour de la fréquence d'actualisation du connecteur",
-        "refreshFrequencyUpdated": "Fréquence d'actualisation du connecteur mise à jour avec succès",
         "targetedReindexFailed": "Échec de la réindexation ciblée : {message}",
-        "targetedReindexSubmitted": "Réindexation ciblée envoyée pour {count, plural, one {# document} other {# documents}}. Les erreurs disparaîtront de la liste au fur et à mesure de la réindexation des documents.",
-        "checkFrequencyUpdated": "Fréquence de vérification du connecteur mise à jour",
+        "targetedReindexRunning": "Nouvelle tentative pour {count, plural, one {# erreur} other {# erreurs}}…",
+        "targetedReindexDone": "Nouvelle tentative terminée. {resolved, plural, one {# erreur résolue} other {# erreurs résolues}}.",
+        "targetedReindexPartial": "Nouvelle tentative terminée. {resolved, plural, one {# erreur résolue} other {# erreurs résolues}}, {failing, plural, one {# document toujours en échec} other {# documents toujours en échec}}.",
+        "targetedReindexIncomplete": "La nouvelle tentative n’a pas abouti. Les erreurs non résolues restent dans la liste.",
         "checkFrequencyUpdateFailed": "Échec de la mise à jour de la fréquence de vérification du connecteur",
         "runResolved": "Marqué comme résolu.",
         "runResolveFailed": "Impossible de résoudre : {message}",
@@ -3285,6 +3271,7 @@
           "canceled": "{count, plural, one {# exécution annulée} other {# exécutions annulées}}",
           "passedChecks": "{count, plural, one {# vérification réussie} other {# vérifications réussies}}",
           "failedChecks": "{count, plural, one {# vérification échouée} other {# vérifications échouées}}",
+          "incompleteChecks": "{count, plural, one {# vérification incomplète} other {# vérifications incomplètes}}",
           "skippedChecks": "{count, plural, one {# vérification ignorée} other {# vérifications ignorées}}",
           "syncedDocs": "{count, plural, one {# document synchronisé} other {# documents synchronisés}}"
         },
@@ -3669,11 +3656,13 @@
           },
           "deleteButton": {
             "label": "Supprimer le compte",
-            "inUseTooltip": "Impossible de supprimer cet identifiant, car d’autres connecteurs l’utilisent."
+            "inUseTooltip": "Impossible de supprimer cet identifiant, car d’autres connecteurs l’utilisent.",
+            "notOwnerTooltip": "Seul le propriétaire peut supprimer cet identifiant"
           },
           "updateButton": {
             "label": "Mettre à jour les identifiants",
-            "tooltip": "Modifie les valeurs enregistrées pour chaque connecteur qui utilise ce compte."
+            "tooltip": "Modifie les valeurs enregistrées pour chaque connecteur qui utilise ce compte.",
+            "notOwnerTooltip": "Seul le propriétaire peut mettre à jour cet identifiant"
           },
           "usedBy": {
             "label": "Utilisé par {count, plural, one {# connecteur} other {# connecteurs}}"
@@ -3693,20 +3682,17 @@
           "rerunButton": {
             "label": "Relancer les vérifications"
           },
+          "renameButton": {
+            "tooltip": "Renommer le compte"
+          },
           "authenticationType": {
             "label": "Type d’authentification"
           },
           "rerunFailed": {
             "toast": "Impossible de lancer les vérifications. Réessayez."
           },
-          "shareSaved": {
-            "toast": "Partage mis à jour."
-          },
           "shareFailed": {
             "toast": "Impossible de modifier qui peut utiliser ce compte. Réessayez."
-          },
-          "renameSaved": {
-            "toast": "Compte renommé."
           },
           "renameFailed": {
             "toast": "Impossible de renommer ce compte. Réessayez."
@@ -3715,10 +3701,16 @@
             "tooltip": "Seule la personne qui a ajouté ce compte peut le rendre privé."
           },
           "shareLocked": {
-            "tooltip": "Seule la personne qui a ajouté ce compte, ou un administrateur avec qui il est partagé, peut modifier qui peut l'utiliser."
+            "tooltip": "Seul le propriétaire peut partager cet identifiant"
           },
           "viewDetails": {
             "tooltip": "Voir les détails"
+          },
+          "failedToRun": {
+            "title": "Échec de l'exécution des vérifications"
+          },
+          "unavailable": {
+            "label": "Non disponible"
           }
         },
         "accountUnavailable": {
@@ -3740,6 +3732,9 @@
       "field": {
         "optionalSuffix": {
           "label": "facultatif"
+        },
+        "availableRefresh": {
+          "tooltip": "Actualiser la liste"
         }
       },
       "gdrive": {
@@ -3885,7 +3880,7 @@
         }
       },
       "content": {
-        "title": "Contenu du connecteur",
+        "title": "Configurations d'indexation",
         "description": "Sélectionnez le contenu à indexer pour ce connecteur."
       },
       "selectInput": {
@@ -3933,18 +3928,21 @@
         },
         "checkFrequency": {
           "title": "Exécuter les vérifications toutes les",
-          "description": "Vérifie la connexion, ses capacités et son état."
-        }
+          "description": "Vérifie la connexion, ses capacités et son état.",
+          "placeholder": "Jamais"
+        },
+        "rangeRequired": "Veuillez saisir une valeur comprise dans la plage {min, number} - {max, number}."
       },
       "settings": {
         "description": "Informations et accès du connecteur.",
         "displayName": {
-          "title": "Nom d'affichage du connecteur"
+          "title": "Nom d'affichage",
+          "placeholder": "Ajoutez un nom d'affichage"
         },
         "documentAccess": {
           "description": "Contrôlez qui peut accéder aux documents indexés par ce connecteur.",
           "everyone": {
-            "description": "Les documents indexés par ce connecteur seront publics pour tout le monde dans votre organisation.",
+            "description": "Les documents indexés par ce connecteur sont accessibles à tous les membres de votre organisation.",
             "title": "Tout le monde dans votre organisation"
           },
           "specificGroups": {
@@ -3998,7 +3996,7 @@
               "label": "Inclure les pièces jointes"
             },
             "scoped_token": {
-              "label": "Il s'agit d'un jeton d'API avec des portées",
+              "label": "Jeton d'API à portée limitée",
               "description": "Les jetons à portée nécessitent un routage via la passerelle d'API d'Atlassian. Laissez désactivé pour les jetons classiques."
             }
           }
@@ -4125,13 +4123,13 @@
               "placeholder": "https://github.example.com"
             },
             "repo_owner": {
-              "label": "Propriétaire du dépôt"
+              "label": "Propriétaire du dépôt",
+              "placeholder": "Indiquez un propriétaire de dépôt"
             },
             "github_mode": {
-              "label": "Contenu GitHub à indexer",
               "tabs": {
                 "repo": {
-                  "label": "Dépôt précis"
+                  "label": "Dépôts précis"
                 },
                 "everything": {
                   "label": "Tout"
@@ -4139,12 +4137,12 @@
               }
             },
             "repositories": {
-              "label": "Nom(s) du dépôt",
-              "description": "Pour plusieurs dépôts, saisissez les noms séparés par des virgules (par ex. repo1,repo2,repo3)"
+              "label": "Noms des dépôts",
+              "placeholder": "Ajoutez un nom de dépôt"
             },
             "everything": {
-              "label": "Tout",
-              "description": "Ce connecteur indexera tous les dépôts auxquels les identifiants fournis donnent accès !"
+              "label": "Tout indexer",
+              "description": "Yahont indexera tous les dépôts trouvés pour le propriétaire {owner}."
             },
             "include_prs": {
               "label": "Inclure les pull requests",
@@ -4160,7 +4158,8 @@
             },
             "branch": {
               "label": "Branche",
-              "description": "Branche dont indexer les documents (par ex. gh-pages). Laissez vide pour utiliser la branche par défaut de chaque dépôt. S'applique uniquement si « Inclure les documents ? » est activé. Après avoir modifié ce champ sur un connecteur existant, lancez une réindexation pour prendre en compte la nouvelle branche immédiatement."
+              "description": "Branche dont indexer les documents (par ex. gh-pages). Laissez vide pour utiliser la branche par défaut de chaque dépôt. S'applique uniquement si « Inclure les documents ? » est activé. Après avoir modifié ce champ sur un connecteur existant, lancez une réindexation pour prendre en compte la nouvelle branche immédiatement.",
+              "placeholder": "Ajoutez un nom de branche"
             }
           }
         },
@@ -4243,8 +4242,8 @@
               "description": "Une ou plusieurs clés de projet Bitbucket (séparées par des virgules) pour indexer tous les dépôts de ces projets (par ex. PROJ1,PROJ2)"
             },
             "workspace_tab": {
-              "label": "Espace de travail",
-              "description": "Ce connecteur indexera tous les dépôts de l'espace de travail."
+              "label": "Indexe tous les dépôts de l'espace de travail",
+              "description": "Yahont indexe tous les dépôts de l'espace de travail que le compte sélectionné peut lire. Pour en indexer moins, choisissez un autre onglet."
             }
           }
         },
@@ -4349,18 +4348,16 @@
             },
             "wiki_base": {
               "label": "URL du site",
-              "placeholder": "https://votre-domaine.atlassian.net/wiki"
+              "placeholder": "https://votre-domaine.atlassian.net/wiki",
+              "placeholderDataCenter": "https://votre-domaine.fr/wiki"
             },
             "indexing_scope": {
               "tabs": {
                 "everything": {
-                  "label": "Tout"
+                  "label": "Tout indexer"
                 },
-                "space": {
-                  "label": "Espace"
-                },
-                "page": {
-                  "label": "Page"
+                "select": {
+                  "label": "Sélectionner des espaces/pages"
                 },
                 "cql": {
                   "label": "Requête CQL"
@@ -4368,24 +4365,36 @@
               }
             },
             "everything": {
-              "label": "Tout",
-              "description": "Ce connecteur indexera toutes les pages auxquelles les identifiants fournis donnent accès !"
+              "label": "Tout indexer",
+              "description": "Yahont indexera tous les espaces et toutes les pages auxquels le compte sélectionné a accès."
             },
             "space": {
-              "label": "Clé de l'espace",
-              "description": "La clé de l'espace Confluence à indexer (par ex. `KB`)."
+              "label": "Espaces",
+              "description": "Clés d'espace que ce connecteur indexe (par ex. ENG).",
+              "placeholder": "Ajoutez une clé d'espace ou une URL",
+              "required": "Ajoutez au moins un espace ou une page.",
+              "available": "{more, select, true {{count, number}+ espaces disponibles} other {{count, plural, one {# espace disponible} other {# espaces disponibles}}}}"
             },
             "page_id": {
-              "label": "ID de la page",
-              "description": "ID d'une page précise à indexer (par ex. `131368`)"
+              "label": "Pages",
+              "description": "ID de page que ce connecteur indexe (par ex. 123456).",
+              "placeholder": "Ajoutez un ID de page ou une URL",
+              "available": "{more, select, true {{count, number}+ pages disponibles} other {{count, plural, one {# page disponible} other {# pages disponibles}}}}"
             },
             "index_recursively": {
-              "label": "Indexer récursivement",
-              "description": "Si cette option est activée, nous indexerons la page indiquée par l'ID de page ainsi que toutes ses pages enfants."
+              "label": "Inclure les pages enfants",
+              "description": "Indexe aussi toutes les pages imbriquées sous les pages indiquées ci-dessus, à n'importe quelle profondeur."
             },
             "cql_query": {
               "label": "Requête CQL",
-              "description": "IMPORTANT : nous ne prenons en charge pour l'instant que les requêtes CQL qui renvoient des objets de type 'page'. Toutes les requêtes CQL doivent donc contenir 'type=page' comme seul filtre de type. N'utilisez pas non plus de filtres sur 'lastModified', car ils perturbent la logique d'interrogation de notre connecteur. N'utilisez pas ORDER BY, car le connecteur définit son propre ordre de tri. Nous récupérons toujours toutes les pièces jointes et tous les commentaires des pages renvoyées par la requête CQL. Les filtres 'lastmodified' sont écrasés. Consultez la [documentation CQL](https://developer.atlassian.com/server/confluence/advanced-searching-using-cql/) d'Atlassian pour plus de détails."
+              "description": "Renvoyez uniquement des pages. Gardez `type=page` comme seul filtre de type.\nÉvitez le tri et les filtres de date. `order by` ou `lastModified` casseront la requête propre d'Yahont. [Référence CQL](https://developer.atlassian.com/server/confluence/advanced-searching-using-cql/)",
+              "testButton": {
+                "label": "Tester la requête"
+              },
+              "required": "Ajoutez une requête CQL."
+            },
+            "include_attachments": {
+              "description": "Indexe les fichiers et images joints aux pages. Voir [Paramètres d'indexation/de traitement des images]({indexSettingsPath})."
             }
           }
         },
@@ -4411,8 +4420,8 @@
               }
             },
             "everything": {
-              "label": "Tout",
-              "description": "Ce connecteur indexera tous les tickets auxquels les identifiants fournis donnent accès !"
+              "label": "Indexe tous les tickets que le compte peut lire",
+              "description": "Yahont indexe tous les tickets de chaque projet que le compte sélectionné peut lire. Pour en indexer moins, choisissez un autre onglet."
             },
             "project_key": {
               "label": "Clé du projet",
@@ -4599,8 +4608,8 @@
               }
             },
             "everything_description": {
-              "label": "Tout",
-              "description": "Ce connecteur indexera tous les espaces auxquels les identifiants fournis donnent accès !"
+              "label": "Indexe tous les espaces que le compte peut lire",
+              "description": "Yahont indexe toutes les pages de chaque espace que le compte sélectionné peut lire. Pour en indexer moins, choisissez un autre onglet."
             },
             "spaces": {
               "label": "ID d'espace",
@@ -5098,8 +5107,8 @@
               }
             },
             "everything_description": {
-              "label": "Tout",
-              "description": "Ce connecteur détectera et indexera automatiquement toutes les bases et toutes les tables accessibles avec votre jeton d'API."
+              "label": "Indexe toutes les bases que le jeton peut lire",
+              "description": "Yahont trouve et indexe toutes les bases et tables que le jeton d'API peut lire. Pour en indexer moins, choisissez un autre onglet."
             },
             "airtable_url": {
               "label": "URL Airtable",
@@ -5138,8 +5147,8 @@
               "description": "Pour plusieurs spots, saisissez-les un par un."
             },
             "everything": {
-              "label": "Tout",
-              "description": "Ce connecteur indexera tous les spots auxquels les identifiants fournis donnent accès !"
+              "label": "Indexe tous les spots que le compte peut lire",
+              "description": "Yahont indexe tous les spots que le compte sélectionné peut lire. Pour en indexer moins, choisissez un autre onglet."
             }
           }
         },
@@ -5163,8 +5172,12 @@
       }
     },
     "costOverrides": {
-      "allProviders": {
-        "label": "Tous les fournisseurs"
+      "deleteModal": {
+        "description": "L'utilisation de **{model}** ({provider}) sera de nouveau facturée au prix intégré.",
+        "submit": {
+          "label": "Supprimer"
+        },
+        "title": "Supprimer le remplacement de *{model}*"
       },
       "empty": {
         "description": "Ajoutez-en un pour appliquer un tarif négocié (USD par million de jetons) à un modèle.",
@@ -5172,27 +5185,34 @@
       },
       "form": {
         "addButton": {
-          "label": "Ajouter un remplacement"
+          "label": "Ajouter"
         },
+        "description": "Définissez un tarif négocié pour un modèle. Il remplace le prix intégré dans le calcul du coût d'utilisation.",
+        "editTitle": "Modifier le remplacement de coût",
+        "newTitle": "Nouveau remplacement de coût",
         "cacheRate": {
-          "label": "Tarif de lecture du cache (USD par million de jetons, facultatif)",
-          "placeholder": "par défaut : tarif d'entrée"
+          "description": "Unité : USD par 1M de jetons. Par défaut, le tarif d'entrée.",
+          "label": "Tarif de lecture du cache"
         },
         "cancelButton": {
           "label": "Annuler"
         },
         "inputRate": {
-          "label": "Tarif d'entrée (USD par million de jetons)"
+          "label": "Tarif d'entrée"
         },
         "model": {
+          "description": "Appliquer un remplacement de coût à ce modèle choisi.",
           "label": "Modèle",
           "placeholder": "Sélectionnez un modèle"
         },
         "outputRate": {
-          "label": "Tarif de sortie (USD par million de jetons)"
+          "label": "Tarif de sortie"
         },
         "saveButton": {
           "label": "Enregistrer"
+        },
+        "units": {
+          "description": "Unité : USD par 1M de jetons."
         }
       },
       "panel": {
@@ -5206,36 +5226,25 @@
         "title": "Remplacements de tarifs"
       },
       "row": {
+        "cache": "Cache {value}",
         "deleteButton": {
           "ariaLabel": "Supprimer le remplacement {provider} pour {model}"
         },
+        "description": "{provider} · Mis à jour {time}",
         "editButton": {
           "ariaLabel": "Modifier le remplacement {provider} pour {model}"
         },
-        "rates": "{provider} · Entrée {input} · Sortie {output} · USD par million de jetons",
-        "ratesWithCache": "{provider} · Entrée {input} · Sortie {output} · Cache {cache} · USD par million de jetons",
-        "updated": "Mis à jour {time}"
+        "input": "Entrée {value}",
+        "output": "Sortie {value}"
       },
       "toasts": {
         "removeFailed": "Échec de la suppression du remplacement : {message}",
-        "removed": "Remplacement supprimé pour {model}.",
         "saveFailed": "Échec de l'enregistrement du remplacement : {message}",
-        "saved": "Tarif enregistré pour {model}.",
         "unknownError": "Erreur inconnue"
-      },
-      "placeholders": {
-        "inputCost": "3.00",
-        "outputCost": "15.00"
       }
     },
     "craft": {
       "accessCell": {
-        "disabledSuccess": {
-          "message": "Craft désactivé pour l'utilisateur"
-        },
-        "enabledSuccess": {
-          "message": "Craft activé pour l'utilisateur"
-        },
         "error": {
           "message": "Échec de la mise à jour de l'accès à Craft"
         }
@@ -5270,9 +5279,6 @@
         }
       },
       "defaultToggle": {
-        "betaTag": {
-          "label": "bêta"
-        },
         "disabled": {
           "description": "Craft est désactivé pour tout le monde. Activez-le utilisateur par utilisateur ci-dessous."
         },
@@ -5353,14 +5359,8 @@
         "resetError": {
           "message": "Échec de l'effacement du modèle par défaut"
         },
-        "resetSuccess": {
-          "message": "Modèle par défaut de Craft effacé"
-        },
         "saveError": {
           "message": "Échec de l'enregistrement du modèle par défaut"
-        },
-        "saveSuccess": {
-          "message": "Modèle par défaut de Craft enregistré"
         }
       },
       "header": {
@@ -5460,6 +5460,9 @@
         },
         "submitError": {
           "toast": "Erreur lors de l'envoi de l'identifiant"
+        },
+        "personalAccessTokenField": {
+          "placeholder": "Ajoutez votre jeton d'accès personnel"
         }
       },
       "delete": {
@@ -5470,9 +5473,9 @@
           "message": "Voulez-vous vraiment supprimer cet identifiant ? Vous ne pouvez pas supprimer des identifiants liés à des connecteurs actifs."
         },
         "confirmButton": {
-          "label": "Confirmer"
+          "label": "Supprimer"
         },
-        "confirmTitle": "Confirmer la suppression"
+        "confirmTitle": "Supprimer *{name}*"
       },
       "displayNames": {
         "accessKeyId": "ID de clé d'accès {source}",
@@ -5521,7 +5524,8 @@
         "zuliprcContent": "Contenu de zuliprc",
         "authenticationMethod": "Méthode d'authentification",
         "primaryAdminEmail": "E-mail de l’administrateur principal",
-        "serviceAccountKey": "Clé du compte de service"
+        "serviceAccountKey": "Clé du compte de service",
+        "personalAccessToken": "Jeton d'accès personnel"
       },
       "hints": {
         "boxUserEmail": "Facultatif. L'utilisateur Box à usurper.",
@@ -5538,7 +5542,8 @@
         "outlineBaseUrl": "Par exemple https://app.getoutline.com, ou l'URL de votre instance auto-hébergée.",
         "pfxFile": "Importez le fichier `.pfx` contenant la clé privée de l’inscription d’application. Doit faire moins de 10 Ko.",
         "testrailBaseUrl": "Par exemple https://yourcompany.testrail.io.",
-        "googleServiceAccountKey": "Importez ou collez la clé `.json` d’un compte de service Google avec délégation au niveau du domaine."
+        "googleServiceAccountKey": "Importez ou collez la clé `.json` d’un compte de service Google avec délégation au niveau du domaine.",
+        "confluencePersonalAccessToken": "Collez le [jeton d'accès personnel](https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html) de votre compte administrateur Confluence."
       },
       "methods": {
         "labels": {
@@ -5742,9 +5747,6 @@
         }
       },
       "defaultAgent": {
-        "cleared": {
-          "toast": "Agent par défaut effacé"
-        },
         "section": {
           "description": "L'agent utilisé par le bot dans tous les canaux, sauf remplacement.",
           "title": "Agent par défaut"
@@ -5757,9 +5759,6 @@
         },
         "updateError": {
           "toast": "Échec de la mise à jour de l'agent"
-        },
-        "updated": {
-          "toast": "Agent par défaut mis à jour"
         }
       },
       "error": {
@@ -5812,15 +5811,9 @@
         "deleted": {
           "toast": "Configuration du serveur supprimée"
         },
-        "disabled": {
-          "toast": "Serveur désactivé"
-        },
         "empty": {
           "description": "Créez une configuration de serveur pour commencer.",
           "title": "Aucun serveur Discord configuré pour l'instant"
-        },
-        "enabled": {
-          "toast": "Serveur activé"
         },
         "fallbackName": "Serveur #{id}",
         "notRegistered": {
@@ -5944,9 +5937,6 @@
       "score": {
         "notANumber": {
           "toast": "Le score doit être un nombre"
-        },
-        "updated": {
-          "toast": "Score mis à jour !"
         }
       },
       "sets": {
@@ -5955,7 +5945,7 @@
             "label": "Privé"
           },
           "public": {
-            "label": "Public"
+            "label": "Organisation"
           }
         },
         "connector": {
@@ -6043,9 +6033,16 @@
         "newButton": {
           "label": "Nouvel ensemble de documents"
         },
+        "noResults": {
+          "description": "Aucun ensemble de documents ne correspond à « {query} »",
+          "title": "Aucun ensemble de documents trouvé"
+        },
         "notFound": {
           "message": "Ensemble de documents avec l'id {id} introuvable",
           "title": "Ensemble de documents introuvable"
+        },
+        "search": {
+          "placeholder": "Rechercher des ensembles de documents..."
         },
         "status": {
           "deleting": {
@@ -6069,7 +6066,7 @@
             "header": "Nom"
           },
           "public": {
-            "header": "Public"
+            "header": "Accès"
           },
           "status": {
             "header": "Statut"
@@ -6360,12 +6357,11 @@
     },
     "groups": {
       "card": {
-        "defaultTag": {
-          "label": "Par défaut"
+        "defaultSuffix": {
+          "label": "(Par défaut)"
         },
         "toasts": {
-          "renameFailed": "Échec du renommage du groupe",
-          "renamed": "Groupe renommé en \"{name}\""
+          "renameFailed": "Échec du renommage du groupe"
         },
         "viewGroup": {
           "label": "Voir le groupe"
@@ -6444,8 +6440,6 @@
         "toasts": {
           "deleteFailed": "Échec de la suppression du groupe",
           "deleted": "Groupe \"{name}\" supprimé",
-          "managerAssigned": "Gestionnaire attribué",
-          "managerRevoked": "Gestionnaire révoqué",
           "managerUpdateFailed": "Échec de la mise à jour du gestionnaire",
           "membersStranded": "Certains de ces membres se retrouveraient sans groupe. Ajoutez-les d'abord à un autre groupe.",
           "syncing": "Ce groupe est en cours de synchronisation. Patientez un instant et réessayez.",
@@ -6467,8 +6461,7 @@
           "text": "Créez des groupes pour organiser les utilisateurs et gérer les accès."
         },
         "loadError": {
-          "description": "Consultez la console pour plus de détails.",
-          "title": "Échec du chargement des groupes."
+          "description": "Consultez la console pour plus de détails."
         },
         "newGroup": {
           "label": "Nouveau groupe"
@@ -6478,7 +6471,7 @@
           "title": "Aucun groupe trouvé"
         },
         "search": {
-          "placeholder": "Rechercher des groupes..."
+          "placeholder": "Rechercher des groupes ou appuyer sur \"/\" pour accéder à la recherche..."
         }
       },
       "members": {
@@ -6923,9 +6916,6 @@
       "deselectError": {
         "message": "Échec de la désélection"
       },
-      "deselectSuccess": {
-        "message": "{title} désélectionné"
-      },
       "disconnectError": {
         "message": "Échec de la déconnexion"
       },
@@ -7110,12 +7100,13 @@
       },
       "setDefaultError": {
         "message": "Échec de la définition du modèle par défaut"
-      },
-      "setDefaultSuccess": {
-        "message": "{title} défini par défaut"
       }
     },
     "indexSettings": {
+      "advanced": {
+        "title": "Options avancées",
+        "description": "Ces paramètres modifient l’efficacité avec laquelle {appName} applique les autorisations des documents dans la recherche. Ils ne modifient pas les documents que chaque utilisateur peut voir. Ne les modifiez pas sans instructions explicites de l’équipe Yahont."
+      },
       "actions": {
         "applyForward": {
           "label": "Appliquer aux documents nouveaux et mis à jour"
@@ -7226,6 +7217,9 @@
         "description": "Ajoutez un contexte au niveau du document à chaque segment indexé pour améliorer la pertinence de la recherche hybride. Cela peut augmenter fortement le coût des embeddings.",
         "noModelsTooltip": "La récupération contextuelle est désactivée car aucun modèle n'est configuré. Configurez d'abord un [modèle de langage]({link}).",
         "title": "Récupération contextuelle"
+      },
+      "currentModel": {
+        "legacyHint": "Ce modèle est un ancien modèle. Il continue de fonctionner, mais vous ne pouvez plus le sélectionner pour un nouvel index. Pour passer à un modèle plus récent, cliquez sur « Voir tous les modèles » et sélectionnez-en un."
       },
       "embeddingModel": {
         "cloudManaged": {
@@ -7369,9 +7363,12 @@
         "currentButton": {
           "label": "Modèle actuel"
         },
-        "deprecated": {
-          "connectTooltip": "Ce modèle d'embedding est obsolète et ne peut pas être connecté.",
-          "selectTooltip": "Ce modèle d'embedding est obsolète et ne peut pas être sélectionné."
+        "gpuRecommended": {
+          "tag": "GPU recommandé"
+        },
+        "legacy": {
+          "tag": "Ancien",
+          "tooltip": "Vous ne pouvez pas sélectionner ce modèle pour un nouvel index. Il continue de fonctionner jusqu'à ce que vous changiez de modèle."
         },
         "selectButton": {
           "label": "Sélectionner le modèle"
@@ -7381,8 +7378,14 @@
         }
       },
       "modelPicker": {
+        "cpuEstimateHint": "Les vitesses CPU sont des estimations qui varient selon le matériel et la taille des documents. La RAM recommandée couvre un modèle chargé, pas toute l’infrastructure Yahont. Prévoyez plus de mémoire pendant la réindexation.",
         "addCustomModel": {
           "label": "Ajouter un modèle personnalisé"
+        },
+        "bringYourOwn": {
+          "cloudDescription": "Connectez un proxy LiteLLM, un déploiement Azure OpenAI ou une passerelle Bifrost. Vous indiquez vous-même le nom du modèle. Pour LiteLLM et Azure, vous indiquez aussi la dimension.",
+          "selfHostedDescription": "Exécutez un modèle d'embedding Hugging Face absent de la liste ci-dessus. Vous indiquez vous-même le nom, la dimension et les préfixes du modèle.",
+          "title": "Avancé : utiliser votre propre modèle ou proxy"
         },
         "cloudTab": {
           "label": "Dans le cloud"
@@ -7584,22 +7587,27 @@
         "restoreHint": "Pour conserver un connecteur, annulez ici, reprenez-le ou corrigez-le, puis relancez la réindexation : il sera alors repris. Sinon, rajoutez-le une fois la réindexation terminée."
       },
       "modelDescriptions": {
+        "cohereEmbedV5Pro": "Le modèle d'embedding phare de Cohere. Le meilleur équilibre entre qualité et coût. Sortie de 2048 dimensions.",
+        "cohereEmbedV5Fast": "Version moins coûteuse d'Embed 5 de Cohere. Reste une excellente option. Sortie de 2048 dimensions.",
         "cohereEmbedEnglishV3": "Modèle d'embedding anglais de Cohere. Bonnes performances pour les tâches en anglais.",
         "cohereEmbedEnglishLightV3": "Modèle d'embedding anglais léger de Cohere. Plus rapide et plus efficace pour les tâches simples.",
-        "cohereEmbedV4": "Dernier modèle d'embedding multilingue de Cohere, avec une sortie par défaut de 1536 dimensions pour une meilleure qualité de recherche.",
-        "openaiTextEmbedding3Large": "Grand modèle d'embedding d'OpenAI. Meilleures performances, mais plus coûteux.",
-        "openaiTextEmbedding3Small": "Modèle d'embedding plus récent et plus efficace d'OpenAI. Bon équilibre entre performances et coût.",
+        "cohereEmbedV4": "Modèle d'embedding multilingue de Cohere, avec une sortie de 1536 dimensions.",
+        "openaiTextEmbedding3Large": "Grand modèle d'embedding d'OpenAI. Un bon choix si vous utilisez déjà OpenAI. Sortie de 3072 dimensions.",
+        "openaiTextEmbedding3Small": "Petit modèle d'embedding d'OpenAI. De loin l'option dans le cloud la plus économique. Sortie de 1536 dimensions.",
         "googleGeminiEmbedding001": "Modèle d'embedding Gemini de Google. Puissant et efficace.",
         "googleTextEmbedding005": "Modèle d'embedding plus petit et plus léger de Google.",
-        "googleGeminiEmbedding2": "Dernier modèle d'embedding multimodal de Google (GA). Recherche de la plus haute qualité avec une sortie de 3072 dimensions.",
+        "googleGeminiEmbedding2": "Le modèle d'embedding phare de Google. Très puissant, mais coûteux et plus lent. Sa sortie de 3072 dimensions produit un index volumineux. Un choix solide pour les équipes qui utilisent déjà Google.",
         "googleGeminiEmbedding2Preview": "Version préliminaire de Gemini Embedding 2. Remplacée par gemini-embedding-2 pour les nouvelles configurations.",
         "voyageLarge2Instruct": "Grand modèle d'embedding de Voyage. Hautes performances grâce au fine-tuning par instructions.",
         "voyage4Large": "Le plus grand modèle d'embedding de la série 4 de Voyage. Meilleure qualité de recherche de Voyage, multilingue.",
         "voyage4": "Modèle d'embedding polyvalent de la série 4 de Voyage. Haute qualité de recherche à coût modéré.",
         "voyage4Lite": "Modèle d'embedding léger de la série 4 de Voyage. Coût le plus bas et limites de débit les plus élevées.",
         "voyageLight2Instruct": "Modèle d'embedding léger de Voyage. Bon équilibre entre performances et efficacité.",
+        "graniteEmbedding97mMultilingualR2": "Le petit modèle multilingue d’IBM. Inclus dans {appName}. 97 M de paramètres, sortie de 384 dimensions. Jusqu’à 200 documents / min / cœur CPU. RAM CPU recommandée : 4 Go par serveur de modèles.",
+        "voyage4Nano": "Le modèle à poids ouverts de Voyage AI. 346 M de paramètres, sortie de 2048 dimensions. Jusqu’à 50 documents / min / cœur CPU. RAM CPU recommandée : 4 Go par serveur de modèles.",
+        "nemotron3Embed1b": "Le modèle multilingue de NVIDIA. 1,1 milliard de paramètres, sortie de 2048 dimensions. Jusqu’à 5 documents / min / cœur CPU. RAM CPU recommandée : 8 Go par serveur de modèles. GPU recommandé.",
         "nomicEmbedTextV1": "Modèle d'embedding de Nomic spécialisé dans la recherche, la similarité, le clustering et la classification.",
-        "e5BaseV2": "Un modèle plus petit et plus rapide que celui par défaut. Environ 2 fois plus rapide que le modèle par défaut, au prix d'une qualité de recherche moindre.",
+        "e5BaseV2": "Modèle d'embedding anglais de la famille E5 de Microsoft. Un équilibre entre vitesse et qualité de recherche.",
         "e5SmallV2": "La version la plus petite et la plus rapide de la gamme E5. Un bon choix si {appName} tourne sur un système aux ressources limitées.",
         "multilingualE5Base": "Pour les corpus dans d'autres langues que l'anglais, c'est le modèle à choisir.",
         "multilingualE5Small": "Pour les corpus dans d'autres langues que l'anglais sur un système aux ressources limitées, c'est le modèle à choisir."
@@ -7651,8 +7659,7 @@
           },
           "placeholder": "Sélectionner un mode",
           "toasts": {
-            "error": "Impossible de mettre à jour le mode d’accès à la recherche.",
-            "success": "Mode d’accès à la recherche défini sur {mode}."
+            "error": "Impossible de mettre à jour le mode d’accès à la recherche."
           }
         },
         "loadError": {
@@ -7679,7 +7686,6 @@
           "period": "Saisissez un nombre entier de secondes de 1 à {max, number}."
         },
         "toasts": {
-          "saved": "Limite enregistrée.",
           "failed": "Impossible d'enregistrer la limite."
         }
       },
@@ -7738,7 +7744,7 @@
           "deleting": "{count, plural, one {# connecteur en cours de suppression} other {# connecteurs en cours de suppression}}"
         },
         "access": {
-          "public": "Public",
+          "public": "Organisation",
           "private": "Privé",
           "sync": "Synchronisation automatique",
           "sync_restricted": "Synchronisation automatique, restreinte"
@@ -7786,7 +7792,7 @@
         "title": "La configuration de nouveaux LLM est temporairement indisponible."
       },
       "defaultModel": {
-        "description": "Ce modèle sera utilisé par défaut par {appName} dans vos discussions.",
+        "description": "Utilisé par défaut pour les nouvelles sessions.",
         "title": "Modèle par défaut"
       },
       "deleteModal": {
@@ -7878,6 +7884,10 @@
           "accessKeyIdField": {
             "title": "ID de clé d'accès AWS"
           },
+          "assumeRoleField": {
+            "description": "Utilisez un rôle Bedrock dans un autre compte AWS. {appName} assume ce rôle avec les identifiants ci-dessus.",
+            "title": "ARN du rôle à assumer"
+          },
           "authMethodField": {
             "accessKey": {
               "description": "Pour les environnements hors AWS",
@@ -7893,6 +7903,10 @@
               "label": "Clé d'API longue durée"
             },
             "title": "Méthode d'authentification"
+          },
+          "externalIdField": {
+            "description": "Uniquement si la politique d’approbation du rôle l’exige.",
+            "title": "ID externe"
           },
           "iamNotice": {
             "title": "{appName} utilisera le rôle IAM associé à l'environnement dans lequel il s'exécute pour s'authentifier."
@@ -8070,10 +8084,16 @@
             "label": "Plus de modèles"
           },
           "refetch": {
+            "label": "Actualiser les modèles",
             "errorToast": "Échec de la récupération des modèles"
           },
           "row": {
             "defaultLabel": "Modèle par défaut",
+            "decisionTag": {
+              "label": "Décision",
+              "decisionOnly": "Modèle de décision. Non disponible dans le sélecteur de modèles de chat.",
+              "chatAndDecision": "Prend en charge les tâches de chat et de décision."
+            },
             "renameButton": {
               "tooltip": "Renommer"
             },
@@ -8311,24 +8331,24 @@
       },
       "toasts": {
         "providerDeleteFailed": "Échec de la suppression du fournisseur : {message}",
-        "providerDeleted": "Fournisseur supprimé avec succès !",
         "providerLoadFailed": "Impossible de charger le fournisseur : {message}",
         "providerResolveFailed": "Impossible de résoudre le fournisseur",
         "settingsUpdateFailed": "Échec de la mise à jour des paramètres",
-        "settingsUpdated": "Paramètres mis à jour",
         "unknownError": "Erreur inconnue"
       },
       "modelRouting": {
         "autoMode": {
           "title": "Mode auto",
-          "description": "Ajoute une option Auto au sélecteur de modèle qui choisit le modèle le plus adapté à chaque message."
+          "description": "Ajoute une option Auto au sélecteur de modèle qui choisit le modèle le plus adapté à chaque message.",
+          "noRoutersTooltip": "Aucun modèle routeur trouvé. Activez d'abord un modèle routeur sur un fournisseur de passerelle.",
+          "noRoutersError": "Aucun modèle routeur trouvé : les utilisateurs ne peuvent pas sélectionner Auto. Activez un modèle routeur chez un fournisseur de passerelle."
         },
         "target": {
           "title": "Modèle de routage",
           "description": "Gère le routage des modèles pour le mode Auto.",
-          "empty": "Aucun modèle routeur trouvé. Activez d'abord un modèle routeur sur un fournisseur de passerelle.",
           "error": "Impossible de charger les modèles de routage.",
-          "retry": "Réessayer"
+          "retry": "Réessayer",
+          "missing": "Choisissez un modèle routeur pour permettre aux utilisateurs d'utiliser le mode de routage automatique."
         }
       },
       "providers": {
@@ -8340,6 +8360,14 @@
           "productName": "Modèles personnalisés",
           "companyName": "Points de terminaison compatibles OpenAI"
         }
+      },
+      "reasoning": {
+        "description": "Permettre aux utilisateurs de remplacer le niveau de raisonnement par défaut du modèle pour chaque session.",
+        "title": "Contrôle du raisonnement"
+      },
+      "temperature": {
+        "description": "Permettre aux utilisateurs de remplacer la température par défaut du modèle pour chaque session.",
+        "title": "Contrôle de la température"
       }
     },
     "mcpActions": {
@@ -8738,9 +8766,6 @@
         "error": "Échec du chargement de l'état du jeton SCIM."
       },
       "modal": {
-        "copied": {
-          "message": "Jeton copié dans le presse-papiers"
-        },
         "copyFailed": {
           "error": "Échec de la copie du jeton"
         },
@@ -8902,6 +8927,10 @@
           "description": "Tout le monde se connecte et s'inscrit uniquement via SSO. Nécessite au moins un fournisseur SSO activé.",
           "title": "Désactiver la connexion et l'inscription par mot de passe"
         },
+        "renamedClaim": {
+          "description": "Permet aux utilisateurs dont l'adresse e-mail a été renommée de se connecter via un autre fournisseur au compte qui porte leur adresse actuelle, lorsque ce compte n'a plus de lien avec un fournisseur. Activez uniquement pendant la migration depuis un fournisseur SSO supprimé.",
+          "title": "Réclamer les comptes renommés après la suppression d'un fournisseur"
+        },
         "section": {
           "title": "Authentification"
         },
@@ -8997,9 +9026,7 @@
       },
       "toasts": {
         "securitySettingsUpdateFailed": "Échec de la mise à jour des paramètres de sécurité",
-        "securitySettingsUpdated": "Paramètres de sécurité mis à jour",
-        "settingsUpdateFailed": "Échec de la mise à jour des paramètres",
-        "settingsUpdated": "Paramètres mis à jour"
+        "settingsUpdateFailed": "Échec de la mise à jour des paramètres"
       },
       "placeholders": {
         "jwksUrl": "https://idp.example.com/.well-known/jwks.json",
@@ -9121,8 +9148,7 @@
       "page": {
         "description": "Utilisez des comptes de service pour accéder à l'API {appName} par programmation.",
         "error": {
-          "description": "Consultez la console pour plus de détails.",
-          "title": "Échec du chargement des comptes de service."
+          "description": "Consultez la console pour plus de détails."
         }
       },
       "regenerateModal": {
@@ -9173,7 +9199,6 @@
       "toasts": {
         "deleteFailed": "Échec de la suppression de la clé d'API.",
         "deleteFailedWithDetail": "Échec de la suppression de la clé d'API : {detail}",
-        "keyCopied": "Clé d'API copiée dans le presse-papiers.",
         "regenerateFailed": "Échec de la régénération de la clé d'API.",
         "regenerateFailedWithDetail": "Échec de la régénération de la clé d'API : {detail}"
       },
@@ -9395,8 +9420,8 @@
         },
         "knowledgeSource": {
           "allPublic": {
-            "label": "Toutes les connaissances publiques",
-            "sublabel": "Laissez YahontBot répondre à partir des informations de tous les connecteurs publics"
+            "label": "Toutes les connaissances de l'organisation",
+            "sublabel": "Laissez YahontBot répondre à partir des informations de tous les connecteurs de l'organisation"
           },
           "documentSets": {
             "label": "Ensembles de documents précis",
@@ -9601,9 +9626,6 @@
         "fieldUpdateFailed": {
           "toast": "Échec de la mise à jour du champ {field} du connecteur"
         },
-        "fieldUpdated": {
-          "toast": "Champ {field} du connecteur mis à jour avec succès"
-        },
         "updateTokensButton": {
           "label": "Mettre à jour les jetons"
         }
@@ -9628,9 +9650,10 @@
         "gatedTooltip": "L'activation de plusieurs fournisseurs SSO est disponible avec le forfait Business ou Enterprise."
       },
       "copyRedirectUri": {
-        "tooltip": "Copier l'URI de redirection",
-        "successToast": "URI de redirection copiée",
-        "errorToast": "Copie impossible"
+        "tooltip": "Copier l'URI de redirection"
+      },
+      "deleteProvider": {
+        "tooltip": "Supprimer"
       },
       "editProvider": {
         "tooltip": "Modifier"
@@ -9644,6 +9667,17 @@
         "title": "Échec du chargement des fournisseurs SSO"
       },
       "modals": {
+        "deleteProvider": {
+          "title": "Supprimer {name}",
+          "description": "Les utilisateurs qui se sont connectés avec {name} conservent leur compte. Leur prochaine connexion via un autre fournisseur avec la même adresse e-mail ouvre le même compte. Ajoutez le fournisseur de remplacement avant de supprimer celui-ci.",
+          "countsError": "Impossible de charger les utilisateurs connectés avec ce fournisseur. Fermez et réessayez.",
+          "countsLoading": "Chargement des utilisateurs connectés avec ce fournisseur…",
+          "linkedUsers": "{count, plural, =0 {Aucun utilisateur ne s'est connecté avec {name}.} one {# utilisateur s'est connecté avec {name}.} other {# utilisateurs se sont connectés avec {name}.}}",
+          "renamedUsers": "{count, plural, one {# d'entre eux a été renommé et a besoin de la fenêtre de réclamation des comptes renommés dans le Renforcement de la sécurité pour se connecter via un autre fournisseur.} other {# d'entre eux ont été renommés et ont besoin de la fenêtre de réclamation des comptes renommés dans le Renforcement de la sécurité pour se connecter via un autre fournisseur.}}",
+          "submit": {
+            "label": "Supprimer"
+          }
+        },
         "domainVerification": {
           "description": "Un domaine connecte automatiquement les utilisateurs de votre espace de travail seulement après que vous avez prouvé qu'il vous appartient. Ajoutez l'enregistrement DNS ci-dessous, puis vérifiez.",
           "loadError": {
@@ -9742,6 +9776,7 @@
         "description": "Permettez aux utilisateurs de se connecter via votre fournisseur d'identité."
       },
       "toasts": {
+        "providerDeleted": "{name} supprimé",
         "unexpectedError": "Une erreur inattendue est survenue."
       },
       "providerTypes": {
@@ -10334,8 +10369,7 @@
         }
       },
       "loadError": {
-        "description": "Impossible de charger la configuration du traçage.",
-        "title": "Échec du chargement des paramètres de traçage"
+        "description": "Impossible de charger la configuration du traçage."
       },
       "page": {
         "description": "Connectez des plateformes d'observabilité pour surveiller et évaluer les appels LLM."
@@ -10895,7 +10929,7 @@
           "required": "La clé d'API est obligatoire"
         },
         "apiSecret": {
-          "description": "Collez votre [secret d'API]({url}) de {provider} pour accéder à Scribe.",
+          "description": "Collez votre [secret API]({url}) de {provider} pour accéder à Zoom AI Services.",
           "label": "Secret d'API",
           "placeholder": "Secret d'API",
           "required": "Le secret d'API est obligatoire"
@@ -11123,7 +11157,6 @@
         "title": "Chaque utilisateur configure son propre jeton et les détails de connexion sous Paramètres → LLM Gateway."
       },
       "toasts": {
-        "settingsUpdated": "Paramètres mis à jour",
         "settingsUpdateFailed": "Échec de la mise à jour des paramètres"
       }
     },
@@ -11133,26 +11166,28 @@
         "title": "Tester la connexion",
         "description": "{appName} effectuera des vérifications pour valider les autorisations requises avant de continuer.",
         "startButton": {
-          "label": "Lancer les vérifications"
+          "label": "Lancer les vérifications",
+          "disabledTooltip": "Choisissez un compte ou renseignez-en un nouveau ci-dessus pour lancer les vérifications"
         }
       },
       "title": "Vérifications du connecteur",
       "groups": {
         "failed": "{count} échouées",
-        "indeterminate": "{count} non vérifiées",
+        "indeterminate": "{count} incomplètes",
         "passed": "{count} réussies",
         "skipped": "{count} ignorées",
-        "running": "{count} en cours",
+        "running": "{count} en cours d’exécution",
         "expected": "{count} attendues"
       },
       "status": {
-        "passed": "Réussie",
+        "passed": "Réussite",
         "failed": "Échouée",
-        "indeterminate": "Impossible à vérifier",
+        "indeterminate": "Incomplète",
         "skipped": "Ignorée",
-        "running": "Test en cours…",
+        "running": "En cours…",
         "pending": "En file d’attente",
-        "waiting": "En attente des paramètres"
+        "waiting": "En attente des paramètres",
+        "stopped": "Arrêtée par vous"
       },
       "required": {
         "label": "Obligatoire"
@@ -11160,17 +11195,15 @@
       "empty": {
         "label": "Aucune vérification n'a encore été exécutée."
       },
-      "docsLink": {
-        "label": "Documentation"
-      },
       "foldButton": {
         "fold": "Réduire",
         "expand": "Tout voir"
       },
       "titleCount": "({complete}/{total})",
+      "titleTotal": "({total})",
       "summary": {
         "failed": "{count} échouées",
-        "unverified": "{count} non vérifiées",
+        "unverified": "{count} incomplètes",
         "inProgress": "{count} en cours",
         "expected": "{count} autres attendues",
         "skipped": "{count} ignorées",
@@ -11193,6 +11226,31 @@
         "proceedButton": {
           "label": "Créer le connecteur quand même"
         }
+      },
+      "actions": {
+        "run": {
+          "label": "Lancer la vérification"
+        },
+        "skip": {
+          "label": "Ignorer la vérification"
+        },
+        "rerun": {
+          "label": "Relancer la vérification"
+        }
+      },
+      "details": {
+        "expand": "Afficher les détails",
+        "collapse": "Masquer les détails"
+      },
+      "docsButton": {
+        "label": "Docs"
+      },
+      "runLost": "Les vérifications ne répondent plus. Réessayez.",
+      "cancelButton": {
+        "label": "Annuler"
+      },
+      "cancelFailed": {
+        "toast": "Impossible d'annuler les vérifications. Réessayez."
       }
     },
     "connectorEdit": {
@@ -11760,7 +11818,7 @@
           }
         },
         "publicPermissionMenu": {
-          "ariaLabel": "Changer l'autorisation publique"
+          "ariaLabel": "Changer l'autorisation de l'organisation"
         },
         "row": {
           "updateAccess": {
@@ -11781,14 +11839,18 @@
         },
         "toasts": {
           "accessRemoved": "Accès retiré.",
-          "copyLinkFailed": "Échec de la copie du lien.",
-          "linkCopied": "Lien copié.",
           "ownershipTransferred": "Propriété transférée.",
           "sharingUpdated": "Partage mis à jour."
         },
         "transfer": {
           "label": "Transférer",
           "title": "Transférer *{name}*"
+        },
+        "people": {
+          "label": "Personnes ayant accès"
+        },
+        "ownerOption": {
+          "disabledTooltip": "Impossible de retirer le partage au propriétaire."
         }
       },
       "viewer": {
@@ -11840,7 +11902,7 @@
           "title": "Rappels de prompt"
         },
         "public": {
-          "label": "Public dans votre organisation"
+          "label": "Disponible pour votre organisation"
         }
       }
     },
@@ -12355,17 +12417,23 @@
         "builtin": {
           "label": "Intégrée"
         },
-        "custom": {
-          "label": "Personnalisée"
-        },
         "invalid": {
           "label": "Non valide"
         },
         "personal": {
           "label": "Personnelle"
         },
+        "required": {
+          "tooltip": "L’administrateur de votre organisation exige que vous disposiez de cette compétence."
+        },
         "unavailable": {
           "label": "Indisponible - cliquez pour en savoir plus"
+        },
+        "shared": {
+          "label": "Partagée"
+        },
+        "organization": {
+          "label": "Organisation"
         }
       },
       "toggle": {
@@ -13549,14 +13617,14 @@
           "title": "Votre organisation"
         },
         "permissionMenu": {
-          "edit": {
-            "label": "Modifier"
+          "canEdit": {
+            "label": "Peut modifier"
+          },
+          "canUse": {
+            "label": "Peut utiliser"
           },
           "removeAccess": {
             "label": "Retirer l'accès"
-          },
-          "viewAndChat": {
-            "label": "Voir et discuter"
           }
         },
         "privateOption": {
@@ -13975,9 +14043,6 @@
   },
   "common": {
     "textListField": {
-      "addButton": {
-        "label": "Ajouter"
-      },
       "removeButton": {
         "tooltip": "Retirer"
       }
@@ -14417,11 +14482,11 @@
         "text": "Chargement..."
       },
       "makePublic": {
-        "label": "Rendre ce {objectName} public ?",
+        "label": "Rendre ce {objectName} disponible pour votre organisation ?",
         "subtext": "Si activé, ce {objectName} sera utilisable par <b>tous les {publicToWhom}</b>. Sinon, seuls les <b>administrateurs</b> et les <b>{publicToWhom}</b> ayant reçu un accès explicite à ce {objectName} (par ex. via un groupe d'utilisateurs) y auront accès."
       },
       "publicDisabled": {
-        "message": "Ce {objectName} est public et accessible à tous les utilisateurs."
+        "message": "Ce {objectName} est accessible à tous les membres de votre organisation."
       },
       "usersFallback": {
         "text": "Utilisateurs"
@@ -14500,21 +14565,23 @@
     },
     "plans": {
       "free": {
-        "title": "Offre gratuite",
-        "tooltip": "Disponible dans toutes les offres."
+        "title": "Offre gratuite"
       },
       "business": {
         "title": "Offre Business",
-        "tooltip": "Nécessite l'[offre Business ou Enterprise](/admin/billing)."
+        "tooltip": "Cette fonctionnalité est disponible uniquement dans la [version Business ou Enterprise d'Yahont](/admin/billing)."
       },
       "enterprise": {
         "title": "Offre Enterprise",
-        "tooltip": "Nécessite l'[offre Enterprise](/admin/billing)."
+        "tooltip": "Cette fonctionnalité est disponible uniquement dans la [version Enterprise d'Yahont](/admin/billing)."
       },
       "upgrade": {
         "label": "Mettre à niveau l'offre"
       },
-      "availableFor": "Disponible avec l’{plan}"
+      "availableFor": "Disponible avec l’{plan}",
+      "beta": {
+        "title": "bêta"
+      }
     },
     "placeholders": {
       "email": "e-mail@votreentreprise.com",
@@ -14539,6 +14606,11 @@
       "vertexAi": {
         "projectId": "mon-projet-vertex",
         "location": "global"
+      }
+    },
+    "languageSelect": {
+      "globalDefault": {
+        "label": "Valeur par défaut globale"
       }
     },
     "appFooter": {
@@ -14659,7 +14731,7 @@
         "title": "Compétences associées",
         "unavailable": {
           "duplicateName": "Une compétence nommée « {name} » est déjà associée.",
-          "invalid": "Compétence non valide : corrigez-la avant de l'associer.",
+          "invalid": "Compétence non valide. Corrigez-la avant de l'associer.",
           "otherApp": "Déjà associée à l'app « {name} »."
         },
         "unlink": {
@@ -14962,11 +15034,12 @@
     },
     "filePreview": {
       "cannotPreview": {
-        "title": "Impossible de prévisualiser le fichier"
+        "title": "L’aperçu de ce type de fichier n’est pas disponible actuellement"
       },
       "error": {
         "inline": "Erreur : {message}",
-        "title": "Erreur de chargement du fichier"
+        "title": "Impossible de charger l’aperçu",
+        "description": "L’aperçu n’a pas pu être chargé. Réessayez ou téléchargez le fichier pour l’ouvrir."
       },
       "loading": {
         "label": "Chargement du fichier..."
@@ -14979,10 +15052,25 @@
         "malformed": "Ce CSV contient un champ entre guillemets non valide. Téléchargez le fichier original pour le vérifier."
       },
       "imageTooLarge": {
-        "description": "Cette image est trop volumineuse pour un aperçu. Téléchargez l’original pour l’ouvrir."
+        "description": "Les images jusqu’à 10 Mo peuvent être prévisualisées. Téléchargez le fichier pour l’ouvrir.",
+        "title": "Image trop volumineuse pour l’aperçu"
       },
       "unsupported": {
-        "description": "Ce fichier ne peut pas être prévisualisé. Téléchargez l’original pour l’ouvrir."
+        "description": "Téléchargez le fichier pour consulter son contenu."
+      },
+      "retry": {
+        "label": "Réessayer"
+      },
+      "download": {
+        "label": "Télécharger le fichier"
+      },
+      "tooLarge": {
+        "title": "Fichier trop volumineux pour l’aperçu",
+        "description": "Les fichiers jusqu’à {size, number} Mo peuvent être prévisualisés ici. Téléchargez le fichier pour l’ouvrir."
+      },
+      "playback": {
+        "title": "Lecture non prise en charge",
+        "description": "Votre navigateur ne peut pas lire ce fichier. Téléchargez-le pour l’ouvrir."
       }
     },
     "filesTab": {
@@ -15943,7 +16031,6 @@
       "actionPolicies": "Paramètres d’approbation",
       "policyCounts": "{auto} automatiques · {ask} demander · {disabled} désactivées",
       "manageActions": "Gérer les actions",
-      "viewActions": "Voir les actions",
       "taskModalDescription": "Les modifications s’appliquent lorsque vous enregistrez la tâche. Les restrictions de l’espace de travail s’appliquent toujours.",
       "searchActions": "Rechercher des actions",
       "setPermissions": "Définir les autorisations",
@@ -16284,6 +16371,11 @@
     "iconTooltip": {
       "label": "Plus d’informations"
     },
+    "inputCurrency": {
+      "amount": "Montant",
+      "fraction": "Partie décimale du montant",
+      "whole": "Partie entière du montant"
+    },
     "input": {
       "day": "Jour",
       "hidePassword": "Masquer le mot de passe",
@@ -16347,6 +16439,12 @@
     "settingsHeader": {
       "cancel": "Annuler"
     },
+    "settingsBody": {
+      "error": {
+        "title": "Impossible de charger {page}",
+        "description": "Un problème est survenu. Réessayez dans un instant."
+      }
+    },
     "table": {
       "alwaysShown": "Toujours affichée",
       "ascending": "Croissant",
@@ -16370,9 +16468,17 @@
       "scrollLeft": "Faire défiler les onglets vers la gauche",
       "scrollRight": "Faire défiler les onglets vers la droite"
     },
+    "toast": {
+      "moreCount": "+{count} de plus"
+    },
     "sidebar": {
       "open": "Ouvrir la barre latérale",
       "close": "Fermer la barre latérale"
+    },
+    "inputNumber": {
+      "outOfRange": "Saisissez un nombre entre {min, number} et {max, number}",
+      "belowMin": "Saisissez un nombre d'au moins {min, number}",
+      "aboveMax": "Saisissez un nombre d'au plus {max, number}"
     }
   },
   "settings": {
@@ -16405,8 +16511,7 @@
         "title": "Modifier le mot de passe",
         "toasts": {
           "networkError": "Une erreur s'est produite lors de la modification du mot de passe",
-          "updateFailed": "Échec de la modification du mot de passe",
-          "updated": "Mot de passe mis à jour avec succès"
+          "updateFailed": "Échec de la modification du mot de passe"
         },
         "validation": {
           "confirmRequired": "Veuillez confirmer votre nouveau mot de passe",
@@ -16478,10 +16583,8 @@
       "toasts": {
         "createFailed": "Échec de la création du jeton",
         "createNetworkError": "Erreur réseau lors de la création du jeton",
-        "created": "Jeton créé avec succès",
         "deleteFailed": "Échec de la suppression du jeton",
         "deleteNetworkError": "Erreur réseau lors de la suppression du jeton",
-        "deleted": "Jeton supprimé avec succès",
         "loadFailed": "Échec du chargement des jetons",
         "loadPermissionsFailed": "Échec du chargement des options d'autorisation",
         "nameRequired": "Le nom du jeton est requis"
@@ -16545,8 +16648,7 @@
       },
       "title": "Chats",
       "toasts": {
-        "saveFailed": "Échec de l'enregistrement des préférences",
-        "saved": "Préférences enregistrées"
+        "saveFailed": "Échec de l'enregistrement des préférences"
       }
     },
     "connectors": {
@@ -16566,8 +16668,7 @@
       },
       "title": "Connecteurs",
       "toasts": {
-        "disconnectFailed": "Échec de la déconnexion",
-        "disconnected": "Déconnecté avec succès"
+        "disconnectFailed": "Échec de la déconnexion"
       }
     },
     "dangerZone": {
@@ -16583,8 +16684,7 @@
         "description": "Supprimez définitivement toutes vos sessions de chat.",
         "title": "Supprimer tous les chats",
         "toasts": {
-          "deleteFailed": "Échec de la suppression de toutes les sessions de chat",
-          "deleted": "Toutes vos sessions de chat ont été supprimées."
+          "deleteFailed": "Échec de la suppression de toutes les sessions de chat"
         }
       },
       "title": "Zone de danger"
@@ -16631,8 +16731,7 @@
       "title": "Langue",
       "toasts": {
         "updateFailed": "Impossible de mettre à jour la préférence de langue"
-      },
-      "workspaceDefault": "Par défaut ({language})"
+      }
     },
     "layout": {
       "header": {
@@ -16719,8 +16818,7 @@
       },
       "title": "Profil",
       "toasts": {
-        "updateFailed": "Échec de la mise à jour de la personnalisation",
-        "updated": "Personnalisation mise à jour avec succès"
+        "updateFailed": "Échec de la mise à jour de la personnalisation"
       },
       "workRole": {
         "description": "Indiquez votre rôle pour mieux adapter les réponses.",
@@ -16732,18 +16830,15 @@
       "row": {
         "contentPlaceholder": "Fournissez un résumé concis en 1 à 2 phrases de ce qui suit :",
         "promptPlaceholder": "Résumer",
-        "publicTooltip": "Impossible de supprimer les raccourcis d'invite publics.",
+        "publicTooltip": "Impossible de supprimer les raccourcis d'invite de l'organisation.",
         "removeAriaLabel": "Supprimer le raccourci"
       },
       "title": "Raccourcis d'invite",
       "toasts": {
         "bothRequired": "Le raccourci et l'expansion sont tous deux requis",
-        "created": "Raccourci créé",
         "deleteFailed": "Échec de la suppression du raccourci",
-        "deleted": "Raccourci supprimé",
         "loadFailed": "Échec du chargement des raccourcis",
-        "saveFailed": "Échec de l'enregistrement du raccourci",
-        "updated": "Raccourci mis à jour"
+        "saveFailed": "Échec de l'enregistrement du raccourci"
       },
       "toggle": {
         "description": "Activez les raccourcis pour insérer rapidement des invites courantes.",
@@ -16906,6 +17001,9 @@
         "languageModels": {
           "label": "Modèles de langage"
         },
+        "decisionModels": {
+          "label": "Modèles de décision"
+        },
         "llmGateway": {
           "label": "LLM Gateway"
         },
@@ -16959,6 +17057,9 @@
         },
         "webSearch": {
           "label": "Recherche web"
+        },
+        "skills": {
+          "label": "Compétences"
         }
       },
       "sections": {
@@ -16986,12 +17087,6 @@
       }
     },
     "adminSidebar": {
-      "businessOrEnterpriseOnly": {
-        "tooltip": "Cette fonctionnalité est disponible uniquement dans la [version Business ou Enterprise d'Yahont](/admin/billing)."
-      },
-      "enterpriseOnly": {
-        "tooltip": "Cette fonctionnalité est disponible uniquement dans la [version Enterprise d'Yahont](/admin/billing)."
-      },
       "exitAdminPanel": {
         "label": "Quitter le panneau d'administration"
       },
@@ -17010,8 +17105,7 @@
         "title": "Agents"
       },
       "craft": {
-        "label": "Craft",
-        "businessTag": "Business"
+        "label": "Craft"
       },
       "exploreAgents": {
         "label": "Explorer les agents"
@@ -17252,21 +17346,11 @@
         "title": "Compétence indisponible"
       },
       "management": {
-        "description": "Contrôlez qui peut utiliser cette compétence.",
-        "externalApp": {
-          "manage": {
-            "label": "Gérer dans les paramètres de l'application"
-          },
-          "readyDescription": "Cette compétence utilise l'application « {appName} ».",
-          "title": "Application externe"
-        },
         "sharing": {
           "edit": {
             "label": "Modifier le partage"
-          },
-          "title": "Partage"
-        },
-        "title": "Gestion"
+          }
+        }
       },
       "saveTooltip": {
         "missingDescription": "Ajoutez une description avant d'enregistrer.",
@@ -17276,21 +17360,6 @@
         "noPermission": "Vous n'avez pas l'autorisation de modifier les détails de cette compétence.",
         "savingChanges": "Enregistrement des modifications...",
         "savingSkill": "Enregistrement de la compétence..."
-      },
-      "sharing": {
-        "organization": {
-          "editorDescription": "Tous les membres de votre organisation peuvent utiliser et modifier cette compétence.",
-          "title": "Organisation",
-          "viewerDescription": "Tous les membres de votre organisation peuvent utiliser cette compétence."
-        },
-        "personal": {
-          "description": "Vous seul pouvez utiliser cette compétence.",
-          "title": "Personnel"
-        },
-        "shares": {
-          "description": "Seuls les utilisateurs et groupes sélectionnés peuvent utiliser cette compétence.",
-          "title": "{count, plural, one {# partage} other {# partages}}"
-        }
       },
       "toasts": {
         "created": "« {name} » créée",
@@ -17304,6 +17373,9 @@
         "inspectFailed": "Échec de l'inspection du paquet de compétence",
         "saveFailed": "Échec de l'enregistrement de la compétence",
         "saved": "« {name} » enregistrée"
+      },
+      "creationAccess": {
+        "title": "Accès"
       }
     },
     "modals": {
@@ -17342,6 +17414,13 @@
           "singleSkill": "Téléversez une seule compétence à la fois.",
           "title": "Exigences pour les fichiers",
           "zip": "Les fichiers ZIP doivent contenir un fichier SKILL.md."
+        },
+        "batch": {
+          "title": "Accès aux compétences téléversées",
+          "selected": "{count, plural, one {# paquet de compétence sélectionné} other {# paquets de compétences sélectionnés}}",
+          "result": "{imported, plural, one {# compétence importée} other {# compétences importées}}. {failed, plural, one {# échec} other {# échecs}}.",
+          "failure": "{name} : {reason}",
+          "requirement": "Sélectionnez plusieurs fichiers ZIP pour importer des compétences ensemble. Chaque ZIP doit contenir une compétence."
         }
       },
       "importGithub": {
@@ -17418,6 +17497,11 @@
         "unavailableFallback": "Cette compétence ne peut pas être importée.",
         "unavailableTag": {
           "label": "Importation impossible"
+        },
+        "sharing": {
+          "title": "Accès aux compétences importées",
+          "configureButton": "Configurer l’accès",
+          "description": "Ces paramètres d’accès s’appliquent à {count, plural, one {la compétence sélectionnée} other {toutes les # compétences sélectionnées}}."
         }
       },
       "nameConflict": {
@@ -17471,7 +17555,6 @@
         },
         "externalAppNotice": "L'accès en lecture pour toute l'organisation est obligatoire tant que cette compétence est associée à l'application “{appName}”.",
         "header": {
-          "title": "Partager *{name}*",
           "transferTitle": "Transférer *{name}*"
         },
         "loading": {
@@ -17505,15 +17588,35 @@
         },
         "transferredToast": {
           "message": "Propriété transférée."
-        }
+        },
+        "installation": {
+          "title": "Installation",
+          "available": "Disponible à l’installation",
+          "default": "Installé par défaut",
+          "required": "Obligatoire",
+          "availableDescription": "Les utilisateurs peuvent installer ou désinstaller à tout moment.",
+          "defaultDescription": "Installé automatiquement. Les utilisateurs peuvent désactiver ou désinstaller à tout moment.",
+          "requiredDescription": "Installé automatiquement. Les utilisateurs ne peuvent ni désactiver ni désinstaller.",
+          "description": "Choisissez comment cette compétence est installée pour les personnes ayant accès."
+        },
+        "description": "Choisissez qui peut utiliser cette compétence et comment elle est installée.",
+        "accessTitle": "Qui peut accéder",
+        "peopleTitle": "Personnes ayant accès",
+        "manageIndividualAccess": "Gérer les accès individuels",
+        "individualAccessTitle": "Accès individuels",
+        "ownershipTitle": "Propriété"
       },
       "placeholders": {
         "githubRepository": "proprietaire/depot ou https://github.com/proprietaire/depot"
+      },
+      "tabs": {
+        "details": "Détails",
+        "sharing": "Partage"
       }
     },
     "page": {
       "browse": {
-        "title": "Parcourir les compétences"
+        "title": "Sélectionner des compétences"
       },
       "countSeparator": {
         "label": "{count, plural, one {Compétence} other {Compétences}}"
@@ -17541,8 +17644,8 @@
           "title": "Aucune compétence correspondante"
         },
         "noSkills": {
-          "description": "Aucune compétence personnalisée n'a encore été partagée avec vous et aucune compétence intégrée n'est configurée.",
-          "title": "Aucune compétence disponible"
+          "title": "Aucune compétence personnalisée pour le moment",
+          "description": "Créez ou importez une compétence pour l’ajouter à votre bibliothèque."
         }
       },
       "focusedApp": {
@@ -17579,6 +17682,9 @@
         "disableFailed": "Échec de la désactivation de {name}",
         "enableFailed": "Échec de l'activation de {name}",
         "refreshFailed": "{name} a été mise à jour, mais la liste des compétences n'a pas pu être actualisée."
+      },
+      "builtins": {
+        "title": "Compétences intégrées ({count, number})"
       }
     },
     "sections": {
@@ -17634,6 +17740,34 @@
           "readFailed": "Impossible de lire le fichier téléversé."
         }
       }
+    },
+    "sharingSummary": {
+      "organization": "{count, plural, one {Tout le monde dans l’organisation peut accéder à cette compétence.} other {Tout le monde dans l’organisation peut accéder à ces compétences.}}",
+      "selected": "Partagée avec {users, plural, one {# personne} other {# personnes}} et {groups, plural, one {# groupe} other {# groupes}}.",
+      "private": "{count, plural, one {Vous seul pouvez accéder à cette compétence.} other {Vous seul pouvez accéder à ces compétences.}}"
+    },
+    "bulk": {
+      "adminDescription": "Gérez les compétences et les accès dans votre organisation.",
+      "selectAll": "Sélectionner toutes les compétences personnalisées visibles",
+      "selected": "{count, plural, one {# sélectionnée} other {# sélectionnées}}",
+      "share": "Partager",
+      "enable": "Activer pour moi",
+      "disable": "Désactiver pour moi",
+      "delete": "Supprimer",
+      "selectSkill": "Sélectionner {name}",
+      "updated": "{count, plural, one {# compétence mise à jour} other {# compétences mises à jour}}",
+      "failed": "Impossible de mettre à jour les compétences. Réessayez.",
+      "partialFailure": "{count, plural, one {# compétence n’a pas pu être mise à jour} other {# compétences n’ont pas pu être mises à jour}}",
+      "deleteTitle": "{count, plural, one {Supprimer # compétence ?} other {Supprimer # compétences ?}}",
+      "deleteDescription": "{count, plural, one {La compétence sélectionnée sera supprimée pour toutes les personnes qui y ont accès. Cette action est irréversible.} other {Les # compétences sélectionnées seront supprimées pour toutes les personnes qui y ont accès. Cette action est irréversible.}}",
+      "shareTitle": "{count, plural, one {Mettre à jour l’accès à # compétence} other {Mettre à jour l’accès à # compétences}}",
+      "shareDescription": "Appliquez ces modifications à chaque compétence sélectionnée. Les paramètres non modifiés conservent leurs valeurs actuelles.",
+      "unchanged": "Ne pas modifier",
+      "everyone": "Tout le monde dans l’organisation",
+      "invitedOnly": "Personnes et groupes invités",
+      "addAccessDescription": "Ajoutez ces personnes et groupes à chaque compétence sélectionnée. Les personnes et groupes indiqués reçoivent la permission choisie. Les autres conservent leur accès actuel.",
+      "apply": "{count, plural, one {Appliquer à # compétence} other {Appliquer à # compétences}}",
+      "moreActions": "Plus d’actions"
     }
   },
   "opensearchHealth": {

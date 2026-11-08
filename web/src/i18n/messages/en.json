@@ -154,7 +154,7 @@
         "title": "Access control",
         "description": "Choose who can use this MCP.",
         "public": {
-          "label": "Public",
+          "label": "Organization",
           "description": "Anyone in your organization can use this MCP"
         },
         "groups": {
@@ -327,8 +327,6 @@
         "saveAuthFailed": "Failed to save authentication configuration",
         "saveConfigFailed": "Failed to save server configuration",
         "saveStage": "Could not save connection settings",
-        "oauthStage": "Could not start sign-in",
-        "discoveryStage": "Could not load server tools",
         "loadStage": "Could not load connection settings",
         "clientRegistrationFailed": "Automatic client registration failed. Use your own OAuth client, or check the provider’s setup requirements.",
         "clientMetadataRejected": "The provider could not use the client metadata document. If this instance is not reachable from the public internet, turn off “Use client metadata document” and connect again.",
@@ -1117,18 +1115,6 @@
         "openapi": "Add OpenAPI plugin"
       },
       "catalog": {
-        "slack": {
-          "summary": "Search conversations and send messages",
-          "description": "Search conversations and send messages. Requires a registered Slack app."
-        },
-        "hubspot": {
-          "summary": "Work with contacts and deals",
-          "description": "Work with contacts and deals. Requires a HubSpot MCP connector."
-        },
-        "asana": {
-          "summary": "Manage tasks and projects",
-          "description": "Manage tasks and projects. Requires a registered OAuth client."
-        },
         "linear": {
           "summary": "Manage issues, projects, and teams",
           "description": "Manage issues, projects, and teams."
@@ -1220,6 +1206,10 @@
       "blocked": "This URL is blocked by your outbound security settings.",
       "publicDetected": "No authentication required",
       "oauthDetected": "OAuth detected",
+      "clientMetadata": "Client metadata document",
+      "clientMetadataSupported": "Supported",
+      "clientMetadataUnsupported": "Not supported",
+      "clientMetadataUnknown": "Not checked",
       "manualRequired": "Choose authentication manually",
       "chooseAuthentication": "We could not determine how this server authenticates. Choose a method below.",
       "connect": "Connect",
@@ -1251,6 +1241,36 @@
     }
   },
   "admin": {
+    "decisionModels": {
+      "sharedModelSettings": "Manage chat settings in Language Models",
+      "decisionModel": {
+        "title": "Decision Model",
+        "openAiDecisionsModelName": "OpenAI Decisions (GPT-6 Luna)",
+        "description": "Select a model for future classification and review features. Yahont does not use this model yet.",
+        "clear": "Clear",
+        "notConfigured": "Not configured",
+        "saveFailed": "Failed to update decision model"
+      },
+      "header": {
+        "title": "Decision Models",
+        "description": "Manage decision model providers and choose an optional model."
+      },
+      "providers": {
+        "title": "Providers",
+        "description": "Connect a provider or manage its decision models.",
+        "clearBeforeRemoval": "Clear the selected decision model before removing this provider.",
+        "connect": "Connect"
+      },
+      "loadFailed": "Could not load decision models.",
+      "retry": "Try again",
+      "zoom": {
+        "title": "Connect Zoom AI Services",
+        "description": "Use one connection for Zoom Scribe and Zoom AI Decisions. Changes apply to both.",
+        "connection": "Zoom connection",
+        "selectConnection": "Select a Zoom connection",
+        "removeDescription": "This removes the shared Zoom connection from Voice and Decision Models."
+      }
+    },
     "addConnector": {
       "categories": {
         "codeRepository": {
@@ -1630,7 +1650,7 @@
             "label": "Private"
           },
           "public": {
-            "label": "Public"
+            "label": "Organization"
           },
           "shared": {
             "label": "Shared"
@@ -1908,7 +1928,7 @@
             "text": "Access controls are removed from this deployment. **This starts a re-index** so search results reflect the change, which can take a while on a large index."
           },
           "madePublic": {
-            "text": "**Made public:** All connectors, plus any agents, document sets, LLM providers, MCP servers, and skills shared with a user group;"
+            "text": "**Opened to your organization:** All connectors, plus any agents, document sets, LLM providers, MCP servers, and skills shared with a user group;"
           },
           "reset": {
             "text": "**Reset to defaults:** Custom branding and chat retention policy."
@@ -2456,43 +2476,30 @@
     },
     "chatPreferences": {
       "chatNaming": {
-        "description": "Model used to name chat sessions. Defaults to each session's model.",
-        "resetButton": {
-          "label": "Reset"
-        },
-        "sessionModel": {
-          "label": "Use Default model"
-        },
-        "title": "Chat naming model"
+        "description": "Generates session titles. A fast, low-cost model works well.",
+        "title": "Chat Naming Model"
       },
       "searchSelectionModel": {
-        "description": "Selects and checks retrieved documents. A lower-cost model can reduce search costs, but may affect answer quality.",
-        "resetButton": {
-          "label": "Reset"
-        },
-        "sessionModel": {
-          "label": "Use Default model"
-        },
-        "title": "Search selection model"
+        "description": "Selects and checks retrieved documents. A fast, low-cost model can reduce search costs, but may affect answer quality.",
+        "title": "Search Selection Model"
       },
       "taskModels": {
-        "title": "Model selection",
         "loadFailed": "Could not load task models",
         "retry": {
           "label": "Retry"
         },
-        "noProviders": {
-          "title": "Connect a language model provider"
-        },
         "addProvider": {
           "label": "Add Provider"
+        },
+        "chatDefault": {
+          "label": "Chat Default"
         }
       },
       "advanced": {
         "title": "Advanced Options"
       },
       "anonymousUsers": {
-        "description": "Allow anyone to start chats without logging in. They do not see any other chats and cannot create agents or update settings.",
+        "description": "Allow anyone to start chats **without logging in**. They do not see any other chats and cannot create agents or update settings.",
         "title": "Allow Anonymous Users"
       },
       "autoDetectFilters": {
@@ -2502,9 +2509,6 @@
       "autoScroll": {
         "description": "Automatically scroll to new content as chat generates response. Users can override this in their personal settings.",
         "title": "Chat Auto-Scroll"
-      },
-      "betaTag": {
-        "label": "beta"
       },
       "connectors": {
         "description": "Sources that Internal Search uses in chat. Add or change them on the indexing status page.",
@@ -2521,12 +2525,12 @@
         "title": "Deep Research"
       },
       "defaultLanguage": {
-        "description": "The UI language for users who have not chosen one in their own settings.",
+        "description": "UI language for users who have not set one in their own settings.",
         "title": "Default Language"
       },
       "disableDefaultChat": {
-        "description": "This forces users to always start in an agent. New chats will be created in their first pinned agent. Set featured agents to help new users get started.",
-        "title": "Disable Default Chat"
+        "description": "This removes the default chat. Users will always start in an agent, and new chats will be created in their last active agent. Set [featured agents](/admin/agents) to help new users get started.",
+        "title": "Always Start with an Agent"
       },
       "fileLimits": {
         "default": {
@@ -2584,10 +2588,6 @@
           "label": "Show with User Info"
         },
         "title": "Query History Visibility"
-      },
-      "reasoning": {
-        "description": "Let users adjust how much reasoning the model performs before answering, from the model picker in chat.",
-        "title": "Reasoning Control"
       },
       "retention": {
         "custom": {
@@ -2659,26 +2659,13 @@
         "placeholder": "Enter team name",
         "title": "Team Name"
       },
-      "temperature": {
-        "description": "Let users adjust the temperature (creativity) of model responses from the model picker in chat.",
-        "title": "Temperature Control"
-      },
       "toasts": {
-        "chatNamingUpdated": "Chat naming model updated",
-        "chatNamingReset": "Chat naming model reset to the default model",
         "chatNamingUpdateFailed": "Failed to update chat naming model",
-        "chatNamingResetFailed": "Failed to reset chat naming model",
         "providerResolveFailed": "Could not resolve provider",
-        "searchSelectionReset": "Search selection model reset to the default model",
-        "searchSelectionResetFailed": "Failed to reset search selection model",
         "searchSelectionUpdateFailed": "Failed to update search selection model",
-        "searchSelectionUpdated": "Search selection model updated",
         "settingsUpdateFailed": "Failed to update settings",
-        "settingsUpdated": "Settings updated",
         "systemPromptUpdateFailed": "Failed to update system prompt",
-        "systemPromptUpdated": "System prompt updated",
         "toolsUpdateFailed": "Failed to update tools",
-        "toolsUpdated": "Tools updated",
         "unknownError": "An unknown error occurred"
       },
       "tools": {
@@ -3115,15 +3102,14 @@
         "indexingStartUnexpectedError": "An unexpected error occurred while trying to start indexing",
         "indexingUpdateStarted": "Indexing update started successfully",
         "nameUpdateFailed": "Failed to update connector name",
-        "nameUpdated": "Connector name updated successfully",
         "noUnresolvedErrors": "No unresolved errors to retry.",
         "pruningFrequencyUpdateFailed": "Failed to update connector pruning frequency",
-        "pruningFrequencyUpdated": "Connector pruning frequency updated successfully",
         "refreshFrequencyUpdateFailed": "Failed to update connector refresh frequency",
-        "refreshFrequencyUpdated": "Connector refresh frequency updated successfully",
         "targetedReindexFailed": "Targeted reindex failed: {message}",
-        "targetedReindexSubmitted": "Targeted reindex submitted for {count, plural, one {# document} other {# documents}}. Errors will clear from the list as documents finish reindexing.",
-        "checkFrequencyUpdated": "Connector check frequency updated successfully",
+        "targetedReindexRunning": "Retrying {count, plural, one {# error} other {# errors}}…",
+        "targetedReindexDone": "Retry finished. {resolved, plural, one {# error} other {# errors}} resolved.",
+        "targetedReindexPartial": "Retry finished. {resolved, plural, one {# error} other {# errors}} resolved, {failing, plural, one {# document} other {# documents}} still failing.",
+        "targetedReindexIncomplete": "The retry did not finish. Unresolved errors stay in the list.",
         "checkFrequencyUpdateFailed": "Failed to update connector check frequency",
         "runResolved": "Marked resolved.",
         "runResolveFailed": "Could not resolve: {message}",
@@ -3285,6 +3271,7 @@
           "canceled": "{count, plural, one {# run canceled} other {# runs canceled}}",
           "passedChecks": "{count, plural, one {# check passed} other {# checks passed}}",
           "failedChecks": "{count, plural, one {# check failed} other {# checks failed}}",
+          "incompleteChecks": "{count, plural, one {# check incomplete} other {# checks incomplete}}",
           "skippedChecks": "{count, plural, one {# check skipped} other {# checks skipped}}",
           "syncedDocs": "{count, plural, one {# document synced} other {# documents synced}}"
         },
@@ -3525,7 +3512,7 @@
       "oneDrive": {
         "description": "Configure OneDrive connector",
         "indexingScope": {
-          "label": "OneDrive files to index",
+          "label": "OneDrive Files to Index",
           "general": {
             "label": "General",
             "description": "Index all eligible users that the Microsoft application can access."
@@ -3544,7 +3531,7 @@
           "description": "Glob patterns matched against each file path and filename, such as `*.tmp` or `Archive/*`."
         },
         "organizationLinks": {
-          "label": "Treat organization links as public",
+          "label": "Treat Organization Links as Public",
           "description": "Treat files shared through an organization-wide link as visible to all Yahont users."
         },
         "authorityHost": {
@@ -3669,11 +3656,13 @@
           },
           "deleteButton": {
             "label": "Delete Account",
-            "inUseTooltip": "Cannot delete this credential because there are other connectors that are using it."
+            "inUseTooltip": "Cannot delete this credential because there are other connectors that are using it.",
+            "notOwnerTooltip": "Only the owner can delete this credential"
           },
           "updateButton": {
             "label": "Update Credentials",
-            "tooltip": "Changes the saved values for every connector that uses this account."
+            "tooltip": "Changes the saved values for every connector that uses this account.",
+            "notOwnerTooltip": "Only the owner can update this credential"
           },
           "usedBy": {
             "label": "Used by {count, plural, one {# connector} other {# connectors}}"
@@ -3693,20 +3682,17 @@
           "rerunButton": {
             "label": "Re-run Checks"
           },
+          "renameButton": {
+            "tooltip": "Rename Account"
+          },
           "authenticationType": {
             "label": "Authentication Type"
           },
           "rerunFailed": {
             "toast": "Couldn't start the checks. Try again."
           },
-          "shareSaved": {
-            "toast": "Sharing updated."
-          },
           "shareFailed": {
             "toast": "Couldn't change who can use this account. Try again."
-          },
-          "renameSaved": {
-            "toast": "Account renamed."
           },
           "renameFailed": {
             "toast": "Couldn't rename this account. Try again."
@@ -3715,10 +3701,16 @@
             "tooltip": "Only the person who added this account can make it private."
           },
           "shareLocked": {
-            "tooltip": "Only the person who added this account, or an admin it is shared with, can change who may use it."
+            "tooltip": "Only the owner can share this credential"
           },
           "viewDetails": {
             "tooltip": "View Details"
+          },
+          "failedToRun": {
+            "title": "Checks Failed to Run"
+          },
+          "unavailable": {
+            "label": "Not Available"
           }
         },
         "accountUnavailable": {
@@ -3740,6 +3732,9 @@
       "field": {
         "optionalSuffix": {
           "label": "optional"
+        },
+        "availableRefresh": {
+          "tooltip": "Refresh the list"
         }
       },
       "gdrive": {
@@ -3885,7 +3880,7 @@
         }
       },
       "content": {
-        "title": "Connector Content",
+        "title": "Index Configurations",
         "description": "Select content to index for this connector."
       },
       "selectInput": {
@@ -3933,18 +3928,21 @@
         },
         "checkFrequency": {
           "title": "Run Checks Every",
-          "description": "Check connection for capabilities and health."
-        }
+          "description": "Check connection for capabilities and health.",
+          "placeholder": "Never"
+        },
+        "rangeRequired": "Please enter in a value from the range {min, number} - {max, number}."
       },
       "settings": {
         "description": "Connector information and access.",
         "displayName": {
-          "title": "Connector Display Name"
+          "title": "Display Name",
+          "placeholder": "Add a display name"
         },
         "documentAccess": {
           "description": "Control who can access documents indexed by this connector.",
           "everyone": {
-            "description": "Documents indexed by this connector will be public to everyone in your organization.",
+            "description": "Documents indexed by this connector are available to everyone in your organization.",
             "title": "Everyone in Your Organization"
           },
           "specificGroups": {
@@ -3998,7 +3996,7 @@
               "label": "Include Attachments"
             },
             "scoped_token": {
-              "label": "This is an API token with scopes",
+              "label": "Scoped API Token",
               "description": "Scoped tokens require routing through Atlassian's API gateway. Leave off for classic tokens."
             }
           }
@@ -4022,15 +4020,15 @@
               "description": "Index every session the members of one Zoom Group host, of the types ticked below. Zoom re-reads the member list on every run, so a joiner or leaver is picked up without editing this connector."
             },
             "include_meetings": {
-              "label": "Include meetings",
+              "label": "Include Meetings",
               "description": "Applies to Host Emails and Zoom Group. The ID lists above already say which type each ID is."
             },
             "include_webinars": {
-              "label": "Include webinars",
+              "label": "Include Webinars",
               "description": "Applies to Host Emails and Zoom Group. Webinars also need the Webinar add-on, enabled for the host."
             },
             "treat_link_access_as_public": {
-              "label": "Treat link access as public",
+              "label": "Treat Link Access as Public",
               "description": "Only matters with permission sync. When on, a recording whose Link access is \"Anyone with the link\" or a signed-in rule is visible to all Yahont users, and a domain rule to users of those domains. When off, every transcript is visible to the recording's owner alone, because Zoom cannot say who is in \"People with access\"."
             },
             "plan_tier": {
@@ -4065,7 +4063,7 @@
               }
             },
             "scroll_before_scraping": {
-              "label": "Scroll before scraping",
+              "label": "Scroll Before Scraping",
               "description": "Enable if the website requires scrolling for the desired content to load"
             },
             "url_rewrites": {
@@ -4082,7 +4080,7 @@
           "description": "Configure LumApps connector",
           "fields": {
             "base_url": {
-              "label": "API Base URL (cell host)",
+              "label": "API Base URL (Cell Host)",
               "description": "Your LumApps cell/API host, e.g. https://go-cell-005.api.lumapps.com (not the docs site api.lumapps.com)."
             },
             "organization_id": {
@@ -4090,7 +4088,7 @@
               "description": "Your LumApps organization id (numeric)."
             },
             "instance_ids": {
-              "label": "Instance (site) IDs",
+              "label": "Instance (Site) IDs",
               "description": "Restrict indexing to specific instance/site IDs. Leave empty to index all content visible to the service user."
             },
             "custom_content_types": {
@@ -4125,13 +4123,13 @@
               "placeholder": "https://github.example.com"
             },
             "repo_owner": {
-              "label": "Repository Owner"
+              "label": "Repository Owner",
+              "placeholder": "Specify a repository owner"
             },
             "github_mode": {
-              "label": "GitHub content to index",
               "tabs": {
                 "repo": {
-                  "label": "Specific Repository"
+                  "label": "Specific Repositories"
                 },
                 "everything": {
                   "label": "Everything"
@@ -4139,15 +4137,15 @@
               }
             },
             "repositories": {
-              "label": "Repository Name(s)",
-              "description": "For multiple repositories, enter comma-separated names (e.g., repo1,repo2,repo3)"
+              "label": "Repository Names",
+              "placeholder": "Add a repository name"
             },
             "everything": {
-              "label": "Everything",
-              "description": "This connector will index all repositories the provided credentials have access to!"
+              "label": "Index Everything",
+              "description": "Yahont will index all repositories found for the owner {owner}."
             },
             "include_prs": {
-              "label": "Include pull requests",
+              "label": "Include Pull Requests",
               "description": "Index pull requests from repositories"
             },
             "include_issues": {
@@ -4160,7 +4158,8 @@
             },
             "branch": {
               "label": "Branch",
-              "description": "Branch to index documents from (e.g. gh-pages). Leave blank to use each repository's default branch. Only applies when 'Include Documents?' is enabled. After changing this on an existing connector, trigger a re-index to pick up the new branch immediately."
+              "description": "Branch to index documents from (e.g. gh-pages). Leave blank to use each repository's default branch. Only applies when 'Include Documents?' is enabled. After changing this on an existing connector, trigger a re-index to pick up the new branch immediately.",
+              "placeholder": "Add a branch name"
             }
           }
         },
@@ -4221,7 +4220,7 @@
               "description": "The Bitbucket workspace to index (e.g., \"atlassian\" from https://bitbucket.org/atlassian/workspace )."
             },
             "bitbucket_mode": {
-              "label": "Bitbucket content to index",
+              "label": "Bitbucket Content to Index",
               "tabs": {
                 "repo": {
                   "label": "Specific Repositories"
@@ -4243,8 +4242,8 @@
               "description": "One or more Bitbucket Project Keys (comma-separated) to index all repositories in those projects (e.g., PROJ1,PROJ2)"
             },
             "workspace_tab": {
-              "label": "Workspace",
-              "description": "This connector will index all repositories in the workspace."
+              "label": "Indexes every repository in the workspace",
+              "description": "Yahont indexes all repositories in the workspace that the selected account can read. To index fewer, choose another tab."
             }
           }
         },
@@ -4261,7 +4260,7 @@
           "description": "Configure Google Drive connector",
           "fields": {
             "credential_kind": {
-              "label": "Credential kind"
+              "label": "Credential Kind"
             },
             "indexing_scope": {
               "tabs": {
@@ -4274,7 +4273,7 @@
               }
             },
             "include_shared_drives": {
-              "label": "Include shared drives",
+              "label": "Include Shared Drives",
               "description": {
                 "oauth": "This will allow Yahont to index everything in the shared drives you have access to.",
                 "serviceAccount": "This will allow Yahont to index everything in your Organization's shared drives."
@@ -4292,7 +4291,7 @@
             },
             "include_files_shared_with_me": {
               "description": "This will allow Yahont to index all files shared with you.",
-              "label": "Include All Files Shared With You"
+              "label": "Include All Files Shared with You"
             },
             "shared_drive_urls": {
               "description": {
@@ -4314,7 +4313,7 @@
               "label": "Specific User Emails"
             },
             "exclude_domain_link_only": {
-              "label": "Hide domain link-only files",
+              "label": "Hide Domain Link-Only Files",
               "description": "When enabled, Yahont skips files that are shared broadly (domain or public) but require the link to access."
             }
           }
@@ -4349,18 +4348,16 @@
             },
             "wiki_base": {
               "label": "Site URL",
-              "placeholder": "https://your-domain.atlassian.net/wiki"
+              "placeholder": "https://your-domain.atlassian.net/wiki",
+              "placeholderDataCenter": "https://your-domain.com/wiki"
             },
             "indexing_scope": {
               "tabs": {
                 "everything": {
-                  "label": "Everything"
+                  "label": "Index Everything"
                 },
-                "space": {
-                  "label": "Space"
-                },
-                "page": {
-                  "label": "Page"
+                "select": {
+                  "label": "Select Spaces/Pages"
                 },
                 "cql": {
                   "label": "CQL Query"
@@ -4368,24 +4365,36 @@
               }
             },
             "everything": {
-              "label": "Everything",
-              "description": "This connector will index all pages the provided credentials have access to!"
+              "label": "Index Everything",
+              "description": "Yahont will index all spaces and pages that the selected account has access to."
             },
             "space": {
-              "label": "Space Key",
-              "description": "The Confluence space key to index (e.g. `KB`)."
+              "label": "Spaces",
+              "description": "List space keys to index for this connector (e.g. ENG).",
+              "placeholder": "Add space key or URL",
+              "required": "Add at least one space or page.",
+              "available": "{more, select, true {{count, number}+ Spaces Available} other {{count, plural, one {# Space Available} other {# Spaces Available}}}}"
             },
             "page_id": {
-              "label": "Page ID",
-              "description": "Specific page ID to index (e.g. `131368`)"
+              "label": "Pages",
+              "description": "List page IDs to index for this connector (e.g. 123456).",
+              "placeholder": "Add page ID or URL",
+              "available": "{more, select, true {{count, number}+ Pages Available} other {{count, plural, one {# Page Available} other {# Pages Available}}}}"
             },
             "index_recursively": {
-              "label": "Index Recursively",
-              "description": "If this is set, we will index the page indicated by the Page ID as well as all of its children."
+              "label": "Include Child Pages",
+              "description": "Also index all pages nested under the named pages above, at any depth."
             },
             "cql_query": {
               "label": "CQL Query",
-              "description": "IMPORTANT: We currently only support CQL queries that return objects of type 'page'. This means all CQL queries must contain 'type=page' as the only type filter. It is also important that no filters for 'lastModified' are used as it will cause issues with our connector polling logic. Do not use ORDER BY, because the connector sets its own sort order. We will still get all attachments and comments for the pages returned by the CQL query. Any 'lastmodified' filters will be overwritten. See Atlassian's [CQL documentation](https://developer.atlassian.com/server/confluence/advanced-searching-using-cql/) for more details."
+              "description": "Return pages only. Keep `type=page` as the only type filter.\nAvoid sorting and date filters. `order by` or `lastModified` will break Yahont’s own query. [CQL references](https://developer.atlassian.com/server/confluence/advanced-searching-using-cql/)",
+              "testButton": {
+                "label": "Test Query"
+              },
+              "required": "Add a CQL query."
+            },
+            "include_attachments": {
+              "description": "Index files and images attached to pages. See [Image indexing/processing settings]({indexSettingsPath})."
             }
           }
         },
@@ -4411,8 +4420,8 @@
               }
             },
             "everything": {
-              "label": "Everything",
-              "description": "This connector will index all issues the provided credentials have access to!"
+              "label": "Indexes every issue the account can read",
+              "description": "Yahont indexes all issues in every project that the selected account can read. To index fewer, choose another tab."
             },
             "project_key": {
               "label": "Project Key",
@@ -4468,7 +4477,7 @@
               "description": "Index aspx-pages of all SharePoint sites defined above, even if a library or folder is specified."
             },
             "treat_sharing_link_as_public": {
-              "label": "Treat sharing links as public",
+              "label": "Treat Sharing Links as Public",
               "description": "When enabled, documents with a sharing link (anonymous or organization-wide) are treated as public (visible to all Yahont users). When disabled, only users and groups with explicit role assignments can see the document."
             },
             "excluded_sites": {
@@ -4588,7 +4597,7 @@
               "description": "The base URL of your Drupal Wiki instance (e.g., https://help.drupal-wiki.com )"
             },
             "indexing_scope": {
-              "label": "Drupal Wiki content to index",
+              "label": "Drupal Wiki Content to Index",
               "tabs": {
                 "everything": {
                   "label": "Everything"
@@ -4599,8 +4608,8 @@
               }
             },
             "everything_description": {
-              "label": "Everything",
-              "description": "This connector will index all spaces the provided credentials have access to!"
+              "label": "Indexes every space the account can read",
+              "description": "Yahont indexes all pages in every space that the selected account can read. To index fewer, choose another tab."
             },
             "spaces": {
               "label": "Space IDs",
@@ -4954,7 +4963,7 @@
               "description": "Input a valid Wikipedia language code (e.g. 'en', 'es')"
             },
             "categories": {
-              "label": "Categories to index",
+              "label": "Categories to Index",
               "description": "Specify 0 or more names of categories to index. For most Wikipedia sites, these are pages with a name of the form 'Category: XYZ', that are lists of other pages/categories. Only specify the name of the category, not its url."
             },
             "pages": {
@@ -5004,7 +5013,7 @@
               "label": "MediaWiki Site URL"
             },
             "categories": {
-              "label": "Categories to index",
+              "label": "Categories to Index",
               "description": "Specify 0 or more names of categories to index. For most MediaWiki sites, these are pages with a name of the form 'Category: XYZ', that are lists of other pages/categories. Only specify the name of the category, not its url."
             },
             "pages": {
@@ -5055,7 +5064,7 @@
               "description": "Only index prompts, datasets, and experiments from this project. Leave empty to index the whole organization."
             },
             "experiment_row_lookback_days": {
-              "label": "Experiment Row Lookback (days)",
+              "label": "Experiment Row Lookback (Days)",
               "description": "Only index per-row results for experiments created within this many days. Experiment summaries are always indexed. Set to 0 to index rows for all experiments."
             }
           }
@@ -5087,7 +5096,7 @@
           "description": "Configure Airtable connector",
           "fields": {
             "airtable_scope": {
-              "label": "Airtable content to index",
+              "label": "Airtable Content to Index",
               "tabs": {
                 "everything": {
                   "label": "Everything"
@@ -5098,8 +5107,8 @@
               }
             },
             "everything_description": {
-              "label": "Everything",
-              "description": "This connector will automatically discover and index all bases and tables accessible by your API token."
+              "label": "Indexes every base the token can read",
+              "description": "Yahont finds and indexes all bases and tables that the API token can read. To index fewer, choose another tab."
             },
             "airtable_url": {
               "label": "Airtable URL",
@@ -5110,7 +5119,7 @@
               "description": "Optional. If you want record links to use a shared view URL, put the share ID here e.g. shrkfjEzDmLaDtK83."
             },
             "treat_all_non_attachment_fields_as_metadata": {
-              "label": "Treat all fields except attachments as metadata",
+              "label": "Treat All Fields Except Attachments as Metadata",
               "description": "Choose this if the primary content to index are attachments and all other columns are metadata for these attachments."
             }
           }
@@ -5123,7 +5132,7 @@
               "placeholder": "https://api-su2.highspot.com/v1.0/"
             },
             "highspot_scope": {
-              "label": "Highspot content to index",
+              "label": "Highspot Content to Index",
               "tabs": {
                 "spots": {
                   "label": "Specific Spots"
@@ -5138,8 +5147,8 @@
               "description": "For multiple spots, enter your spot one by one."
             },
             "everything": {
-              "label": "Everything",
-              "description": "This connector will index all spots the provided credentials have access to!"
+              "label": "Indexes every spot the account can read",
+              "description": "Yahont indexes all spots that the selected account can read. To index fewer, choose another tab."
             }
           }
         },
@@ -5163,8 +5172,12 @@
       }
     },
     "costOverrides": {
-      "allProviders": {
-        "label": "All providers"
+      "deleteModal": {
+        "description": "Usage of **{model}** ({provider}) will be priced at the built-in rate again.",
+        "submit": {
+          "label": "Delete"
+        },
+        "title": "Delete *{model}* override"
       },
       "empty": {
         "description": "Add one to apply a negotiated rate (USD per 1M tokens) for a model.",
@@ -5172,27 +5185,34 @@
       },
       "form": {
         "addButton": {
-          "label": "Add override"
+          "label": "Add"
         },
+        "description": "Set a negotiated rate for a model. It replaces the built-in price in usage cost calculations.",
+        "editTitle": "Edit Cost Override",
+        "newTitle": "New Cost Override",
         "cacheRate": {
-          "label": "Cache-read rate (USD per 1M tokens, optional)",
-          "placeholder": "defaults to input rate"
+          "description": "Units are in USD per 1M tokens. Defaults to the input rate.",
+          "label": "Cache-read rate"
         },
         "cancelButton": {
           "label": "Cancel"
         },
         "inputRate": {
-          "label": "Input rate (USD per 1M tokens)"
+          "label": "Input rate"
         },
         "model": {
+          "description": "Apply a cost override on this chosen model.",
           "label": "Model",
           "placeholder": "Select a model"
         },
         "outputRate": {
-          "label": "Output rate (USD per 1M tokens)"
+          "label": "Output rate"
         },
         "saveButton": {
           "label": "Save"
+        },
+        "units": {
+          "description": "Units are in USD per 1M tokens."
         }
       },
       "panel": {
@@ -5206,36 +5226,25 @@
         "title": "Cost Overrides"
       },
       "row": {
+        "cache": "Cache {value}",
         "deleteButton": {
           "ariaLabel": "Delete {provider} override for {model}"
         },
+        "description": "{provider} · Updated {time}",
         "editButton": {
           "ariaLabel": "Edit {provider} override for {model}"
         },
-        "rates": "{provider} · In {input} · Out {output} · USD per 1M tokens",
-        "ratesWithCache": "{provider} · In {input} · Out {output} · Cache {cache} · USD per 1M tokens",
-        "updated": "Updated {time}"
+        "input": "In {value}",
+        "output": "Out {value}"
       },
       "toasts": {
         "removeFailed": "Failed to remove override: {message}",
-        "removed": "Removed override for {model}.",
         "saveFailed": "Failed to save override: {message}",
-        "saved": "Saved rate for {model}.",
         "unknownError": "Unknown error"
-      },
-      "placeholders": {
-        "inputCost": "3.00",
-        "outputCost": "15.00"
       }
     },
     "craft": {
       "accessCell": {
-        "disabledSuccess": {
-          "message": "Craft disabled for user"
-        },
-        "enabledSuccess": {
-          "message": "Craft enabled for user"
-        },
         "error": {
           "message": "Failed to update Craft access"
         }
@@ -5270,9 +5279,6 @@
         }
       },
       "defaultToggle": {
-        "betaTag": {
-          "label": "beta"
-        },
         "disabled": {
           "description": "Craft is off for everyone. Toggle individual users below."
         },
@@ -5353,14 +5359,8 @@
         "resetError": {
           "message": "Failed to clear the default model"
         },
-        "resetSuccess": {
-          "message": "Craft default model cleared"
-        },
         "saveError": {
           "message": "Failed to save the default model"
-        },
-        "saveSuccess": {
-          "message": "Craft default model saved"
         }
       },
       "header": {
@@ -5460,6 +5460,9 @@
         },
         "submitError": {
           "toast": "Error submitting credential"
+        },
+        "personalAccessTokenField": {
+          "placeholder": "Add your personal access token"
         }
       },
       "delete": {
@@ -5470,9 +5473,9 @@
           "message": "Are you sure you want to delete this credential? You cannot delete credentials that are linked to live connectors."
         },
         "confirmButton": {
-          "label": "Confirm"
+          "label": "Delete"
         },
-        "confirmTitle": "Confirm Deletion"
+        "confirmTitle": "Delete *{name}*"
       },
       "displayNames": {
         "accessKeyId": "{source} Access Key ID",
@@ -5521,7 +5524,8 @@
         "zuliprcContent": "Zuliprc Content",
         "authenticationMethod": "Authentication Method",
         "primaryAdminEmail": "Primary Admin Email",
-        "serviceAccountKey": "Service Account Key"
+        "serviceAccountKey": "Service Account Key",
+        "personalAccessToken": "Personal Access Token"
       },
       "hints": {
         "boxUserEmail": "Optional. The Box user to impersonate.",
@@ -5538,7 +5542,8 @@
         "outlineBaseUrl": "For example https://app.getoutline.com, or your self-hosted URL.",
         "pfxFile": "Upload the `.pfx` file containing the private key of the app registration. Must be under 10 KB.",
         "testrailBaseUrl": "For example https://yourcompany.testrail.io.",
-        "googleServiceAccountKey": "Upload or paste the `.json` key of a Google service account with domain-wide delegation."
+        "googleServiceAccountKey": "Upload or paste the `.json` key of a Google service account with domain-wide delegation.",
+        "confluencePersonalAccessToken": "Paste the [Personal Access Token](https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html) from your Confluence admin account."
       },
       "methods": {
         "labels": {
@@ -5742,9 +5747,6 @@
         }
       },
       "defaultAgent": {
-        "cleared": {
-          "toast": "Default agent cleared"
-        },
         "section": {
           "description": "The agent used by the bot in all channels unless overridden.",
           "title": "Default Agent"
@@ -5757,9 +5759,6 @@
         },
         "updateError": {
           "toast": "Failed to update agent"
-        },
-        "updated": {
-          "toast": "Default agent updated"
         }
       },
       "error": {
@@ -5812,15 +5811,9 @@
         "deleted": {
           "toast": "Server configuration deleted"
         },
-        "disabled": {
-          "toast": "Server disabled"
-        },
         "empty": {
           "description": "Create a server configuration to get started.",
           "title": "No Discord servers configured yet"
-        },
-        "enabled": {
-          "toast": "Server enabled"
         },
         "fallbackName": "Server #{id}",
         "notRegistered": {
@@ -5944,9 +5937,6 @@
       "score": {
         "notANumber": {
           "toast": "Score must be a number"
-        },
-        "updated": {
-          "toast": "Updated score!"
         }
       },
       "sets": {
@@ -5955,7 +5945,7 @@
             "label": "Private"
           },
           "public": {
-            "label": "Public"
+            "label": "Organization"
           }
         },
         "connector": {
@@ -6043,9 +6033,16 @@
         "newButton": {
           "label": "New Document Set"
         },
+        "noResults": {
+          "description": "No document sets matching \"{query}\"",
+          "title": "No document sets found"
+        },
         "notFound": {
           "message": "Document set with id {id} not found",
           "title": "Document set not found"
+        },
+        "search": {
+          "placeholder": "Search document sets..."
         },
         "status": {
           "deleting": {
@@ -6069,7 +6066,7 @@
             "header": "Name"
           },
           "public": {
-            "header": "Public"
+            "header": "Access"
           },
           "status": {
             "header": "Status"
@@ -6360,12 +6357,11 @@
     },
     "groups": {
       "card": {
-        "defaultTag": {
-          "label": "Default"
+        "defaultSuffix": {
+          "label": "(Default)"
         },
         "toasts": {
-          "renameFailed": "Failed to rename group",
-          "renamed": "Group renamed to \"{name}\""
+          "renameFailed": "Failed to rename group"
         },
         "viewGroup": {
           "label": "View group"
@@ -6444,8 +6440,6 @@
         "toasts": {
           "deleteFailed": "Failed to delete group",
           "deleted": "Group \"{name}\" deleted",
-          "managerAssigned": "Manager assigned",
-          "managerRevoked": "Manager revoked",
           "managerUpdateFailed": "Failed to update manager",
           "membersStranded": "Some of those members would be left without a group. Add them to another group first.",
           "syncing": "This group is currently syncing. Please wait a moment and try again.",
@@ -6467,8 +6461,7 @@
           "text": "Create groups to organize users and manage access."
         },
         "loadError": {
-          "description": "Please check the console for more details.",
-          "title": "Failed to load groups."
+          "description": "Please check the console for more details."
         },
         "newGroup": {
           "label": "New Group"
@@ -6478,7 +6471,7 @@
           "title": "No groups found"
         },
         "search": {
-          "placeholder": "Search groups..."
+          "placeholder": "Search groups or press \"/\" to focus..."
         }
       },
       "members": {
@@ -6923,9 +6916,6 @@
       "deselectError": {
         "message": "Failed to deselect"
       },
-      "deselectSuccess": {
-        "message": "{title} deselected"
-      },
       "disconnectError": {
         "message": "Failed to disconnect"
       },
@@ -7110,12 +7100,13 @@
       },
       "setDefaultError": {
         "message": "Failed to set default"
-      },
-      "setDefaultSuccess": {
-        "message": "{title} set as default"
       }
     },
     "indexSettings": {
+      "advanced": {
+        "title": "Advanced Options",
+        "description": "These settings change how efficiently {appName} applies document permissions in search. They do not change which documents each user can see. Do not change them without explicit guidance from the Yahont team."
+      },
       "actions": {
         "applyForward": {
           "label": "Apply to new and updated documents"
@@ -7226,6 +7217,9 @@
         "description": "Add document-level context to every indexed chunk to improve hybrid search relevance. This can increase embedding cost significantly.",
         "noModelsTooltip": "Contextual Retrieval is disabled because you have no models configured. Set up a [Language Model]({link}) first.",
         "title": "Contextual Retrieval"
+      },
+      "currentModel": {
+        "legacyHint": "This is a legacy model. It keeps working, but you cannot select it again for a new index. To upgrade, click View All Models and select a newer model."
       },
       "embeddingModel": {
         "cloudManaged": {
@@ -7369,9 +7363,12 @@
         "currentButton": {
           "label": "Current Model"
         },
-        "deprecated": {
-          "connectTooltip": "This embedding model is deprecated and cannot be connected to.",
-          "selectTooltip": "This embedding model is deprecated and cannot be selected."
+        "gpuRecommended": {
+          "tag": "GPU recommended"
+        },
+        "legacy": {
+          "tag": "Legacy",
+          "tooltip": "You cannot select this model for a new index. It keeps working until you change the model."
         },
         "selectButton": {
           "label": "Select Model"
@@ -7381,8 +7378,14 @@
         }
       },
       "modelPicker": {
+        "cpuEstimateHint": "CPU speeds are estimates and vary with hardware and document size. RAM recommendations cover one loaded model, not the full Yahont stack. Allow more memory during re-indexing.",
         "addCustomModel": {
           "label": "Add Custom Model"
+        },
+        "bringYourOwn": {
+          "cloudDescription": "Connect a LiteLLM proxy, an Azure OpenAI deployment or a Bifrost gateway. You supply the model name. For LiteLLM and Azure, you also supply the dimension.",
+          "selfHostedDescription": "Run a Hugging Face embedding model that is not in the list above. You supply the model name, dimension and prefixes.",
+          "title": "Advanced: bring your own model or proxy"
         },
         "cloudTab": {
           "label": "Cloud-based"
@@ -7584,22 +7587,27 @@
         "restoreHint": "To keep a connector, cancel here, resume or fix it, then re-index — it will be carried over. Otherwise, add it back once the re-index finishes."
       },
       "modelDescriptions": {
+        "cohereEmbedV5Pro": "Cohere's top embedding model. The best balance of quality and cost. 2048-dim output.",
+        "cohereEmbedV5Fast": "A lower-cost version of Cohere's Embed 5. Still an excellent option. 2048-dim output.",
         "cohereEmbedEnglishV3": "Cohere's English embedding model. Good performance for English-language tasks.",
         "cohereEmbedEnglishLightV3": "Cohere's lightweight English embedding model. Faster and more efficient for simpler tasks.",
-        "cohereEmbedV4": "Cohere's latest multilingual embedding model with the default 1536-dim output for stronger retrieval quality.",
-        "openaiTextEmbedding3Large": "OpenAI's large embedding model. Best performance, but more expensive.",
-        "openaiTextEmbedding3Small": "OpenAI's newer, more efficient embedding model. Good balance of performance and cost.",
+        "cohereEmbedV4": "Cohere's multilingual embedding model, with a 1536-dim output.",
+        "openaiTextEmbedding3Large": "OpenAI's large embedding model. A good choice if you already use OpenAI. 3072-dim output.",
+        "openaiTextEmbedding3Small": "OpenAI's small embedding model. By far the most economical cloud-based option. 1536-dim output.",
         "googleGeminiEmbedding001": "Google's Gemini embedding model. Powerful and efficient.",
         "googleTextEmbedding005": "Smaller, lighter-weight embedding model from Google.",
-        "googleGeminiEmbedding2": "Google's latest multimodal embedding model (GA). Highest-quality retrieval with a 3072-dim output.",
+        "googleGeminiEmbedding2": "Google's top embedding model. Very powerful, but expensive and slower. Its 3072-dim output builds a large index. A solid choice for teams that already use Google.",
         "googleGeminiEmbedding2Preview": "Preview version of Gemini Embedding 2. Superseded by gemini-embedding-2 for new setups.",
         "voyageLarge2Instruct": "Voyage's large embedding model. High performance with instruction fine-tuning.",
         "voyage4Large": "Voyage's largest 4-series embedding model. Best Voyage retrieval quality, multilingual.",
         "voyage4": "Voyage's general-purpose 4-series embedding model. High retrieval quality at moderate cost.",
         "voyage4Lite": "Voyage's lightweight 4-series embedding model. Lowest cost and highest rate limits.",
         "voyageLight2Instruct": "Voyage's lightweight embedding model. Good balance of performance and efficiency.",
+        "graniteEmbedding97mMultilingualR2": "IBM's small multilingual model. Ships with {appName}. 97M parameters, 384-dim output. Up to 200 docs / min / CPU core. Recommended CPU RAM: 4 GB per model server.",
+        "voyage4Nano": "Voyage AI's open-weights model. 346M parameters, 2048-dim output. Up to 50 docs / min / CPU core. Recommended CPU RAM: 4 GB per model server.",
+        "nemotron3Embed1b": "NVIDIA's multilingual model. 1.1B parameters, 2048-dim output. Up to 5 docs / min / CPU core. Recommended CPU RAM: 8 GB per model server. GPU recommended.",
         "nomicEmbedTextV1": "Nomic's embedding model specialized for retrieval, similarity, clustering and classification.",
-        "e5BaseV2": "A smaller and faster model than the default. It is around 2x faster than the default model at the cost of lower search quality.",
+        "e5BaseV2": "English embedding model from Microsoft's E5 family. A balance of speed and search quality.",
         "e5SmallV2": "The smallest and fastest version of the E5 line of models. If you're running {appName} on a resource constrained system, then this may be a good choice.",
         "multilingualE5Base": "For corpora in other languages besides English, this is the one to choose.",
         "multilingualE5Small": "For corpora in other languages besides English, as well as being on a resource constrained system, this is the one to choose."
@@ -7651,8 +7659,7 @@
           },
           "placeholder": "Select a mode",
           "toasts": {
-            "error": "Could not update the search access mode.",
-            "success": "Search access mode set to {mode}."
+            "error": "Could not update the search access mode."
           }
         },
         "loadError": {
@@ -7679,7 +7686,6 @@
           "period": "Enter a whole number of seconds from 1 to {max, number}."
         },
         "toasts": {
-          "saved": "Rate limit saved.",
           "failed": "Could not save the rate limit."
         }
       },
@@ -7738,7 +7744,7 @@
           "deleting": "{count, plural, one {# connector deleting} other {# connectors deleting}}"
         },
         "access": {
-          "public": "Public",
+          "public": "Organization",
           "private": "Private",
           "sync": "Auto-sync",
           "sync_restricted": "Auto-sync, restricted"
@@ -7786,7 +7792,7 @@
         "title": "New LLM configuration temporarily unavailable."
       },
       "defaultModel": {
-        "description": "This model will be used by {appName} by default in your chats.",
+        "description": "Used for new sessions by default.",
         "title": "Default Model"
       },
       "deleteModal": {
@@ -7878,6 +7884,10 @@
           "accessKeyIdField": {
             "title": "AWS Access Key ID"
           },
+          "assumeRoleField": {
+            "description": "Use a Bedrock role in a different AWS account. {appName} assumes this role with the credentials above.",
+            "title": "Role ARN to assume"
+          },
           "authMethodField": {
             "accessKey": {
               "description": "For non-AWS environments",
@@ -7893,6 +7903,10 @@
               "label": "Long-term API Key"
             },
             "title": "Authentication Method"
+          },
+          "externalIdField": {
+            "description": "Only if the role's trust policy requires one.",
+            "title": "External ID"
           },
           "iamNotice": {
             "title": "{appName} will use the IAM role attached to the environment it’s running in to authenticate."
@@ -8070,10 +8084,16 @@
             "label": "More Models"
           },
           "refetch": {
+            "label": "Refresh models",
             "errorToast": "Failed to fetch models"
           },
           "row": {
             "defaultLabel": "Default Model",
+            "decisionTag": {
+              "label": "Decision",
+              "decisionOnly": "Decision model. Not available in the chat model picker.",
+              "chatAndDecision": "Supports both chat and decision tasks."
+            },
             "renameButton": {
               "tooltip": "Rename"
             },
@@ -8311,24 +8331,24 @@
       },
       "toasts": {
         "providerDeleteFailed": "Failed to delete provider: {message}",
-        "providerDeleted": "Provider deleted successfully!",
         "providerLoadFailed": "Could not load the provider: {message}",
         "providerResolveFailed": "Could not resolve provider",
         "settingsUpdateFailed": "Failed to update settings",
-        "settingsUpdated": "Settings updated",
         "unknownError": "Unknown error"
       },
       "modelRouting": {
         "autoMode": {
           "title": "Auto Mode",
-          "description": "Add an Auto option to the model picker that picks the best-fit model for each message."
+          "description": "Add an Auto option to the model picker that picks the best-fit model for each message.",
+          "noRoutersTooltip": "No router models found. Enable a router model on a gateway provider first.",
+          "noRoutersError": "No router models found, so users can't select Auto. Enable a router model on a gateway provider."
         },
         "target": {
           "title": "Router Model",
           "description": "Handles model routing for Auto mode.",
-          "empty": "No router models found. Enable a router model on a gateway provider first.",
           "error": "Failed to load router models.",
-          "retry": "Retry"
+          "retry": "Retry",
+          "missing": "Choose a router model to enable users to use the auto routing mode."
         }
       },
       "providers": {
@@ -8340,6 +8360,14 @@
           "productName": "Custom Models",
           "companyName": "OpenAI-compatible endpoints"
         }
+      },
+      "reasoning": {
+        "description": "Allow users to override the default model reasoning level per session.",
+        "title": "Reasoning Control"
+      },
+      "temperature": {
+        "description": "Allow users to override the default model temperature per session.",
+        "title": "Temperature Control"
       }
     },
     "mcpActions": {
@@ -8738,9 +8766,6 @@
         "error": "Failed to load SCIM token status."
       },
       "modal": {
-        "copied": {
-          "message": "Token copied to clipboard"
-        },
         "copyFailed": {
           "error": "Failed to copy token"
         },
@@ -8902,6 +8927,10 @@
           "description": "Everyone signs in and registers through SSO only. Requires at least one enabled SSO provider.",
           "title": "Disable Password Login & Signup"
         },
+        "renamedClaim": {
+          "description": "Let users whose email was renamed sign in through another provider to the account that holds their current email, when that account has no provider link left. Turn on only while moving users off a deleted SSO provider.",
+          "title": "Claim Renamed Accounts After a Provider Delete"
+        },
         "section": {
           "title": "Authentication"
         },
@@ -8997,9 +9026,7 @@
       },
       "toasts": {
         "securitySettingsUpdateFailed": "Failed to update security settings",
-        "securitySettingsUpdated": "Security settings updated",
-        "settingsUpdateFailed": "Failed to update settings",
-        "settingsUpdated": "Settings updated"
+        "settingsUpdateFailed": "Failed to update settings"
       },
       "placeholders": {
         "jwksUrl": "https://idp.example.com/.well-known/jwks.json",
@@ -9121,8 +9148,7 @@
       "page": {
         "description": "Use service accounts to programmatically access {appName} API.",
         "error": {
-          "description": "Please check the console for more details.",
-          "title": "Failed to load service accounts."
+          "description": "Please check the console for more details."
         }
       },
       "regenerateModal": {
@@ -9173,7 +9199,6 @@
       "toasts": {
         "deleteFailed": "Failed to delete API Key.",
         "deleteFailedWithDetail": "Failed to delete API Key: {detail}",
-        "keyCopied": "API key copied to clipboard.",
         "regenerateFailed": "Failed to regenerate API Key.",
         "regenerateFailedWithDetail": "Failed to regenerate API Key: {detail}"
       },
@@ -9395,8 +9420,8 @@
         },
         "knowledgeSource": {
           "allPublic": {
-            "label": "All Public Knowledge",
-            "sublabel": "Let YahontBot respond based on information from all public connectors"
+            "label": "All Organization-Wide Knowledge",
+            "sublabel": "Let YahontBot respond based on information from all organization-wide connectors"
           },
           "documentSets": {
             "label": "Specific Document Sets",
@@ -9601,9 +9626,6 @@
         "fieldUpdateFailed": {
           "toast": "Failed to update connector {field}"
         },
-        "fieldUpdated": {
-          "toast": "Connector {field} updated successfully"
-        },
         "updateTokensButton": {
           "label": "Update Tokens"
         }
@@ -9628,9 +9650,10 @@
         "gatedTooltip": "Multiple enabled SSO providers are available on the Business or Enterprise plan."
       },
       "copyRedirectUri": {
-        "tooltip": "Copy redirect URI",
-        "successToast": "Redirect URI copied",
-        "errorToast": "Could not copy"
+        "tooltip": "Copy redirect URI"
+      },
+      "deleteProvider": {
+        "tooltip": "Delete"
       },
       "editProvider": {
         "tooltip": "Edit"
@@ -9644,6 +9667,17 @@
         "title": "Failed to load SSO providers"
       },
       "modals": {
+        "deleteProvider": {
+          "title": "Delete {name}",
+          "description": "Users who signed in with {name} keep their accounts. Their next sign-in through another provider with the same email opens the same account. Add the replacement provider before you delete this one.",
+          "countsError": "We couldn't load who signed in with this provider. Close and try again.",
+          "countsLoading": "Loading who signed in with this provider…",
+          "linkedUsers": "{count, plural, =0 {No users have signed in with {name}.} one {# user signed in with {name}.} other {# users signed in with {name}.}}",
+          "renamedUsers": "{count, plural, one {# of them was renamed and needs the renamed-account claim window in Security Hardening to sign in through another provider.} other {# of them were renamed and need the renamed-account claim window in Security Hardening to sign in through another provider.}}",
+          "submit": {
+            "label": "Delete"
+          }
+        },
         "domainVerification": {
           "description": "A domain signs your workspace's users in automatically only after you verify you own it. Add the DNS record below, then verify.",
           "loadError": {
@@ -9742,6 +9776,7 @@
         "description": "Let users sign in through your identity provider."
       },
       "toasts": {
+        "providerDeleted": "{name} deleted",
         "unexpectedError": "Unexpected error occurred."
       },
       "providerTypes": {
@@ -10334,8 +10369,7 @@
         }
       },
       "loadError": {
-        "description": "Unable to load tracing configuration.",
-        "title": "Failed to load tracing settings"
+        "description": "Unable to load tracing configuration."
       },
       "page": {
         "description": "Connect observability platforms to monitor and evaluate LLM calls."
@@ -10895,7 +10929,7 @@
           "required": "API key is required"
         },
         "apiSecret": {
-          "description": "Paste your [API secret]({url}) from {provider} to access Scribe.",
+          "description": "Paste your [API secret]({url}) from {provider} to access Zoom AI Services.",
           "label": "API Secret",
           "placeholder": "API secret",
           "required": "API secret is required"
@@ -11123,7 +11157,6 @@
         "title": "Each user configures their own token and connection details under Settings → LLM Gateway."
       },
       "toasts": {
-        "settingsUpdated": "Settings updated",
         "settingsUpdateFailed": "Failed to update settings"
       }
     },
@@ -11133,26 +11166,28 @@
         "title": "Test Connection",
         "description": "{appName} will run checks to validate required scopes before proceeding.",
         "startButton": {
-          "label": "Start Checks"
+          "label": "Start Checks",
+          "disabledTooltip": "Choose an account or fill in a new one above to start the checks"
         }
       },
       "title": "Connector Checks",
       "groups": {
         "failed": "{count} Failed",
-        "indeterminate": "{count} Unverified",
+        "indeterminate": "{count} Incomplete",
         "passed": "{count} Successful",
         "skipped": "{count} Skipped",
-        "running": "{count} Running",
+        "running": "{count} in Progress",
         "expected": "{count} Expected"
       },
       "status": {
-        "passed": "Passed",
+        "passed": "Successful",
         "failed": "Failed",
-        "indeterminate": "Could not be verified",
+        "indeterminate": "Incomplete",
         "skipped": "Skipped",
-        "running": "Testing…",
+        "running": "Running…",
         "pending": "Queued",
-        "waiting": "Waiting for settings"
+        "waiting": "Waiting for settings",
+        "stopped": "Stopped by you"
       },
       "required": {
         "label": "Required"
@@ -11160,17 +11195,15 @@
       "empty": {
         "label": "No checks have run yet."
       },
-      "docsLink": {
-        "label": "Documentation"
-      },
       "foldButton": {
         "fold": "Fold",
         "expand": "View All"
       },
       "titleCount": "({complete}/{total})",
+      "titleTotal": "({total})",
       "summary": {
         "failed": "{count} failed",
-        "unverified": "{count} unverified",
+        "unverified": "{count} incomplete",
         "inProgress": "{count} in progress",
         "expected": "{count} more expected",
         "skipped": "{count} skipped",
@@ -11193,6 +11226,31 @@
         "proceedButton": {
           "label": "Create Connector Anyway"
         }
+      },
+      "actions": {
+        "run": {
+          "label": "Run Check"
+        },
+        "skip": {
+          "label": "Skip Check"
+        },
+        "rerun": {
+          "label": "Re-run Check"
+        }
+      },
+      "details": {
+        "expand": "Show details",
+        "collapse": "Hide details"
+      },
+      "docsButton": {
+        "label": "Docs"
+      },
+      "runLost": "The checks stopped responding. Try again.",
+      "cancelButton": {
+        "label": "Cancel"
+      },
+      "cancelFailed": {
+        "toast": "Couldn't cancel the checks. Try again."
       }
     },
     "connectorEdit": {
@@ -11760,7 +11818,7 @@
           }
         },
         "publicPermissionMenu": {
-          "ariaLabel": "Change public permission"
+          "ariaLabel": "Change organization permission"
         },
         "row": {
           "updateAccess": {
@@ -11781,14 +11839,18 @@
         },
         "toasts": {
           "accessRemoved": "Access removed.",
-          "copyLinkFailed": "Failed to copy link.",
-          "linkCopied": "Copied link.",
           "ownershipTransferred": "Ownership transferred.",
           "sharingUpdated": "Sharing updated."
         },
         "transfer": {
           "label": "Transfer",
           "title": "Transfer *{name}*"
+        },
+        "people": {
+          "label": "People with access"
+        },
+        "ownerOption": {
+          "disabledTooltip": "Owner cannot be unshared."
         }
       },
       "viewer": {
@@ -11840,7 +11902,7 @@
           "title": "Prompt Reminders"
         },
         "public": {
-          "label": "Public to your organization"
+          "label": "Available to your organization"
         }
       }
     },
@@ -12355,17 +12417,23 @@
         "builtin": {
           "label": "Built-in"
         },
-        "custom": {
-          "label": "Custom"
-        },
         "invalid": {
           "label": "Invalid"
         },
         "personal": {
           "label": "Personal"
         },
+        "required": {
+          "tooltip": "Your organization admin requires you to have this skill."
+        },
         "unavailable": {
           "label": "Unavailable - click to learn more"
+        },
+        "shared": {
+          "label": "Shared"
+        },
+        "organization": {
+          "label": "Organization"
         }
       },
       "toggle": {
@@ -13549,14 +13617,14 @@
           "title": "Your Organization"
         },
         "permissionMenu": {
-          "edit": {
-            "label": "Edit"
+          "canEdit": {
+            "label": "Can edit"
+          },
+          "canUse": {
+            "label": "Can use"
           },
           "removeAccess": {
             "label": "Remove Access"
-          },
-          "viewAndChat": {
-            "label": "View & Chat"
           }
         },
         "privateOption": {
@@ -13975,9 +14043,6 @@
   },
   "common": {
     "textListField": {
-      "addButton": {
-        "label": "Add New"
-      },
       "removeButton": {
         "tooltip": "Remove"
       }
@@ -14417,11 +14482,11 @@
         "text": "Loading..."
       },
       "makePublic": {
-        "label": "Make this {objectName} Public?",
+        "label": "Make this {objectName} available to your organization?",
         "subtext": "If set, then this {objectName} will be usable by <b>All {publicToWhom}</b>. Otherwise, only <b>Admins</b> and <b>{publicToWhom}</b> who have explicitly been given access to this {objectName} (e.g. via a User Group) will have access."
       },
       "publicDisabled": {
-        "message": "This {objectName} is public and available to all users."
+        "message": "This {objectName} is available to everyone in your organization."
       },
       "usersFallback": {
         "text": "Users"
@@ -14500,21 +14565,23 @@
     },
     "plans": {
       "free": {
-        "title": "Free Plan",
-        "tooltip": "Available on every plan."
+        "title": "Free Plan"
       },
       "business": {
         "title": "Business Plan",
-        "tooltip": "Requires the [Business or Enterprise plan](/admin/billing)."
+        "tooltip": "This feature is available on the [Business or Enterprise version of Yahont](/admin/billing) only."
       },
       "enterprise": {
         "title": "Enterprise Plan",
-        "tooltip": "Requires the [Enterprise plan](/admin/billing)."
+        "tooltip": "This feature is available on the [Enterprise version of Yahont](/admin/billing) only."
       },
       "upgrade": {
         "label": "Upgrade Plan"
       },
-      "availableFor": "Available for {plan}"
+      "availableFor": "Available for {plan}",
+      "beta": {
+        "title": "beta"
+      }
     },
     "placeholders": {
       "email": "email@yourcompany.com",
@@ -14539,6 +14606,11 @@
       "vertexAi": {
         "projectId": "my-vertex-project",
         "location": "global"
+      }
+    },
+    "languageSelect": {
+      "globalDefault": {
+        "label": "Global Default"
       }
     },
     "appFooter": {
@@ -14659,7 +14731,7 @@
         "title": "Associated skills",
         "unavailable": {
           "duplicateName": "A skill named “{name}” is already associated.",
-          "invalid": "Invalid skill — fix it before associating.",
+          "invalid": "Invalid skill. Fix it before associating.",
           "otherApp": "Already associated with app “{name}”."
         },
         "unlink": {
@@ -14962,11 +15034,12 @@
     },
     "filePreview": {
       "cannotPreview": {
-        "title": "Cannot preview file"
+        "title": "Preview for this file type is not currently supported"
       },
       "error": {
         "inline": "Error: {message}",
-        "title": "Error loading file"
+        "title": "Unable to load preview",
+        "description": "The preview could not be loaded. Try again or download the file to open it."
       },
       "loading": {
         "label": "Loading file..."
@@ -14979,10 +15052,25 @@
         "malformed": "This CSV contains an invalid quoted field. Download the original to inspect it."
       },
       "imageTooLarge": {
-        "description": "This image is too large to preview. Download the original to open it."
+        "description": "Images up to 10 MB can be previewed. Download the file to open it.",
+        "title": "Image too large to preview"
       },
       "unsupported": {
-        "description": "Download the original to open it."
+        "description": "Download the file to view its contents."
+      },
+      "retry": {
+        "label": "Try again"
+      },
+      "download": {
+        "label": "Download file"
+      },
+      "tooLarge": {
+        "title": "File too large to preview",
+        "description": "Files up to {size, number} MB can be previewed here. Download the file to open it."
+      },
+      "playback": {
+        "title": "Playback not supported",
+        "description": "Your browser cannot play this file. Download the file to open it."
       }
     },
     "filesTab": {
@@ -15943,7 +16031,6 @@
       "actionPolicies": "Approval settings",
       "policyCounts": "{auto} auto-approve · {ask} ask · {disabled} disabled",
       "manageActions": "Manage actions",
-      "viewActions": "View actions",
       "taskModalDescription": "Changes apply when you save the task. Workspace restrictions always apply.",
       "searchActions": "Search actions",
       "setPermissions": "Set permissions",
@@ -16284,6 +16371,11 @@
     "iconTooltip": {
       "label": "More information"
     },
+    "inputCurrency": {
+      "amount": "Amount",
+      "fraction": "Fractional amount",
+      "whole": "Whole amount"
+    },
     "input": {
       "day": "Day",
       "hidePassword": "Hide password",
@@ -16347,6 +16439,12 @@
     "settingsHeader": {
       "cancel": "Cancel"
     },
+    "settingsBody": {
+      "error": {
+        "title": "{page} failed to load",
+        "description": "Something went wrong. Try again in a moment."
+      }
+    },
     "table": {
       "alwaysShown": "Always Shown",
       "ascending": "Ascending",
@@ -16370,9 +16468,17 @@
       "scrollLeft": "Scroll tabs left",
       "scrollRight": "Scroll tabs right"
     },
+    "toast": {
+      "moreCount": "+{count} more"
+    },
     "sidebar": {
       "open": "Open Sidebar",
       "close": "Close Sidebar"
+    },
+    "inputNumber": {
+      "outOfRange": "Enter a number from {min, number} to {max, number}",
+      "belowMin": "Enter a number of at least {min, number}",
+      "aboveMax": "Enter a number of at most {max, number}"
     }
   },
   "settings": {
@@ -16405,8 +16511,7 @@
         "title": "Change Password",
         "toasts": {
           "networkError": "An error occurred while changing the password",
-          "updateFailed": "Failed to change password",
-          "updated": "Password updated successfully"
+          "updateFailed": "Failed to change password"
         },
         "validation": {
           "confirmRequired": "Please confirm your new password",
@@ -16478,10 +16583,8 @@
       "toasts": {
         "createFailed": "Failed to create token",
         "createNetworkError": "Network error creating token",
-        "created": "Token created successfully",
         "deleteFailed": "Failed to delete token",
         "deleteNetworkError": "Network error deleting token",
-        "deleted": "Token deleted successfully",
         "loadFailed": "Failed to load tokens",
         "loadPermissionsFailed": "Failed to load permission options",
         "nameRequired": "Token name is required"
@@ -16545,8 +16648,7 @@
       },
       "title": "Chats",
       "toasts": {
-        "saveFailed": "Failed to save preferences",
-        "saved": "Preferences saved"
+        "saveFailed": "Failed to save preferences"
       }
     },
     "connectors": {
@@ -16566,8 +16668,7 @@
       },
       "title": "Connectors",
       "toasts": {
-        "disconnectFailed": "Failed to disconnect",
-        "disconnected": "Disconnected successfully"
+        "disconnectFailed": "Failed to disconnect"
       }
     },
     "dangerZone": {
@@ -16583,8 +16684,7 @@
         "description": "Permanently delete all your chat sessions.",
         "title": "Delete All Chats",
         "toasts": {
-          "deleteFailed": "Failed to delete all chat sessions",
-          "deleted": "All your chat sessions have been deleted."
+          "deleteFailed": "Failed to delete all chat sessions"
         }
       },
       "title": "Danger Zone"
@@ -16631,8 +16731,7 @@
       "title": "Language",
       "toasts": {
         "updateFailed": "Failed to update language preference"
-      },
-      "workspaceDefault": "Default ({language})"
+      }
     },
     "layout": {
       "header": {
@@ -16719,8 +16818,7 @@
       },
       "title": "Profile",
       "toasts": {
-        "updateFailed": "Failed to update personalization",
-        "updated": "Personalization updated successfully"
+        "updateFailed": "Failed to update personalization"
       },
       "workRole": {
         "description": "Share your role to better tailor responses.",
@@ -16732,18 +16830,15 @@
       "row": {
         "contentPlaceholder": "Provide a concise 1–2 sentence summary of the following:",
         "promptPlaceholder": "Summarize",
-        "publicTooltip": "Cannot delete public prompt-shortcuts.",
+        "publicTooltip": "Cannot delete organization-wide prompt shortcuts.",
         "removeAriaLabel": "Remove shortcut"
       },
       "title": "Prompt Shortcuts",
       "toasts": {
         "bothRequired": "Both shortcut and expansion are required",
-        "created": "Shortcut created",
         "deleteFailed": "Failed to delete shortcut",
-        "deleted": "Shortcut deleted",
         "loadFailed": "Failed to load shortcuts",
-        "saveFailed": "Failed to save shortcut",
-        "updated": "Shortcut updated"
+        "saveFailed": "Failed to save shortcut"
       },
       "toggle": {
         "description": "Enable shortcuts to quickly insert common prompts.",
@@ -16906,6 +17001,9 @@
         "languageModels": {
           "label": "Language Models"
         },
+        "decisionModels": {
+          "label": "Decision Models"
+        },
         "llmGateway": {
           "label": "LLM Gateway"
         },
@@ -16959,6 +17057,9 @@
         },
         "webSearch": {
           "label": "Web Search"
+        },
+        "skills": {
+          "label": "Skills"
         }
       },
       "sections": {
@@ -16986,12 +17087,6 @@
       }
     },
     "adminSidebar": {
-      "businessOrEnterpriseOnly": {
-        "tooltip": "This feature is available on the [Business or Enterprise version of Yahont](/admin/billing) only."
-      },
-      "enterpriseOnly": {
-        "tooltip": "This feature is available on the [Enterprise version of Yahont](/admin/billing) only."
-      },
       "exitAdminPanel": {
         "label": "Exit Admin Panel"
       },
@@ -17010,8 +17105,7 @@
         "title": "Agents"
       },
       "craft": {
-        "label": "Craft",
-        "businessTag": "Business"
+        "label": "Craft"
       },
       "exploreAgents": {
         "label": "Explore Agents"
@@ -17252,21 +17346,11 @@
         "title": "Skill unavailable"
       },
       "management": {
-        "description": "Control who can use this skill.",
-        "externalApp": {
-          "manage": {
-            "label": "Manage in app settings"
-          },
-          "readyDescription": "This skill uses app “{appName}”.",
-          "title": "External app"
-        },
         "sharing": {
           "edit": {
             "label": "Edit sharing"
-          },
-          "title": "Sharing"
-        },
-        "title": "Management"
+          }
+        }
       },
       "saveTooltip": {
         "missingDescription": "Add a description before saving.",
@@ -17276,21 +17360,6 @@
         "noPermission": "You don't have permission to edit this skill's details.",
         "savingChanges": "Saving changes...",
         "savingSkill": "Saving skill..."
-      },
-      "sharing": {
-        "organization": {
-          "editorDescription": "Everyone in your organization can use and edit this skill.",
-          "title": "Organization",
-          "viewerDescription": "Everyone in your organization can use this skill."
-        },
-        "personal": {
-          "description": "Only you can use this skill.",
-          "title": "Personal"
-        },
-        "shares": {
-          "description": "Only selected users and groups can use this skill.",
-          "title": "{count, plural, one {# share} other {# shares}}"
-        }
       },
       "toasts": {
         "created": "Created \"{name}\"",
@@ -17304,6 +17373,9 @@
         "inspectFailed": "Failed to inspect skill bundle",
         "saveFailed": "Failed to save skill",
         "saved": "Saved \"{name}\""
+      },
+      "creationAccess": {
+        "title": "Access"
       }
     },
     "modals": {
@@ -17342,6 +17414,13 @@
           "singleSkill": "Upload one skill at a time.",
           "title": "File requirements",
           "zip": "ZIP files must contain a SKILL.md file."
+        },
+        "batch": {
+          "title": "Access for Uploaded Skills",
+          "selected": "{count, plural, one {# skill bundle selected} other {# skill bundles selected}}",
+          "result": "{imported, plural, one {# skill imported} other {# skills imported}}. {failed, plural, one {# failed} other {# failed}}.",
+          "failure": "{name}: {reason}",
+          "requirement": "Select multiple ZIP files to import skills together. Each ZIP must contain one skill."
         }
       },
       "importGithub": {
@@ -17418,6 +17497,11 @@
         "unavailableFallback": "This skill cannot be imported.",
         "unavailableTag": {
           "label": "Can't import"
+        },
+        "sharing": {
+          "title": "Access for Imported Skills",
+          "configureButton": "Configure access",
+          "description": "These access settings apply to all {count, plural, one {# selected skill} other {# selected skills}}."
         }
       },
       "nameConflict": {
@@ -17471,7 +17555,6 @@
         },
         "externalAppNotice": "Organization-wide viewer access is required while this skill is associated with app “{appName}”.",
         "header": {
-          "title": "Share *{name}*",
           "transferTitle": "Transfer *{name}*"
         },
         "loading": {
@@ -17505,15 +17588,35 @@
         },
         "transferredToast": {
           "message": "Ownership transferred."
-        }
+        },
+        "installation": {
+          "title": "Installation",
+          "available": "Available to install",
+          "default": "Installed by default",
+          "required": "Required",
+          "availableDescription": "Users can install or uninstall anytime.",
+          "defaultDescription": "Installed automatically. Users can disable or uninstall anytime.",
+          "requiredDescription": "Installed automatically. Users cannot disable or uninstall.",
+          "description": "Choose how this skill is installed for everyone with access."
+        },
+        "description": "Choose who can use this skill and how it is installed.",
+        "accessTitle": "Who can access",
+        "peopleTitle": "People with access",
+        "manageIndividualAccess": "Manage individual access",
+        "individualAccessTitle": "Individual access",
+        "ownershipTitle": "Ownership"
       },
       "placeholders": {
         "githubRepository": "owner/repository or https://github.com/owner/repository"
+      },
+      "tabs": {
+        "details": "Details",
+        "sharing": "Sharing"
       }
     },
     "page": {
       "browse": {
-        "title": "Browse skills"
+        "title": "Select skills"
       },
       "countSeparator": {
         "label": "{count, plural, one {Skill} other {Skills}}"
@@ -17541,8 +17644,8 @@
           "title": "No matching skills"
         },
         "noSkills": {
-          "description": "No custom skills have been shared with you yet, and no built-ins are configured.",
-          "title": "No skills available"
+          "title": "No custom skills yet",
+          "description": "Create or import a skill to add it to your library."
         }
       },
       "focusedApp": {
@@ -17579,6 +17682,9 @@
         "disableFailed": "Failed to disable {name}",
         "enableFailed": "Failed to enable {name}",
         "refreshFailed": "{name} was updated, but the skill list could not be refreshed."
+      },
+      "builtins": {
+        "title": "Built-in skills ({count, number})"
       }
     },
     "sections": {
@@ -17634,6 +17740,34 @@
           "readFailed": "Could not read the upload."
         }
       }
+    },
+    "sharingSummary": {
+      "organization": "{count, plural, one {Everyone in the organization can access this skill.} other {Everyone in the organization can access these skills.}}",
+      "selected": "Shared with {users, plural, one {# person} other {# people}} and {groups, plural, one {# group} other {# groups}}.",
+      "private": "{count, plural, one {Only you can access this skill.} other {Only you can access these skills.}}"
+    },
+    "bulk": {
+      "adminDescription": "Manage skills and access across your organization.",
+      "selectAll": "Select all visible custom skills",
+      "selected": "{count, plural, one {# selected} other {# selected}}",
+      "share": "Share",
+      "enable": "Enable for me",
+      "disable": "Disable for me",
+      "delete": "Delete",
+      "selectSkill": "Select {name}",
+      "updated": "{count, plural, one {# skill updated} other {# skills updated}}",
+      "failed": "Could not update skills. Try again.",
+      "partialFailure": "{count, plural, one {# skill could not be updated} other {# skills could not be updated}}",
+      "deleteTitle": "{count, plural, one {Delete # skill?} other {Delete # skills?}}",
+      "deleteDescription": "{count, plural, one {This deletes the selected skill for everyone who has access. This cannot be undone.} other {This deletes all # selected skills for everyone who has access. This cannot be undone.}}",
+      "shareTitle": "{count, plural, one {Update Access for # Skill} other {Update Access for # Skills}}",
+      "shareDescription": "Apply these changes to every selected skill. Settings left unchanged keep their current values.",
+      "unchanged": "Keep unchanged",
+      "everyone": "Everyone in the organization",
+      "invitedOnly": "Invited people and groups",
+      "addAccessDescription": "Add these people and groups to every selected skill. People and groups you list get the chosen permission. Everyone else keeps their current access.",
+      "apply": "{count, plural, one {Apply to # skill} other {Apply to # skills}}",
+      "moreActions": "More actions"
     }
   },
   "opensearchHealth": {

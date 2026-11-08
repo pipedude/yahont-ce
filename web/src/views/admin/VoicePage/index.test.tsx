@@ -56,10 +56,10 @@ describe("VoicePage in the cloud build", () => {
     render(<VoicePage />);
 
     expect(
-      screen.getAllByText("RouterAI — Works in Russia without a VPN")
+      screen.getAllByText(/^RouterAI — Works in Russia without a VPN$/)
     ).toHaveLength(2);
     expect(
-      screen.getAllByText("Polza.AI — Works in Russia without a VPN")
+      screen.getAllByText(/^Polza\.AI — Works in Russia without a VPN$/)
     ).toHaveLength(2);
     for (const label of [
       "voice-stt-elevenlabs/scribe-v2",

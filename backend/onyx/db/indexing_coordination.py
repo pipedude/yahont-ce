@@ -123,20 +123,6 @@ class IndexingCoordination:
         return attempt.cancellation_requested if attempt else False
 
     @staticmethod
-    def request_cancellation(
-        db_session: Session,
-        index_attempt_id: int,
-    ) -> None:
-        """
-        Request cancellation of an indexing attempt.
-        This replaces Redis termination signals.
-        """
-        IndexingCoordination.request_cancellation__no_commit(
-            db_session, index_attempt_id
-        )
-        db_session.commit()
-
-    @staticmethod
     def request_cancellation__no_commit(
         db_session: Session,
         index_attempt_id: int,
@@ -168,6 +154,17 @@ class IndexingCoordination:
                 index_attempt_id,
                 total_batches,
             )
+
+    @staticmethod
+    def get_completed_batches(db_session: Session, index_attempt_id: int) -> int:
+        """Reads the count from the database. A column query skips the
+        session's identity map, so an attempt loaded earlier cannot make it stale."""
+        completed = db_session.scalar(
+            select(IndexAttempt.completed_batches).where(
+                IndexAttempt.id == index_attempt_id
+            )
+        )
+        return completed or 0
 
     @staticmethod
     def update_batch_completion_and_docs(

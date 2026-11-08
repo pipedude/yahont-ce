@@ -236,6 +236,7 @@ class _YandexDiskCheck(CapabilityCheck[YandexDiskConnectorConfig]):
         display_name: str,
         remediation: str,
         requires_connector_config: bool = False,
+        validates_binding: bool = False,
         fails_when_unreachable: bool = False,
         depends_on: tuple[str, ...] = (),
     ) -> None:
@@ -247,6 +248,7 @@ class _YandexDiskCheck(CapabilityCheck[YandexDiskConnectorConfig]):
             requires_connector_instance=False,
             requires_connector_config=requires_connector_config,
             remediation=remediation,
+            validates_binding=validates_binding,
             fails_when_unreachable=fails_when_unreachable,
         )
 
@@ -257,6 +259,7 @@ class _TokenCheck(_YandexDiskCheck):
             check_id=TOKEN_CHECK_ID,
             display_name="Sign in to Yandex Disk",
             remediation=_NEW_TOKEN_LINE,
+            validates_binding=True,
             fails_when_unreachable=True,
         )
 

@@ -23,7 +23,7 @@ import { invalidateBillingInformation } from "@/lib/billing/information-keys";
 import { NEXT_PUBLIC_CLOUD_ENABLED } from "@/lib/constants";
 import { SWR_KEYS } from "@/lib/swr-keys";
 import { useUser } from "@/providers/UserProvider";
-import { LinkButton, MessageCard } from "@opal/components";
+import { Enter, LinkButton, MessageCard } from "@opal/components";
 
 import PlansView from "./PlansView";
 import CheckoutView from "./CheckoutView";
@@ -106,12 +106,8 @@ export default function BillingPage() {
   const [showLicenseActivationInput, setShowLicenseActivationInput] =
     useState(false);
   const [licenseCardAutoOpened, setLicenseCardAutoOpened] = useState(false);
-  const [viewChangeId, setViewChangeId] = useState(0);
   const [chargePending, setChargePending] = useState(false);
   const timerRef = useRef<number | null>(null);
-  const [transitionType, setTransitionType] = useState<
-    "expand" | "collapse" | "fade"
-  >("fade");
   const [isActivating, setIsActivating] = useState<boolean>(false);
 
   const {
@@ -237,7 +233,6 @@ export default function BillingPage() {
     };
     void tick();
     // Runs once per mount: the transit params are read before the replace.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle return from checkout or customer portal
@@ -304,7 +299,7 @@ export default function BillingPage() {
     };
     // changeView intentionally omitted: it only calls stable state setters and the
     // effect runs at most once (when the session_id param is present).
-  }, [searchParams, router, refreshBilling, refreshLicense]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [searchParams, router, refreshBilling, refreshLicense]);
 
   // Poll every 15s while activating, up to 2 minutes, to detect when the license arrives.
   useEffect(() => {
@@ -344,7 +339,7 @@ export default function BillingPage() {
     }, 15_000);
 
     return () => clearInterval(intervalId);
-  }, [isActivating]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isActivating]);
 
   const handleRefresh = async () => {
     await Promise.all([
@@ -377,7 +372,7 @@ export default function BillingPage() {
         )
       )
       .finally(() => setIsGraceSyncing(false));
-  }, [isSelfHosted, graceSyncAttempted, licenseData?.expiry_warning_stage, t]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isSelfHosted, graceSyncAttempted, licenseData?.expiry_warning_stage, t]);
 
   // Hide license activation card when billing connectivity is restored (only if auto-opened)
   useEffect(() => {
@@ -454,17 +449,8 @@ export default function BillingPage() {
 
   const viewConfig = getViewConfig();
 
-  // Handle view changes with transition
   const changeView = (newView: "plans" | "details" | "checkout") => {
     if (newView === view) return;
-    if (newView === "checkout" && view === "plans") {
-      setTransitionType("expand");
-    } else if (newView === "plans" && view === "checkout") {
-      setTransitionType("collapse");
-    } else {
-      setTransitionType("fade");
-    }
-    setViewChangeId((id) => id + 1);
     setView(newView);
   };
 
@@ -480,13 +466,6 @@ export default function BillingPage() {
 
   const renderContent = () => {
     if (isLoading || view === null) return null;
-
-    const animationClass =
-      transitionType === "expand"
-        ? "billing-view-expand"
-        : transitionType === "collapse"
-          ? "billing-view-collapse"
-          : "billing-view-enter";
 
     const views: Record<typeof view, React.ReactNode> = {
       checkout: <CheckoutView onAdjustPlan={() => changeView("plans")} />,
@@ -530,11 +509,7 @@ export default function BillingPage() {
       ),
     };
 
-    return (
-      <div key={viewChangeId} className={`w-full ${animationClass}`}>
-        {views[view]}
-      </div>
-    );
+    return <div className="w-full">{views[view]}</div>;
   };
 
   // Render footer
@@ -543,7 +518,7 @@ export default function BillingPage() {
     return (
       <>
         {showLicenseActivationInput && !isManualLicenseOnly && (
-          <div className="w-full billing-card-enter">
+          <Enter>
             <LicenseActivationCard
               isOpen={showLicenseActivationInput}
               onSuccess={handleLicenseActivated}
@@ -553,7 +528,7 @@ export default function BillingPage() {
                 setShowLicenseActivationInput(false);
               }}
             />
-          </div>
+          </Enter>
         )}
         <FooterLinks
           hasSubscription={!!hasSubscription || !!licenseData?.has_license}

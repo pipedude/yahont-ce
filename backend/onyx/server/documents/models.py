@@ -16,12 +16,16 @@ from pydantic import (
 from onyx.auth.permission_projection import cc_pair_permissions
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.capability_checks.findings_setting import (
-    hide_findings_if_disabled,
+    shown_check_results,
 )
 from onyx.connectors.capability_checks.indexing_hold_models import IndexingHold
 from onyx.connectors.capability_checks.models import (
     CapabilityCheckResult,
     CredentialCapabilityReport,
+    TwoStepRow,
+)
+from onyx.connectors.capability_checks.two_step import (
+    two_step_rows_of_results,
 )
 from onyx.connectors.connector_config import CredentialBinding
 from onyx.connectors.credential_families import to_source_credential_json
@@ -269,6 +273,12 @@ class CredentialUsage(BaseModel):
 class SimilarCredentialSnapshot(CredentialSnapshot):
     # Only connectors the requesting user can manage.
     usages: list[CredentialUsage] = Field(default_factory=list)
+    # Whether the requesting user may use the credential at all
+    # (``factory.credential_use_refusal`` with no config). A usable shared
+    # credential may still require the settings of a connector that uses it.
+    usable: bool
+    # The refusal's text when ``usable`` is False.
+    refusal_reason: str | None = None
 
 
 class IndexAttemptSnapshot(BaseModel):
@@ -610,6 +620,8 @@ class CheckRunSnapshot(BaseModel):
     trigger: CapabilityCheckTrigger
     # Empty until the run completes, and for a run that broke.
     check_results: list[CapabilityCheckResult]
+    # How each two-step row of ``check_results`` shows.
+    two_step_rows: list[TwoStepRow] = []
     # Why a run broke.
     error_message: str | None
     time_created: str
@@ -620,16 +632,16 @@ class CheckRunSnapshot(BaseModel):
     def from_check_run(cls, run: CapabilityCheckRun) -> "CheckRunSnapshot":
         results: list[CapabilityCheckResult] = []
         if run.report is not None:
-            results = CredentialCapabilityReport.model_validate(
-                run.report
-            ).check_results
-        # The history keeps the findings, the response honors the workspace switch.
-        hide_findings_if_disabled(results)
+            # The history keeps every result; the response shows what applies.
+            results = shown_check_results(
+                CredentialCapabilityReport.model_validate(run.report).check_results
+            )
         return cls(
             id=run.id,
             status=run.status,
             trigger=run.trigger,
             check_results=results,
+            two_step_rows=two_step_rows_of_results(results),
             error_message=run.error_message,
             time_created=run.time_created.isoformat(),
             time_started=run.time_created.isoformat(),

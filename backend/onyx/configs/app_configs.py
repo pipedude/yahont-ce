@@ -586,6 +586,13 @@ DOCUMENT_INDEX_NUM_ATTEMPTS_ON_STARTUP = int(
     os.environ.get("NUM_RETRIES_ON_STARTUP") or 10
 )
 
+# Seconds the API server waits on startup for the model server to load the
+# self-hosted embedding model, which includes a download if it is not cached.
+# Startup fails when the wait runs out. 0 disables the wait.
+LOCAL_EMBEDDING_MODEL_STARTUP_TIMEOUT = int(
+    os.environ.get("LOCAL_EMBEDDING_MODEL_STARTUP_TIMEOUT") or 1800
+)
+
 # Number of documents in a batch during indexing (further batching done by chunks before passing to bi-encoder)
 INDEX_BATCH_SIZE = int(os.environ.get("INDEX_BATCH_SIZE") or 16)
 
@@ -1483,6 +1490,8 @@ LEAVE_CONNECTOR_ACTIVE_ON_INITIALIZATION_FAILURE = (
 )
 
 DEFAULT_PRUNING_FREQ = 60 * 60 * 24 * 7  # 7 days
+# What the create form fills in for a new connector's schedule.
+DEFAULT_REFRESH_FREQ = 60 * 30  # 30 minutes
 
 ALLOW_SIMULTANEOUS_PRUNING = (
     os.environ.get("ALLOW_SIMULTANEOUS_PRUNING", "").lower() == "true"

@@ -9,11 +9,12 @@ import {
   Card,
   Divider,
   Dropdown,
-  FilterButton,
+  SelectButton,
   InputTypeIn,
   MessageCard,
   Pagination,
   Tag,
+  Tooltip,
   Text,
 } from "@opal/components";
 import { useDebouncedValue } from "@opal/hooks";
@@ -406,13 +407,16 @@ export default function RunsCard({
             ) : (
               <Dropdown>
                 <Dropdown.Trigger asChild>
-                  <FilterButton
+                  <SelectButton
+                    variant="select-filter"
+                    chevron
+                    labelFont="main-ui-action"
                     icon={SvgClock}
-                    active={picked.hours !== null}
+                    state={picked.hours !== null ? "selected" : "empty"}
                     onClear={() => pickWindow(ALL_TIME)}
                   >
                     {t(`window.${picked.id}`)}
-                  </FilterButton>
+                  </SelectButton>
                 </Dropdown.Trigger>
                 <Dropdown.Data
                   label={t("window.label")}
@@ -432,13 +436,16 @@ export default function RunsCard({
             {kinds.length > 1 && (
               <Dropdown>
                 <Dropdown.Trigger asChild>
-                  <FilterButton
+                  <SelectButton
+                    variant="select-filter"
+                    chevron
+                    labelFont="main-ui-action"
                     icon={SvgSlowMotion}
-                    active={kind !== null}
+                    state={kind !== null ? "selected" : "empty"}
                     onClear={() => pickKind(null)}
                   >
                     {kind === null ? t("kinds.all") : t(`kinds.${kind}`)}
-                  </FilterButton>
+                  </SelectButton>
                 </Dropdown.Trigger>
                 <Dropdown.Data
                   label={t("kinds.label")}
@@ -467,15 +474,18 @@ export default function RunsCard({
             )}
             <Dropdown>
               <Dropdown.Trigger asChild>
-                <FilterButton
+                <SelectButton
+                  variant="select-filter"
+                  chevron
+                  labelFont="main-ui-action"
                   icon={SvgActivity}
-                  active={statusGroup !== null}
+                  state={statusGroup !== null ? "selected" : "empty"}
                   onClear={() => pickStatusGroup(null)}
                 >
                   {statusGroup === null
                     ? t("statusGroups.all")
                     : t(`statusGroups.${statusGroup}`)}
-                </FilterButton>
+                </SelectButton>
               </Dropdown.Trigger>
               <Dropdown.Data
                 label={t("statusGroups.label")}
@@ -511,15 +521,19 @@ export default function RunsCard({
             {COUNT_TAGS.filter(
               ({ group }) => (data?.status_counts[group] ?? 0) > 0
             ).map(({ group, icon, color }) => (
-              <Tag
+              <Tooltip
                 key={group}
-                icon={icon}
-                title={format.number(data?.status_counts[group] ?? 0)}
                 tooltip={t(`counts.${group}`, {
                   count: data?.status_counts[group] ?? 0,
                 })}
-                color={color}
-              />
+                side="top"
+              >
+                <Tag
+                  icon={icon}
+                  title={format.number(data?.status_counts[group] ?? 0)}
+                  color={color}
+                />
+              </Tooltip>
             ))}
           </Section>
         </Section>

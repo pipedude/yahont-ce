@@ -68,7 +68,7 @@ jest.mock("@/lib/settings/hooks", () => ({
   }),
 }));
 
-describe("LanguageModelsPage — image captioning banner", () => {
+describe("LanguageModelsPage: image captioning banner", () => {
   beforeEach(() => {
     defaultVision = null;
     imageExtractionEnabled = true;

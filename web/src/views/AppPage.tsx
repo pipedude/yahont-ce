@@ -93,7 +93,7 @@ import useScreenSize from "@/hooks/useScreenSize";
 import { useSidebarState } from "@opal/layouts";
 import { useQueryController } from "@/providers/QueryControllerProvider";
 import WelcomeMessage from "@/app/app/components/WelcomeMessage";
-import ChatUI from "@/sections/chat/ChatUI";
+import ChatUI, { FULL_WIDTH_TRANSITION } from "@/sections/chat/ChatUI";
 import { useFullWidthChat } from "@/providers/FullWidthChatProvider";
 import { paidTierGated } from "@/ce";
 import EESearchUI from "@/ee/sections/SearchUI";
@@ -463,7 +463,6 @@ export default function AppPage({ firstMessage }: ChatPageProps) {
       setFolded(preMultiModelFoldedRef.current);
       preMultiModelFoldedRef.current = null;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [multiModel.isMultiModelActive]);
 
   // Sync single-model selection to llmManager so the submission path uses
@@ -976,8 +975,10 @@ export default function AppPage({ firstMessage }: ChatPageProps) {
                       justifyContent="between"
                       alignItems="end"
                       className={cn(
-                        !fullWidthActive &&
-                          "max-w-(--app-page-main-content-width)"
+                        fullWidthActive
+                          ? "max-w-full"
+                          : "max-w-(--app-page-main-content-width)",
+                        FULL_WIDTH_TRANSITION
                       )}
                     >
                       <WelcomeMessage
@@ -1016,8 +1017,10 @@ export default function AppPage({ firstMessage }: ChatPageProps) {
                     className={cn(
                       "relative w-full flex flex-col",
                       onboardingVisible && "min-h-0",
-                      !fullWidthActive &&
-                        "md:max-w-(--app-page-main-content-width)"
+                      fullWidthActive
+                        ? "md:max-w-full"
+                        : "md:max-w-(--app-page-main-content-width)",
+                      FULL_WIDTH_TRANSITION
                     )}
                   >
                     {/* Scroll to bottom button - positioned absolutely above AppInputBar */}

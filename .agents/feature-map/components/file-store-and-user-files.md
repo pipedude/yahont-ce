@@ -312,8 +312,9 @@ Computed **at upload time**, before any chat turn runs:
 `natural_language_processing/utils.py:get_tokenizer(model_name, provider_type)`
 from the workspace's default LLM model
 (`db/llm.py:fetch_default_model(..., LLMModelFlowType.CHAT)`), falling back to
-`_get_default_tokenizer()` (`HuggingFaceTokenizer(DOCUMENT_ENCODER_MODEL)`)
-when the provider type is unrecognized. Text/document files are counted with
+`_get_default_tokenizer()` (`HuggingFaceTokenizer(DEFAULT_TOKENIZER_MODEL)`:
+the `DOCUMENT_ENCODER_MODEL` env var, else nomic, whose tokenizer the API image
+bakes) when the provider type is unrecognized. Text/document files are counted with
 `natural_language_processing/utils.py:count_tokens` against the extracted
 text. Images are **not** tokenized against real content; their count is a
 heuristic, `projects_file_utils.py:estimate_image_tokens_for_upload`, which
@@ -468,6 +469,10 @@ access-control consequence of this.
    `save_file` call, or the new write silently overwrites the renamed object
    still referenced by the old key. The Postgres backend is safe: it moves the
    `FileContent` row to the new id, so a reused id makes a new large object.
+   `change_file_id` and `delete_file` lock the `FileRecord` row, so a rename
+   and a delete of the same file run one after the other. `delete_file` removes
+   the object only after it deletes the row. `change_file_id` returns `False`
+   when the record is already gone.
 
 ---
 

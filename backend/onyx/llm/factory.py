@@ -17,6 +17,8 @@ from onyx.db.llm import (
 from onyx.db.models import LLMProvider as LLMProviderModel
 from onyx.db.models import Persona, SearchSettings, User
 from onyx.llm.constants import LlmProviderNames
+from onyx.llm.decisions.client import DecisionClient
+from onyx.llm.decisions.factory import build_decision_client
 from onyx.llm.interfaces import LLM, LlmRequestPolicy
 from onyx.llm.models import ReasoningEffort, UserChatDefaults
 from onyx.llm.multi_llm import LitellmLLM
@@ -296,6 +298,8 @@ def llm_from_provider(
     model_configuration = _get_model_configuration(
         llm_provider=llm_provider, model_name=model_name
     )
+    if model_configuration is not None and not model_configuration.supports_chat:
+        raise ValueError("This model does not support chat requests")
     configured_max_input_tokens = (
         model_configuration.max_input_tokens if model_configuration else None
     )
@@ -363,6 +367,9 @@ def llm_from_provider(
             model_configuration.supports_reasoning if model_configuration else False
         ),
         is_router=model_configuration.is_router if model_configuration else False,
+        model_configuration_id=(
+            model_configuration.id if model_configuration else None
+        ),
     )
 
 
@@ -443,6 +450,38 @@ def get_default_utility_llm(
     )
 
 
+def get_decision_client(
+    additional_headers: dict[str, str] | None = None,
+) -> DecisionClient | None:
+    with get_session_with_current_tenant() as db_session:
+        model = fetch_default_model(db_session, LLMModelFlowType.DECISION)
+        if model is None:
+            return None
+        provider = model.llm_provider
+        api_key = (
+            provider.api_key.get_value(apply_mask=False) if provider.api_key else ""
+        )
+        check_llm_cost_limit_for_provider(
+            db_session=db_session,
+            tenant_id=get_current_tenant_id(),
+            llm_provider_api_key=api_key,
+        )
+        return build_decision_client(
+            provider=provider.provider,
+            model=model.name,
+            api_key=api_key,
+            api_base=provider.api_base,
+            zoom_voice_provider_id=provider.zoom_voice_provider_id,
+            extra_headers={
+                **build_llm_extra_headers(additional_headers),
+                **_build_provider_extra_headers(
+                    provider.provider, provider.custom_config
+                ),
+            },
+            model_configuration_id=model.id,
+        )
+
+
 def get_search_selection_llm(
     *,
     fallback: LLM,
@@ -477,7 +516,10 @@ def get_llm(
     supports_reasoning: bool = False,
     supports_images: bool | None = None,
     is_router: bool = False,
+    model_configuration_id: int | None = None,
 ) -> LitellmLLM:
+    if provider == LlmProviderNames.TYPESAFE:
+        raise ValueError("TypeSafe AI does not support chat generation")
     if temperature is None:
         temperature = GEN_AI_TEMPERATURE
 
@@ -517,6 +559,7 @@ def get_llm(
         supports_reasoning=supports_reasoning,
         supports_images=supports_images,
         is_router=is_router,
+        model_configuration_id=model_configuration_id,
     )
 
 

@@ -137,7 +137,7 @@ function setupHooks() {
 
 // ---- Tests ----
 
-describe("BillingPage — handleBillingReturn retry logic", () => {
+describe("BillingPage: handleBillingReturn retry logic", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
@@ -234,7 +234,7 @@ describe("BillingPage — handleBillingReturn retry logic", () => {
     consoleSpy.mockRestore();
   });
 
-  test("does not call claimLicense on portal_return — the portal is gone", async () => {
+  test("does not call claimLicense on portal_return: the portal is gone", async () => {
     // The portal_return fallback is removed — the ЮKassa return is
     // served by the ?yk_return=1 flow (the charge polling), and the
     // self-hosted license claim keeps only the session_id path.

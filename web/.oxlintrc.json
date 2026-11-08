@@ -1,13 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "typescript",
-    "unicorn",
-    "oxc",
-    "react",
-    "nextjs",
-    "jsx-a11y"
-  ],
+  "plugins": ["typescript", "unicorn", "oxc", "react", "nextjs", "jsx-a11y"],
   "jsPlugins": [
     {
       "name": "react-doctor",
@@ -26,6 +19,9 @@
       "specifier": "./tools/oxlint/opal/index.ts"
     }
   ],
+  "options": {
+    "reportUnusedDisableDirectives": "error"
+  },
   "categories": {
     "correctness": "error"
   },
@@ -53,10 +49,13 @@
     "anti-slop/no-unknown-type-aliases": "error",
     "anti-slop/no-widen-then-assert": "error",
     "anti-slop/no-conditional-empty-object-spread": "error",
+    "anti-slop/no-em-dash": "error",
+    "anti-slop/no-hookless-use-function": "error",
     "anti-slop/no-known-value-widening": "warn",
     "anti-slop/no-unknown-parameters": "error",
     "anti-slop/no-unsafe-dictionary-type": "warn",
     "anti-slop/require-safety-comment-for-type-assertion": "warn",
+    "anti-slop/require-suppression-reason": "error",
     "anti-slop/no-runtime-typeof": "off",
     "anti-slop/no-shape-in-symbol-names": "off",
     "i18n/no-raw-jsx-text": "off",
@@ -88,10 +87,22 @@
       "error",
       {
         "forbid": [
-          { "element": "button", "message": "Use `Button` from `@opal/components`." },
-          { "element": "input", "message": "Use an Opal input such as `InputTypeIn` or `InputCheckbox` from `@opal/components`." },
-          { "element": "select", "message": "Use `InputSingleSelect` from `@opal/components`." },
-          { "element": "textarea", "message": "Use `InputTextArea` from `@opal/components`." }
+          {
+            "element": "button",
+            "message": "Use `Button` from `@opal/components`."
+          },
+          {
+            "element": "input",
+            "message": "Use an Opal input such as `InputTypeIn` or `InputCheckbox` from `@opal/components`."
+          },
+          {
+            "element": "select",
+            "message": "Use `InputSingleSelect` from `@opal/components`."
+          },
+          {
+            "element": "textarea",
+            "message": "Use `InputTextArea` from `@opal/components`."
+          }
         ]
       }
     ]
@@ -105,8 +116,7 @@
         "**/*.spec.tsx",
         "**/__tests__/**",
         "**/__mocks__/**",
-        "tests/**",
-        "**/*.stories.tsx"
+        "tests/**"
       ],
       "rules": {
         "anti-slop/no-chained-type-assertions": "off",
@@ -142,8 +152,7 @@
         "**/*.spec.tsx",
         "**/__tests__/**",
         "**/__mocks__/**",
-        "tests/**",
-        "**/*.stories.tsx"
+        "tests/**"
       ],
       "rules": {
         "i18n/no-raw-jsx-text": "off"
@@ -157,8 +166,7 @@
         "**/*.spec.tsx",
         "**/__tests__/**",
         "**/__mocks__/**",
-        "tests/**",
-        "**/*.stories.tsx"
+        "tests/**"
       ],
       "rules": {
         "no-restricted-imports": "off",
@@ -303,10 +311,22 @@
           "warn",
           {
             "forbid": [
-              { "element": "button", "message": "Use `Button` from `@opal/components`." },
-              { "element": "input", "message": "Use an Opal input such as `InputTypeIn` or `InputCheckbox` from `@opal/components`." },
-              { "element": "select", "message": "Use `InputSingleSelect` from `@opal/components`." },
-              { "element": "textarea", "message": "Use `InputTextArea` from `@opal/components`." }
+              {
+                "element": "button",
+                "message": "Use `Button` from `@opal/components`."
+              },
+              {
+                "element": "input",
+                "message": "Use an Opal input such as `InputTypeIn` or `InputCheckbox` from `@opal/components`."
+              },
+              {
+                "element": "select",
+                "message": "Use `InputSingleSelect` from `@opal/components`."
+              },
+              {
+                "element": "textarea",
+                "message": "Use `InputTextArea` from `@opal/components`."
+              }
             ]
           }
         ]
@@ -441,7 +461,6 @@
         "src/app/craft/onboarding/components/CraftLlmSetup.tsx",
         "src/app/craft/onboarding/components/LivingMapDiagram.tsx",
         "src/app/craft/onboarding/components/LivingMapModal.tsx",
-        "src/app/craft/onboarding/explorations/WelcomePageMock.tsx",
         "src/app/craft/page.tsx",
         "src/app/craft/v1/apps/UserCredentialsModal.tsx",
         "src/app/craft/v1/apps/admin/ActionPolicyEditorModal.tsx",
@@ -527,7 +546,6 @@
         "src/sections/agents/AgentCard.tsx",
         "src/sections/banners/OpenSearchResourceWarning.tsx",
         "src/sections/cards/FileCard.tsx",
-        "src/sections/cards/SkillCard.tsx",
         "src/sections/chat/ChatScrollContainer.tsx",
         "src/sections/chat/ChatUI.tsx",
         "src/sections/document-sidebar/ChatDocumentDisplay.tsx",
@@ -547,11 +565,9 @@
         "src/sections/modals/PreviewModal/variants/imageVariant.tsx",
         "src/sections/modals/PreviewModal/variants/unsupportedVariant.tsx",
         "src/sections/modals/ShareAccessRow.tsx",
-        "src/sections/modals/SkillPreviewModal.tsx",
         "src/sections/modals/TransferOwnershipView.tsx",
         "src/sections/modals/languageModels/CustomModal.tsx",
         "src/sections/modals/languageModels/shared.tsx",
-        "src/sections/modals/skills/ImportSkillsFromGitHubModal.tsx",
         "src/sections/modals/skills/ShareSkillModal.tsx",
         "src/sections/model-selector/ModelSelectorContent.tsx",
         "src/sections/model-selector/MultiModelSelector.tsx",
@@ -595,8 +611,6 @@
         "src/views/AgentsNavigationPage.tsx",
         "src/views/AppPage.tsx",
         "src/views/SettingsPage.tsx",
-        "src/views/SkillEditorPage.tsx",
-        "src/views/SkillsPage.tsx",
         "src/views/admin/AgentsPage/AgentRowActions.tsx",
         "src/views/admin/AgentsPage/AgentsTable.tsx",
         "src/views/admin/ChatPreferencesPage.tsx",
@@ -675,7 +689,6 @@
     "out",
     "build",
     "public",
-    "storybook-static",
     "lib/opal/dist",
     "tools/oxlint/anti-slop",
     "tools/oxlint/i18n",

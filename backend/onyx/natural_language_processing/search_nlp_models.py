@@ -9,10 +9,10 @@ from functools import partial, wraps
 from types import TracebackType
 from typing import Any, TypeVar, cast
 
-import aioboto3
 import httpx
 import requests
 import voyageai
+from aiobotocore.session import get_session
 from cohere import AsyncClient as CohereAsyncClient
 from cohere.core.api_error import ApiError
 from httpx import HTTPError
@@ -333,10 +333,6 @@ WARM_UP_STRINGS = [
 ]
 
 
-def clean_model_name(model_str: str) -> str:
-    return model_str.replace("/", "_").replace("-", "_").replace(".", "_").lower()
-
-
 def build_model_server_url(
     model_server_host: str,
     model_server_port: int,
@@ -424,7 +420,7 @@ def _is_retryable_bifrost_error(error: BaseException) -> bool:
 
 
 def _bifrost_error_message(response: httpx.Response) -> str:
-    """The gateway's error text, e.g. "The model `gpt-5-mini` does not support embeddings."."""
+    """The gateway's error text, e.g. "The model `gpt-6-luna` does not support embeddings."."""
     try:
         body: object = response.json()
     except ValueError:
@@ -496,7 +492,7 @@ def _extract_cohere_embeddings(response_embeddings: Any) -> list[Embedding]:
     """Normalize Cohere's embed response across SDK versions.
 
     v3 models return ``response.embeddings`` as a flat ``list[list[float]]``.
-    v4 models return an ``EmbedByTypeResponseEmbeddings`` object that carries
+    v4 and v5 models return an ``EmbedByTypeResponseEmbeddings`` object that carries
     the embeddings under ``float_`` (and possibly other per-type buckets when
     ``embedding_types`` is set). We always read the float bucket here since
     we never request alternate types.
@@ -1101,11 +1097,12 @@ async def cohere_rerank_aws(
     aws_access_key_id: str,
     aws_secret_access_key: str,
 ) -> list[float]:
-    session = aioboto3.Session(
-        aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key
-    )
-    async with session.client(
-        "bedrock-runtime", region_name=region_name
+    session = get_session()
+    async with session.create_client(
+        "bedrock-runtime",
+        region_name=region_name,
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
     ) as bedrock_client:
         body = json.dumps(
             {
@@ -1328,19 +1325,18 @@ class EmbeddingModel:
                 reraise=True,
             )(final_make_request_func)
 
-        response: Response | None = None
-
         try:
             response = final_make_request_func()
             return EmbedResponse(**response.json())
         except requests.HTTPError as e:
-            if not response:
+            # raise_for_status() raised, so the failed response is only on the error.
+            if e.response is None:
                 raise HTTPError("HTTP error occurred - response is None.") from e
 
             try:
-                error_detail = response.json().get("detail", str(e))
+                error_detail = e.response.json().get("detail", str(e))
             except Exception:
-                error_detail = response.text
+                error_detail = e.response.text
             raise HTTPError(f"HTTP error occurred: {error_detail}") from e
         except requests.RequestException as e:
             raise HTTPError(f"Request failed: {str(e)}") from e

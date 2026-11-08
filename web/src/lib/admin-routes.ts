@@ -1,8 +1,10 @@
 import { Permission } from "@/lib/types";
 import { Tier } from "@/lib/tiers/types";
+import { DECISION_MODELS_HIDDEN } from "@/lib/languageModels/cloudVisibility";
 import { IconFunctionComponent } from "@opal/types";
 import {
   SvgActions,
+  SvgBlocks,
   SvgActivity,
   SvgArrowExchange,
   SvgAudio,
@@ -80,6 +82,7 @@ export interface FeatureFlags {
  *   visible (subject to the permission and tier checks above).** When
  *   provided, the predicate is evaluated against the resolved feature flags;
  *   returning `false` hides the route from the sidebar.
+ * - `beta`: Shows a Beta tag on the sidebar entry.
  */
 export interface AdminRouteEntry {
   path: string;
@@ -90,6 +93,7 @@ export interface AdminRouteEntry {
   section: string;
   requiredTier: Tier | null;
   visibleWhen: ((flags: FeatureFlags) => boolean) | null;
+  beta?: boolean;
 }
 
 export const ADMIN_ROUTES = {
@@ -103,6 +107,17 @@ export const ADMIN_ROUTES = {
     section: "",
     requiredTier: null,
     visibleWhen: null,
+  },
+  DECISION_MODELS: {
+    path: "/admin/decision-models",
+    icon: SvgUserCheck,
+    title: "Decision Models",
+    sidebarLabel: "Decision Models",
+    requiredPermission: Permission.MANAGE_LLMS,
+    section: "",
+    requiredTier: null,
+    visibleWhen: () => !DECISION_MODELS_HIDDEN,
+    beta: true,
   },
   WEB_SEARCH: {
     path: "/admin/web-search",
@@ -180,6 +195,16 @@ export const ADMIN_ROUTES = {
     icon: SvgPlug,
     title: "Apps",
     sidebarLabel: "",
+    requiredPermission: Permission.FULL_ADMIN_PANEL_ACCESS,
+    section: "Craft",
+    requiredTier: null,
+    visibleWhen: (f: FeatureFlags) => f.craftAvailable,
+  },
+  SKILLS: {
+    path: "/admin/skills",
+    icon: SvgBlocks,
+    title: "Skills",
+    sidebarLabel: "Skills",
     requiredPermission: Permission.FULL_ADMIN_PANEL_ACCESS,
     section: "Craft",
     requiredTier: null,

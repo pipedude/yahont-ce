@@ -127,6 +127,7 @@ describe("buildEditProposal", () => {
       name: "Docs repos",
       refresh_freq: 1800,
       prune_freq: 86400,
+      check_freq: null,
     });
   });
 
@@ -171,7 +172,7 @@ describe("buildEditProposal", () => {
 
     const proposal = proposalFor(ccPair, [], (values) => ({
       ...values,
-      repositories: "onyx,docs",
+      repositories: ["onyx", "docs"],
       name: "Renamed",
       refreshFreq: 60,
     }));

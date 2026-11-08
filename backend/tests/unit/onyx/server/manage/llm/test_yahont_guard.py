@@ -275,7 +275,7 @@ def test_test_endpoint_refuses_the_yahont_provider() -> None:
         pytest.raises(OnyxError) as excinfo,
     ):
         llm_api.test_llm_configuration(
-            test_llm_request=request, _=MagicMock(), db_session=MagicMock()
+            test_llm_request=request, user=MagicMock(), db_session=MagicMock()
         )
 
     _assert_forbidden(excinfo)

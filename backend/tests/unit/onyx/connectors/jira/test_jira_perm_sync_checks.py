@@ -132,7 +132,9 @@ def test_permission_scheme_read_probes_the_first_project_without_a_project() -> 
 
     _run("jira_permission_scheme_read", gateway, {**_CONFIG, "project_key": ""})
 
-    gateway.get_project_permission_scheme.assert_called_once_with(project_key="AS")
+    gateway.get_project_permission_scheme.assert_called_once_with(
+        project_key="AS", fast=True
+    )
 
 
 def test_permission_scheme_read_probes_the_project_of_a_jql_match() -> None:
@@ -151,7 +153,9 @@ def test_permission_scheme_read_probes_the_project_of_a_jql_match() -> None:
         {**_CONFIG, "project_key": "", "jql_query": 'project = "AS"'},
     )
 
-    gateway.get_project_permission_scheme.assert_called_once_with(project_key="AS")
+    gateway.get_project_permission_scheme.assert_called_once_with(
+        project_key="AS", fast=True
+    )
 
 
 @pytest.mark.parametrize(
@@ -383,7 +387,7 @@ def test_permission_user_emails_looks_up_data_center_users_by_name() -> None:
     result = _run("jira_permission_user_emails", gateway)
 
     assert result.status == CapabilityCheckStatus.PASSED
-    gateway.get_user.assert_called_once_with(user_id="jdoe")
+    gateway.get_user.assert_called_once_with(user_id="jdoe", fast=True)
 
 
 def test_permission_user_emails_reads_direct_user_grants() -> None:
@@ -514,7 +518,9 @@ def test_sampled_checks_move_past_an_open_project(check_id: str) -> None:
     result = _run(check_id, gateway, _ALL_PROJECTS)
 
     assert result.status == CapabilityCheckStatus.PASSED, result
-    gateway.get_project_role.assert_called_with(project_key="ROLE", role_id="10003")
+    gateway.get_project_role.assert_called_with(
+        project_key="ROLE", role_id="10003", fast=True
+    )
 
 
 @pytest.mark.parametrize("check_id", _SAMPLE_CHECK_IDS)
@@ -690,7 +696,9 @@ def test_sampled_checks_skip_an_open_configured_project(check_id: str) -> None:
 
     assert result.status == CapabilityCheckStatus.SKIPPED, result
     assert result.summary == "AS is open to all users"
-    gateway.get_project_permission_scheme.assert_called_once_with(project_key="AS")
+    gateway.get_project_permission_scheme.assert_called_once_with(
+        project_key="AS", fast=True
+    )
 
 
 # --- group sync ---

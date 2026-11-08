@@ -22,12 +22,14 @@ export type AdminNavItemId =
   | "webSearch"
   | "imageGeneration"
   | "voice"
+  | "decisionModels"
   | "codeInterpreter"
   | "chatPreferences"
   | "llmGateway"
   | "craftAccess"
   | "craftApps"
   | "craftPreferences"
+  | "skills"
   | "customAnalytics"
   | "agents"
   | "plugins"
@@ -77,6 +79,7 @@ export const NAV_ITEM_IDS: Record<
   AdminNavItemId | null
 > = {
   LLM_MODELS: "languageModels",
+  DECISION_MODELS: "decisionModels",
   WEB_SEARCH: "webSearch",
   IMAGE_GENERATION: "imageGeneration",
   VOICE: "voice",
@@ -86,6 +89,7 @@ export const NAV_ITEM_IDS: Record<
   CRAFT_ACCESS: "craftAccess",
   CRAFT_APPS: null,
   CRAFT_PREFERENCES: "craftPreferences",
+  SKILLS: "skills",
   CUSTOM_ANALYTICS: "customAnalytics",
   AGENTS: "agents",
   PLUGINS: "plugins",
@@ -177,6 +181,11 @@ const NAV_SECTION_IDS: readonly (readonly [
   ["Usage", "usage"],
 ];
 
+/** Sections whose heading shows a Beta tag. */
+export const BETA_SECTION_IDS: ReadonlySet<AdminNavSectionId> = new Set([
+  "craft",
+]);
+
 /** `null` for the unlabeled (default) section. */
 function sectionIdFor(section: string): AdminNavSectionId | null {
   return NAV_SECTION_IDS.find(([label]) => label === section)?.[1] ?? null;
@@ -191,6 +200,7 @@ export interface SidebarItemEntry {
   error?: boolean;
   disabled?: boolean;
   requiredTier?: Tier | null;
+  beta?: boolean;
 }
 
 export function buildItems(
@@ -225,6 +235,7 @@ export function buildItems(
       sectionId: sectionIdFor(route.section),
       disabled,
       requiredTier: route.requiredTier,
+      beta: route.beta,
     };
 
     // INDEX_SETTINGS surfaces a reindexing-needed error indicator

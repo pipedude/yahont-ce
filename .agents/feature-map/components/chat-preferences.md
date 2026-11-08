@@ -35,6 +35,10 @@ policy, and file-size limits. Nothing here is per-user; every toggle applies to
 every chat that uses the default agent (a persona picked by the user still
 carries its own prompt and tools, see [[agents-personas]]).
 
+Decision-model setup and the optional decision-model selection live on the
+separate **Admin > Decision Models** page. Chat Preferences does not configure a
+decision provider or model. No product workflow consumes the selected model yet.
+
 **A user**, at `/app/settings/chat-preferences` and the neighboring "General"
 tab, sets things that describe themselves to the model: their preferred name
 and role, free-text preferences ("I prefer concise answers"), whether the
@@ -139,12 +143,17 @@ A schema change here is a KV-blob field addition, not a migration; see root
 
 ## 4. How it works
 
-Chat Preferences includes an always-visible Model selection section beneath the
-general chat behavior controls. It uses a smaller static header, without a
-disclosure control. `ChatTaskModelSettings` owns its model-provider fetch and
-shows Chat naming model and Search selection model immediately on page load.
-Both optional selectors show Use Default model
-when unset and save/reset independently from the page's workspace settings.
+Chat Preferences starts with two cards. The chat card holds Default Language,
+Chat Naming Model, Multi-Model Generation, Deep Research and Chat Auto-Scroll.
+The search card holds Search Selection Model, Search Mode and Auto-Detect
+Search Filters. Temperature Control and Reasoning Control are on Language
+Models. `ChatTaskModelSettings` exports one row component for each task model.
+Each row owns its model-provider fetch. Each selector starts with a Global
+Default row above a divider: "Chat Default", since an unset task runs on the
+chat's own model (search selection in the Search UI uses the workspace
+default instead).
+Global Default clears the designation. Each row saves independently from the
+page's workspace settings.
 CHAT_NAMING controls naming; SEARCH_SELECTION controls document selection and
 relevance checks. Neither changes query rewrites, and neither falls back to
 the other. Language Models retains provider configuration and the default chat

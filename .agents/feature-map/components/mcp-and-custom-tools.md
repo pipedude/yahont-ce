@@ -270,9 +270,6 @@ reads only the caller's skills, filters by external-app ID, and shows search,
 count, preview, per-user enable switches, and loading/retry feedback. Preview reuses the rendered skill instructions within the same modal and backdrop. Back or Escape returns to Skills without losing drafts. Switches remain drafts until Save and respect skill toggle permissions. Cancel discards drafts. Each successful save updates the shared skill cache; retries retain only unsaved changes. Name conflicts offer the same explicit replacement as the Skills page. The confirmation keeps the modal backdrop and remaining drafts; cancelling returns to the draft. The footer links to the app-filtered skills page; no admin metadata is fetched.
 Craft must be enabled before skills or launch actions appear. Apps needing
 authentication show Connect account instead of Open in Craft.
-`web/src/sections/plugins/OpenAPIPluginCreateModal.stories.tsx` covers schema entry, default Chat selection,
-Back navigation, authorization choices and draft retention, invalid JSON, validation failure/pending, saving, creation failure/success,
-and closing/reopening a discarded draft. Network fixtures remain local to each story.
 Explore offers official remote endpoints for Slack, HubSpot, Asana, Linear, Notion,
 Sentry, and Atlassian. Compact rows show a logo, regular-weight title, short summary,
 and centered action. The setup modal shows registration requirements and provider setup guides.
@@ -934,7 +931,15 @@ credentials, a Client ID Metadata Document (CIMD), or Dynamic Client
 Registration (DCR), as supported by the provider. CIMD needs the provider to
 fetch the deployment's metadata document, so `MCPServer.oauth_cimd_enabled`
 lets an admin turn it off per server. Automatic discovery then registers
-through DCR, which a private deployment needs. Tool discovery follows
+through DCR, which a private deployment needs. The setup probe checks this
+first: `server/features/mcp/oauth_discovery.py:_client_metadata_accepted` sends a
+status-only authorization request with the CIMD client ID and reports
+`supports_client_metadata`. A network error, a timeout or HTTP 429 gives `null`
+(unknown). The setup page sets the CIMD switch from that result, unless the admin
+already changed the switch.
+`server/features/mcp/oauth_flow.py:validate_client_metadata_authorization`
+repeats the check at connect time and fails with `client_metadata_rejected`. The
+setup page then turns CIMD off and retries with DCR. Tool discovery follows
 authentication; it is separate from OAuth discovery.
 
 1. **Connect.** The frontend calls `POST /mcp/oauth/connect` (user) or
@@ -1190,10 +1195,6 @@ MCP server creation also creates its `GatedApp` identity, so permission reads re
 ## 8. How to verify a change
 
 ### Tests
-
-Storybook covers setup, saved settings, access control, discovery, validation,
-and failure states. See `web/src/sections/actions/modals/MCPModalStories.md`
-for the state inventory and preview links. Fixtures intercept requests locally.
 
 ```bash
 # Frontend setup, retry, credential scope, and OAuth service regressions

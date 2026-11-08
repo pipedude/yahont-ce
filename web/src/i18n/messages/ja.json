@@ -154,7 +154,7 @@
         "title": "アクセス制御",
         "description": "このMCPを使用できるユーザーを選択します。",
         "public": {
-          "label": "公開",
+          "label": "組織",
           "description": "組織内の誰でもこのMCPを使用できます"
         },
         "groups": {
@@ -327,8 +327,6 @@
         "saveAuthFailed": "認証設定の保存に失敗しました",
         "saveConfigFailed": "サーバー設定の保存に失敗しました",
         "saveStage": "接続設定を保存できませんでした",
-        "oauthStage": "サインインを開始できませんでした",
-        "discoveryStage": "サーバーのツールを読み込めませんでした",
         "loadStage": "接続設定を読み込めませんでした",
         "clientRegistrationFailed": "クライアントの自動登録に失敗しました。独自のOAuthクライアントを使用するか、プロバイダーの設定要件を確認してください。",
         "clientMetadataRejected": "プロバイダーがクライアントメタデータドキュメントを使用できませんでした。このインスタンスがインターネットからアクセスできない場合は、「クライアントメタデータドキュメントを使用」をオフにして、もう一度接続してください。",
@@ -1117,18 +1115,6 @@
         "openapi": "OpenAPI プラグインを追加"
       },
       "catalog": {
-        "slack": {
-          "summary": "会話の検索とメッセージの送信",
-          "description": "会話の検索とメッセージの送信。登録済みのSlackアプリが必要です。"
-        },
-        "hubspot": {
-          "summary": "連絡先と取引を管理",
-          "description": "連絡先と取引を管理。HubSpot MCPコネクターが必要です。"
-        },
-        "asana": {
-          "summary": "タスクとプロジェクトを管理",
-          "description": "タスクとプロジェクトを管理。登録済みのOAuthクライアントが必要です。"
-        },
         "linear": {
           "summary": "課題、プロジェクト、チームを管理します",
           "description": "課題、プロジェクト、チームを管理します。"
@@ -1220,6 +1206,10 @@
       "blocked": "このURLは送信セキュリティ設定によってブロックされています。",
       "publicDetected": "認証は不要です",
       "oauthDetected": "OAuthを検出しました",
+      "clientMetadata": "クライアントメタデータドキュメント",
+      "clientMetadataSupported": "対応",
+      "clientMetadataUnsupported": "非対応",
+      "clientMetadataUnknown": "未確認",
       "manualRequired": "認証方法を手動で選択",
       "chooseAuthentication": "このサーバーの認証方法を確認できませんでした。以下から方法を選択してください。",
       "connect": "接続",
@@ -1251,6 +1241,36 @@
     }
   },
   "admin": {
+    "decisionModels": {
+      "sharedModelSettings": "言語モデルでチャット設定を管理",
+      "decisionModel": {
+        "title": "判断モデル",
+        "openAiDecisionsModelName": "OpenAI Decisions (GPT-6 Luna)",
+        "description": "今後の分類・レビュー機能に使用するモデルを選択します。Yahont はまだこのモデルを使用しません。",
+        "clear": "解除",
+        "notConfigured": "未設定",
+        "saveFailed": "判断モデルを更新できませんでした"
+      },
+      "header": {
+        "title": "判断モデル",
+        "description": "判断モデルのプロバイダーを管理し、必要に応じてモデルを選択します。"
+      },
+      "providers": {
+        "title": "プロバイダー",
+        "description": "プロバイダーを接続するか、判断モデルを管理します。",
+        "clearBeforeRemoval": "このプロバイダーを削除する前に、選択した判断モデルを解除してください。",
+        "connect": "接続"
+      },
+      "loadFailed": "判断モデルを読み込めませんでした。",
+      "retry": "再試行",
+      "zoom": {
+        "title": "Zoom AI Services に接続",
+        "description": "Zoom Scribe と Zoom AI Decisions に同じ接続を使用します。変更は両方に適用されます。",
+        "connection": "Zoom 接続",
+        "selectConnection": "Zoom 接続を選択",
+        "removeDescription": "音声と決定モデルから共有 Zoom 接続を削除します。"
+      }
+    },
     "addConnector": {
       "categories": {
         "codeRepository": {
@@ -1630,7 +1650,7 @@
             "label": "プライベート"
           },
           "public": {
-            "label": "公開"
+            "label": "組織"
           },
           "shared": {
             "label": "共有"
@@ -1908,7 +1928,7 @@
             "text": "このデプロイメントからアクセス制御が削除されます。**再インデックスが開始され**、検索結果に変更が反映されます。大きなインデックスでは時間がかかることがあります。"
           },
           "madePublic": {
-            "text": "**公開:** すべてのコネクタと、ユーザーグループに共有されているエージェント、ドキュメントセット、LLM プロバイダー、MCP サーバー、スキル"
+            "text": "**組織に開放:** すべてのコネクタと、ユーザーグループに共有されているエージェント、ドキュメントセット、LLM プロバイダー、MCP サーバー、スキル"
           },
           "reset": {
             "text": "**デフォルトにリセット:** カスタムブランディングとチャット保持ポリシー"
@@ -2456,43 +2476,30 @@
     },
     "chatPreferences": {
       "chatNaming": {
-        "description": "チャットセッションの名前を付けるモデルです。既定では各セッションのモデルを使用します。",
-        "resetButton": {
-          "label": "リセット"
-        },
-        "sessionModel": {
-          "label": "デフォルトモデルを使用"
-        },
-        "title": "チャット名の生成モデル"
+        "description": "セッションのタイトルを生成します。高速で低コストのモデルが適しています。",
+        "title": "チャット命名モデル"
       },
       "searchSelectionModel": {
-        "description": "取得したドキュメントを選択して確認します。低コストのモデルは検索コストを削減できますが、回答の品質に影響する可能性があります。",
-        "resetButton": {
-          "label": "リセット"
-        },
-        "sessionModel": {
-          "label": "デフォルトモデルを使用"
-        },
-        "title": "検索選択モデル"
+        "description": "取得したドキュメントを選択して確認します。高速で低コストのモデルは検索コストを削減できますが、回答の品質に影響する場合があります。",
+        "title": "検索ドキュメント選択モデル"
       },
       "taskModels": {
-        "title": "モデルの選択",
         "loadFailed": "タスクモデルを読み込めませんでした",
         "retry": {
           "label": "再試行"
         },
-        "noProviders": {
-          "title": "言語モデルのプロバイダーを接続"
-        },
         "addProvider": {
           "label": "プロバイダーを追加"
+        },
+        "chatDefault": {
+          "label": "チャットのデフォルト"
         }
       },
       "advanced": {
         "title": "詳細オプション"
       },
       "anonymousUsers": {
-        "description": "ログインなしで誰でもチャットを開始できるようにします。他のチャットは表示されず、エージェントの作成や設定の変更もできません。",
+        "description": "**ログインせずに**誰でもチャットを開始できるようにします。他のチャットは表示されず、エージェントの作成や設定の変更もできません。",
         "title": "匿名ユーザーを許可"
       },
       "autoDetectFilters": {
@@ -2502,9 +2509,6 @@
       "autoScroll": {
         "description": "チャットが応答を生成するときに、新しい内容へ自動的にスクロールします。ユーザーは個人設定でこれを変更できます。",
         "title": "チャットの自動スクロール"
-      },
-      "betaTag": {
-        "label": "ベータ"
       },
       "connectors": {
         "description": "チャットの内部検索で使用されるソースです。追加や変更はインデックス作成ステータスのページで行います。",
@@ -2521,12 +2525,12 @@
         "title": "ディープリサーチ"
       },
       "defaultLanguage": {
-        "description": "自分の設定で言語を選択していないユーザーに適用される UI の言語です。",
+        "description": "個人設定で言語を設定していないユーザー向けの UI 言語。",
         "title": "既定の言語"
       },
       "disableDefaultChat": {
-        "description": "ユーザーは必ずエージェントからチャットを開始します。新しいチャットは、最初にピン留めされたエージェントで作成されます。新しいユーザーを支援するため、注目のエージェントを設定してください。",
-        "title": "既定のチャットを無効化"
+        "description": "既定のチャットを削除します。ユーザーは常にエージェントで開始し、新しいチャットは最後に使用したエージェントで作成されます。新しいユーザーが始めやすいように[おすすめのエージェント](/admin/agents)を設定してください。",
+        "title": "常にエージェントから開始"
       },
       "fileLimits": {
         "default": {
@@ -2584,10 +2588,6 @@
           "label": "ユーザー情報付きで表示"
         },
         "title": "クエリ履歴の表示設定"
-      },
-      "reasoning": {
-        "description": "チャットのモデル選択メニューから、回答前にモデルが行う推論の量をユーザーが調整できるようにします。",
-        "title": "推論の制御"
       },
       "retention": {
         "custom": {
@@ -2659,26 +2659,13 @@
         "placeholder": "チーム名を入力",
         "title": "チーム名"
       },
-      "temperature": {
-        "description": "チャットのモデル選択メニューから、モデル応答の Temperature（創造性）をユーザーが調整できるようにします。",
-        "title": "Temperature の制御"
-      },
       "toasts": {
-        "chatNamingUpdated": "チャット名の生成モデルを更新しました",
-        "chatNamingReset": "チャット名の生成モデルをデフォルトモデルにリセットしました",
         "chatNamingUpdateFailed": "チャット名の生成モデルの更新に失敗しました",
-        "chatNamingResetFailed": "チャット名の生成モデルのリセットに失敗しました",
         "providerResolveFailed": "プロバイダーを解決できませんでした",
-        "searchSelectionReset": "検索選択モデルをデフォルトモデルにリセットしました",
-        "searchSelectionResetFailed": "検索選択モデルのリセットに失敗しました",
         "searchSelectionUpdateFailed": "検索選択モデルの更新に失敗しました",
-        "searchSelectionUpdated": "検索選択モデルを更新しました",
         "settingsUpdateFailed": "設定の更新に失敗しました",
-        "settingsUpdated": "設定を更新しました",
         "systemPromptUpdateFailed": "システムプロンプトの更新に失敗しました",
-        "systemPromptUpdated": "システムプロンプトを更新しました",
         "toolsUpdateFailed": "ツールの更新に失敗しました",
-        "toolsUpdated": "ツールを更新しました",
         "unknownError": "不明なエラーが発生しました"
       },
       "tools": {
@@ -3115,15 +3102,14 @@
         "indexingStartUnexpectedError": "インデックス作成の開始中に予期しないエラーが発生しました",
         "indexingUpdateStarted": "インデックスの更新を開始しました",
         "nameUpdateFailed": "コネクター名を更新できませんでした",
-        "nameUpdated": "コネクター名を更新しました",
         "noUnresolvedErrors": "再試行する未解決のエラーはありません。",
         "pruningFrequencyUpdateFailed": "コネクターのプルーニング頻度を更新できませんでした",
-        "pruningFrequencyUpdated": "コネクターのプルーニング頻度を更新しました",
         "refreshFrequencyUpdateFailed": "コネクターの更新頻度を変更できませんでした",
-        "refreshFrequencyUpdated": "コネクターの更新頻度を変更しました",
         "targetedReindexFailed": "対象を指定した再インデックス作成に失敗しました: {message}",
-        "targetedReindexSubmitted": "{count, plural, one {# 件のドキュメント} other {# 件のドキュメント}}について、対象を指定した再インデックス作成を送信しました。再インデックス作成が完了したドキュメントから、エラーは一覧から消えます。",
-        "checkFrequencyUpdated": "コネクタのチェック頻度を更新しました",
+        "targetedReindexRunning": "{count, plural, one {# 件のエラー} other {# 件のエラー}}を再試行しています…",
+        "targetedReindexDone": "再試行が完了しました。{resolved, plural, one {# 件のエラー} other {# 件のエラー}}が解決しました。",
+        "targetedReindexPartial": "再試行が完了しました。{resolved, plural, one {# 件のエラー} other {# 件のエラー}}が解決し、{failing, plural, one {# 件のドキュメント} other {# 件のドキュメント}}は引き続き失敗しています。",
+        "targetedReindexIncomplete": "再試行は完了しませんでした。未解決のエラーは一覧に残ります。",
         "checkFrequencyUpdateFailed": "コネクタのチェック頻度を更新できませんでした",
         "runResolved": "解決済みにしました。",
         "runResolveFailed": "解決できませんでした: {message}",
@@ -3285,6 +3271,7 @@
           "canceled": "{count, plural, other {# 件の実行がキャンセルされました}}",
           "passedChecks": "{count, plural, one {# 件のチェックが成功} other {# 件のチェックが成功}}",
           "failedChecks": "{count, plural, one {# 件のチェックが失敗} other {# 件のチェックが失敗}}",
+          "incompleteChecks": "{count, plural, one {# 件のチェックが未完了} other {# 件のチェックが未完了}}",
           "skippedChecks": "{count, plural, one {# 件のチェックをスキップ} other {# 件のチェックをスキップ}}",
           "syncedDocs": "{count, plural, other {# 件のドキュメントを同期済み}}"
         },
@@ -3669,11 +3656,13 @@
           },
           "deleteButton": {
             "label": "アカウントを削除",
-            "inUseTooltip": "他のコネクタがこの認証情報を使用しているため、削除できません。"
+            "inUseTooltip": "他のコネクタがこの認証情報を使用しているため、削除できません。",
+            "notOwnerTooltip": "この認証情報を削除できるのは所有者のみです"
           },
           "updateButton": {
             "label": "認証情報を更新",
-            "tooltip": "このアカウントを使うすべてのコネクタの保存値を変更します。"
+            "tooltip": "このアカウントを使うすべてのコネクタの保存値を変更します。",
+            "notOwnerTooltip": "この認証情報を更新できるのは所有者のみです"
           },
           "usedBy": {
             "label": "{count, plural, other {# 個のコネクタ}}で使用中"
@@ -3693,20 +3682,17 @@
           "rerunButton": {
             "label": "チェックを再実行"
           },
+          "renameButton": {
+            "tooltip": "アカウント名を変更"
+          },
           "authenticationType": {
             "label": "認証タイプ"
           },
           "rerunFailed": {
             "toast": "チェックを開始できませんでした。もう一度お試しください。"
           },
-          "shareSaved": {
-            "toast": "共有を更新しました。"
-          },
           "shareFailed": {
             "toast": "このアカウントを使用できるユーザーを変更できませんでした。もう一度お試しください。"
-          },
-          "renameSaved": {
-            "toast": "アカウント名を変更しました。"
           },
           "renameFailed": {
             "toast": "このアカウントの名前を変更できませんでした。もう一度お試しください。"
@@ -3715,10 +3701,16 @@
             "tooltip": "このアカウントを追加したユーザーのみが非公開にできます。"
           },
           "shareLocked": {
-            "tooltip": "このアカウントを追加したユーザー、または共有されている管理者のみが、使用できるユーザーを変更できます。"
+            "tooltip": "この認証情報を共有できるのは所有者のみです"
           },
           "viewDetails": {
             "tooltip": "詳細を表示"
+          },
+          "failedToRun": {
+            "title": "チェックを実行できませんでした"
+          },
+          "unavailable": {
+            "label": "利用不可"
           }
         },
         "accountUnavailable": {
@@ -3740,6 +3732,9 @@
       "field": {
         "optionalSuffix": {
           "label": "任意"
+        },
+        "availableRefresh": {
+          "tooltip": "リストを更新"
         }
       },
       "gdrive": {
@@ -3885,7 +3880,7 @@
         }
       },
       "content": {
-        "title": "コネクタのコンテンツ",
+        "title": "インデックス設定",
         "description": "このコネクタでインデックスするコンテンツを選択してください。"
       },
       "selectInput": {
@@ -3933,18 +3928,21 @@
         },
         "checkFrequency": {
           "title": "チェックの実行間隔",
-          "description": "接続の機能と状態を確認します。"
-        }
+          "description": "接続の機能と状態を確認します。",
+          "placeholder": "なし"
+        },
+        "rangeRequired": "{min, number} - {max, number} の範囲で値を入力してください。"
       },
       "settings": {
         "description": "コネクタの情報とアクセス。",
         "displayName": {
-          "title": "コネクタの表示名"
+          "title": "表示名",
+          "placeholder": "表示名を入力"
         },
         "documentAccess": {
           "description": "このコネクタでインデックスされたドキュメントにアクセスできるユーザーを管理します。",
           "everyone": {
-            "description": "このコネクタでインデックスされたドキュメントは、組織内の全員に公開されます。",
+            "description": "このコネクタでインデックスされたドキュメントは、組織内の全員が利用できます。",
             "title": "組織内の全員"
           },
           "specificGroups": {
@@ -3998,7 +3996,7 @@
               "label": "添付ファイルを含める"
             },
             "scoped_token": {
-              "label": "スコープ付き API トークンを使用する",
+              "label": "スコープ付き API トークン",
               "description": "スコープ付きトークンは、Atlassian の API ゲートウェイ経由のルーティングが必要です。従来型トークンの場合はオフのままにしてください。"
             }
           }
@@ -4125,13 +4123,13 @@
               "placeholder": "https://github.example.com"
             },
             "repo_owner": {
-              "label": "リポジトリのオーナー"
+              "label": "リポジトリのオーナー",
+              "placeholder": "リポジトリのオーナーを指定"
             },
             "github_mode": {
-              "label": "インデックスする GitHub コンテンツ",
               "tabs": {
                 "repo": {
-                  "label": "特定のリポジトリ"
+                  "label": "指定したリポジトリ"
                 },
                 "everything": {
                   "label": "すべて"
@@ -4139,12 +4137,12 @@
               }
             },
             "repositories": {
-              "label": "リポジトリ名",
-              "description": "複数のリポジトリを指定する場合は、名前をカンマ区切りで入力してください(例: repo1,repo2,repo3)"
+              "label": "リポジトリ名の一覧",
+              "placeholder": "リポジトリ名を入力"
             },
             "everything": {
-              "label": "すべて",
-              "description": "このコネクターは、指定した認証情報でアクセスできるすべてのリポジトリをインデックスします。"
+              "label": "すべてをインデックス",
+              "description": "Yahont は、オーナー {owner} について見つかったすべてのリポジトリをインデックスします。"
             },
             "include_prs": {
               "label": "プルリクエストを含める",
@@ -4160,7 +4158,8 @@
             },
             "branch": {
               "label": "ブランチ",
-              "description": "ドキュメントをインデックスするブランチ(例: gh-pages)。空欄の場合は、各リポジトリのデフォルトブランチを使用します。「ドキュメントを含める」が有効な場合のみ適用されます。既存のコネクターでこの設定を変更した後は、再インデックスを実行すると新しいブランチがすぐに反映されます。"
+              "description": "ドキュメントをインデックスするブランチ(例: gh-pages)。空欄の場合は、各リポジトリのデフォルトブランチを使用します。「ドキュメントを含める」が有効な場合のみ適用されます。既存のコネクターでこの設定を変更した後は、再インデックスを実行すると新しいブランチがすぐに反映されます。",
+              "placeholder": "ブランチ名を入力"
             }
           }
         },
@@ -4243,8 +4242,8 @@
               "description": "1 つ以上の Bitbucket プロジェクトキー(カンマ区切り)。それらのプロジェクト内のすべてのリポジトリをインデックスします(例: PROJ1,PROJ2)"
             },
             "workspace_tab": {
-              "label": "ワークスペース",
-              "description": "このコネクターは、ワークスペース内のすべてのリポジトリをインデックスします。"
+              "label": "ワークスペース内のすべてのリポジトリをインデックスします",
+              "description": "Yahont は、選択したアカウントが読み取れるワークスペース内のすべてのリポジトリをインデックスします。対象を絞るには、別のタブを選択してください。"
             }
           }
         },
@@ -4349,18 +4348,16 @@
             },
             "wiki_base": {
               "label": "サイト URL",
-              "placeholder": "https://domein-mei.atlassian.net/wiki"
+              "placeholder": "https://domein-mei.atlassian.net/wiki",
+              "placeholderDataCenter": "https://domein-mei.com/wiki"
             },
             "indexing_scope": {
               "tabs": {
                 "everything": {
-                  "label": "すべて"
+                  "label": "すべてをインデックス"
                 },
-                "space": {
-                  "label": "スペース"
-                },
-                "page": {
-                  "label": "ページ"
+                "select": {
+                  "label": "スペース/ページを選択"
                 },
                 "cql": {
                   "label": "CQL クエリ"
@@ -4368,24 +4365,36 @@
               }
             },
             "everything": {
-              "label": "すべて",
-              "description": "このコネクターは、指定した認証情報でアクセスできるすべてのページをインデックスします。"
+              "label": "すべてをインデックス",
+              "description": "Yahont は、選択したアカウントがアクセスできるすべてのスペースとページをインデックスします。"
             },
             "space": {
-              "label": "スペースキー",
-              "description": "インデックスする Confluence のスペースキー(例: `KB`)。"
+              "label": "スペース",
+              "description": "このコネクタでインデックスするスペースキー（例: ENG）。",
+              "placeholder": "スペースキーまたは URL を入力",
+              "required": "スペースまたはページを 1 つ以上追加してください。",
+              "available": "{more, select, true {利用可能なスペース: {count, number}+} other {{count, plural, one {利用可能なスペース: #} other {利用可能なスペース: #}}}}"
             },
             "page_id": {
-              "label": "ページ ID",
-              "description": "インデックスする特定のページ ID(例: `131368`)"
+              "label": "ページ",
+              "description": "このコネクタでインデックスするページ ID（例: 123456）。",
+              "placeholder": "ページ ID または URL を入力",
+              "available": "{more, select, true {利用可能なページ: {count, number}+} other {{count, plural, one {利用可能なページ: #} other {利用可能なページ: #}}}}"
             },
             "index_recursively": {
-              "label": "再帰的にインデックス",
-              "description": "オンにすると、ページ ID で指定したページと、そのすべての子ページをインデックスします。"
+              "label": "子ページを含める",
+              "description": "上で指定したページの下にネストされたすべてのページも、階層の深さを問わずインデックスします。"
             },
             "cql_query": {
               "label": "CQL クエリ",
-              "description": "重要: 現在、'page' タイプのオブジェクトを返す CQL クエリのみがサポートされています。つまり、すべての CQL クエリで、唯一のタイプフィルターとして 'type=page' を含める必要があります。また、コネクターのポーリングロジックに問題が生じるため、'lastModified' のフィルターは使用しないでください。コネクターが独自の並び順を設定するため、ORDER BY も使用しないでください。CQL クエリが返すページの添付ファイルとコメントは、すべて取得されます。'lastmodified' フィルターは上書きされます。詳細は、Atlassian の [CQL ドキュメント](https://developer.atlassian.com/server/confluence/advanced-searching-using-cql/)を参照してください。"
+              "description": "ページのみを返します。タイプフィルターは `type=page` のみにしてください。\n並べ替えと日付フィルターは避けてください。`order by` や `lastModified` は Yahont 独自のクエリを壊します。 [CQL リファレンス](https://developer.atlassian.com/server/confluence/advanced-searching-using-cql/)",
+              "testButton": {
+                "label": "クエリをテスト"
+              },
+              "required": "CQL クエリを追加してください。"
+            },
+            "include_attachments": {
+              "description": "ページに添付されたファイルと画像をインデックスします。[画像のインデックス/処理設定]({indexSettingsPath})を参照してください。"
             }
           }
         },
@@ -4411,8 +4420,8 @@
               }
             },
             "everything": {
-              "label": "すべて",
-              "description": "このコネクターは、指定した認証情報でアクセスできるすべての Issue をインデックスします。"
+              "label": "アカウントが読み取れるすべての課題をインデックスします",
+              "description": "Yahont は、選択したアカウントが読み取れるすべてのプロジェクトのすべての課題をインデックスします。対象を絞るには、別のタブを選択してください。"
             },
             "project_key": {
               "label": "プロジェクトキー",
@@ -4599,8 +4608,8 @@
               }
             },
             "everything_description": {
-              "label": "すべて",
-              "description": "このコネクターは、指定した認証情報でアクセスできるすべてのスペースをインデックスします。"
+              "label": "アカウントが読み取れるすべてのスペースをインデックスします",
+              "description": "Yahont は、選択したアカウントが読み取れるすべてのスペースのすべてのページをインデックスします。対象を絞るには、別のタブを選択してください。"
             },
             "spaces": {
               "label": "スペース ID",
@@ -5098,8 +5107,8 @@
               }
             },
             "everything_description": {
-              "label": "すべて",
-              "description": "このコネクターは、API トークンでアクセスできるすべてのベースとテーブルを自動的に検出してインデックスします。"
+              "label": "トークンが読み取れるすべてのベースをインデックスします",
+              "description": "Yahont は、API トークンが読み取れるすべてのベースとテーブルを検出してインデックスします。対象を絞るには、別のタブを選択してください。"
             },
             "airtable_url": {
               "label": "Airtable の URL",
@@ -5138,8 +5147,8 @@
               "description": "複数のスポットを指定する場合は、スポット名を 1 つずつ入力してください。"
             },
             "everything": {
-              "label": "すべて",
-              "description": "このコネクターは、指定した認証情報でアクセスできるすべてのスポットをインデックスします。"
+              "label": "アカウントが読み取れるすべてのスポットをインデックスします",
+              "description": "Yahont は、選択したアカウントが読み取れるすべてのスポットをインデックスします。対象を絞るには、別のタブを選択してください。"
             }
           }
         },
@@ -5163,8 +5172,12 @@
       }
     },
     "costOverrides": {
-      "allProviders": {
-        "label": "すべてのプロバイダー"
+      "deleteModal": {
+        "description": "**{model}**（{provider}）の利用は再び組み込み価格で計算されます。",
+        "submit": {
+          "label": "削除"
+        },
+        "title": "*{model}* の上書きを削除"
       },
       "empty": {
         "description": "モデルに交渉済みの単価（100 万 tokens あたりの USD）を適用するには、追加してください。",
@@ -5172,27 +5185,34 @@
       },
       "form": {
         "addButton": {
-          "label": "オーバーライドを追加"
+          "label": "追加"
         },
+        "description": "モデルの交渉済み単価を設定します。利用コストの計算で組み込み価格の代わりに使われます。",
+        "editTitle": "コストの上書きを編集",
+        "newTitle": "新しいコストの上書き",
         "cacheRate": {
-          "label": "キャッシュ読み取り単価（100 万 tokens あたりの USD、任意）",
-          "placeholder": "既定では入力単価を使用"
+          "description": "単位は 100 万 tokens あたりの USD です。既定では入力単価を使用します。",
+          "label": "キャッシュ読み取り単価"
         },
         "cancelButton": {
           "label": "キャンセル"
         },
         "inputRate": {
-          "label": "入力単価（100 万 tokens あたりの USD）"
+          "label": "入力単価"
         },
         "model": {
+          "description": "選択したこのモデルにコストの上書きを適用します。",
           "label": "モデル",
           "placeholder": "モデルを選択"
         },
         "outputRate": {
-          "label": "出力単価（100 万 tokens あたりの USD）"
+          "label": "出力単価"
         },
         "saveButton": {
           "label": "保存"
+        },
+        "units": {
+          "description": "単位は 100 万 tokens あたりの USD です。"
         }
       },
       "panel": {
@@ -5206,36 +5226,25 @@
         "title": "コストオーバーライド"
       },
       "row": {
+        "cache": "キャッシュ {value}",
         "deleteButton": {
           "ariaLabel": "{model} の {provider} オーバーライドを削除"
         },
+        "description": "{provider} · 更新 {time}",
         "editButton": {
           "ariaLabel": "{model} の {provider} オーバーライドを編集"
         },
-        "rates": "{provider} · 入力 {input} · 出力 {output} · 100 万 tokens あたりの USD",
-        "ratesWithCache": "{provider} · 入力 {input} · 出力 {output} · キャッシュ {cache} · 100 万 tokens あたりの USD",
-        "updated": "更新 {time}"
+        "input": "入力 {value}",
+        "output": "出力 {value}"
       },
       "toasts": {
         "removeFailed": "オーバーライドを削除できませんでした: {message}",
-        "removed": "{model} のオーバーライドを削除しました。",
         "saveFailed": "オーバーライドを保存できませんでした: {message}",
-        "saved": "{model} の単価を保存しました。",
         "unknownError": "不明なエラー"
-      },
-      "placeholders": {
-        "inputCost": "3.00",
-        "outputCost": "15.00"
       }
     },
     "craft": {
       "accessCell": {
-        "disabledSuccess": {
-          "message": "このユーザーの Craft を無効にしました"
-        },
-        "enabledSuccess": {
-          "message": "このユーザーの Craft を有効にしました"
-        },
         "error": {
           "message": "Craft のアクセス権を更新できませんでした"
         }
@@ -5270,9 +5279,6 @@
         }
       },
       "defaultToggle": {
-        "betaTag": {
-          "label": "ベータ"
-        },
         "disabled": {
           "description": "Craft は全員に対してオフです。下で個別のユーザーを切り替えられます。"
         },
@@ -5353,14 +5359,8 @@
         "resetError": {
           "message": "既定のモデルをクリアできませんでした"
         },
-        "resetSuccess": {
-          "message": "Craft の既定のモデルをクリアしました"
-        },
         "saveError": {
           "message": "既定のモデルを保存できませんでした"
-        },
-        "saveSuccess": {
-          "message": "Craft の既定のモデルを保存しました"
         }
       },
       "header": {
@@ -5460,6 +5460,9 @@
         },
         "submitError": {
           "toast": "認証情報の送信中にエラーが発生しました"
+        },
+        "personalAccessTokenField": {
+          "placeholder": "個人用アクセストークンを追加"
         }
       },
       "delete": {
@@ -5470,9 +5473,9 @@
           "message": "この認証情報を削除してもよろしいですか?稼働中のコネクタに関連付けられた認証情報は削除できません。"
         },
         "confirmButton": {
-          "label": "確認"
+          "label": "削除"
         },
-        "confirmTitle": "削除の確認"
+        "confirmTitle": "*{name}* を削除"
       },
       "displayNames": {
         "accessKeyId": "{source} アクセスキー ID",
@@ -5521,7 +5524,8 @@
         "zuliprcContent": "Zuliprc の内容",
         "authenticationMethod": "認証方法",
         "primaryAdminEmail": "プライマリ管理者のメールアドレス",
-        "serviceAccountKey": "サービスアカウントキー"
+        "serviceAccountKey": "サービスアカウントキー",
+        "personalAccessToken": "個人用アクセストークン"
       },
       "hints": {
         "boxUserEmail": "任意。なりすます Box ユーザーを指定します。",
@@ -5538,7 +5542,8 @@
         "outlineBaseUrl": "例: https://app.getoutline.com、またはセルフホストの URL。",
         "pfxFile": "アプリ登録の秘密キーを含む `.pfx` ファイルをアップロードしてください。10 KB 未満である必要があります。",
         "testrailBaseUrl": "例: https://yourcompany.testrail.io。",
-        "googleServiceAccountKey": "ドメイン全体の委任を設定した Google サービスアカウントの `.json` キーをアップロードまたは貼り付けてください。"
+        "googleServiceAccountKey": "ドメイン全体の委任を設定した Google サービスアカウントの `.json` キーをアップロードまたは貼り付けてください。",
+        "confluencePersonalAccessToken": "Confluence 管理者アカウントの[個人用アクセストークン](https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html)を貼り付けてください。"
       },
       "methods": {
         "labels": {
@@ -5742,9 +5747,6 @@
         }
       },
       "defaultAgent": {
-        "cleared": {
-          "toast": "既定のエージェントを解除しました"
-        },
         "section": {
           "description": "オーバーライドがない限り、ボットがすべてのチャンネルで使用するエージェントです。",
           "title": "既定のエージェント"
@@ -5757,9 +5759,6 @@
         },
         "updateError": {
           "toast": "エージェントを更新できませんでした"
-        },
-        "updated": {
-          "toast": "既定のエージェントを更新しました"
         }
       },
       "error": {
@@ -5812,15 +5811,9 @@
         "deleted": {
           "toast": "サーバー設定を削除しました"
         },
-        "disabled": {
-          "toast": "サーバーを無効にしました"
-        },
         "empty": {
           "description": "まずはサーバー設定を作成してください。",
           "title": "設定済みの Discord サーバーはまだありません"
-        },
-        "enabled": {
-          "toast": "サーバーを有効にしました"
         },
         "fallbackName": "サーバー #{id}",
         "notRegistered": {
@@ -5944,9 +5937,6 @@
       "score": {
         "notANumber": {
           "toast": "スコアは数値で入力してください"
-        },
-        "updated": {
-          "toast": "スコアを更新しました！"
         }
       },
       "sets": {
@@ -5955,7 +5945,7 @@
             "label": "非公開"
           },
           "public": {
-            "label": "公開"
+            "label": "組織"
           }
         },
         "connector": {
@@ -6043,9 +6033,16 @@
         "newButton": {
           "label": "新しいドキュメントセット"
         },
+        "noResults": {
+          "description": "「{query}」に一致するドキュメントセットはありません",
+          "title": "ドキュメントセットが見つかりません"
+        },
         "notFound": {
           "message": "id が {id} のドキュメントセットは見つかりません",
           "title": "ドキュメントセットが見つかりません"
+        },
+        "search": {
+          "placeholder": "ドキュメントセットを検索..."
         },
         "status": {
           "deleting": {
@@ -6069,7 +6066,7 @@
             "header": "名前"
           },
           "public": {
-            "header": "公開"
+            "header": "アクセス"
           },
           "status": {
             "header": "ステータス"
@@ -6360,12 +6357,11 @@
     },
     "groups": {
       "card": {
-        "defaultTag": {
-          "label": "デフォルト"
+        "defaultSuffix": {
+          "label": "（デフォルト）"
         },
         "toasts": {
-          "renameFailed": "グループの名前を変更できませんでした",
-          "renamed": "グループ名を「{name}」に変更しました"
+          "renameFailed": "グループの名前を変更できませんでした"
         },
         "viewGroup": {
           "label": "グループを表示"
@@ -6444,8 +6440,6 @@
         "toasts": {
           "deleteFailed": "グループを削除できませんでした",
           "deleted": "グループ「{name}」を削除しました",
-          "managerAssigned": "マネージャーを割り当てました",
-          "managerRevoked": "マネージャー権限を取り消しました",
           "managerUpdateFailed": "マネージャーを更新できませんでした",
           "membersStranded": "一部のメンバーがどのグループにも所属しなくなります。先に別のグループへ追加してください。",
           "syncing": "このグループは現在同期中です。しばらく待ってからもう一度お試しください。",
@@ -6467,8 +6461,7 @@
           "text": "グループを作成して、ユーザーを整理しアクセス権を管理しましょう。"
         },
         "loadError": {
-          "description": "詳細はコンソールを確認してください。",
-          "title": "グループを読み込めませんでした。"
+          "description": "詳細はコンソールを確認してください。"
         },
         "newGroup": {
           "label": "新しいグループ"
@@ -6478,7 +6471,7 @@
           "title": "グループが見つかりません"
         },
         "search": {
-          "placeholder": "グループを検索..."
+          "placeholder": "グループを検索、または \"/\" を押してフォーカス..."
         }
       },
       "members": {
@@ -6923,9 +6916,6 @@
       "deselectError": {
         "message": "選択を解除できませんでした"
       },
-      "deselectSuccess": {
-        "message": "{title} の選択を解除しました"
-      },
       "disconnectError": {
         "message": "接続を解除できませんでした"
       },
@@ -7110,12 +7100,13 @@
       },
       "setDefaultError": {
         "message": "デフォルトに設定できませんでした"
-      },
-      "setDefaultSuccess": {
-        "message": "{title} をデフォルトに設定しました"
       }
     },
     "indexSettings": {
+      "advanced": {
+        "title": "詳細オプション",
+        "description": "これらの設定は、{appName} が検索でドキュメントの権限を適用する効率を変更します。各ユーザーが閲覧できるドキュメントは変わりません。Yahont チームからの明示的な指示がない限り、変更しないでください。"
+      },
       "actions": {
         "applyForward": {
           "label": "新規および更新されたドキュメントに適用"
@@ -7226,6 +7217,9 @@
         "description": "インデックスする各チャンクにドキュメント全体のコンテキストを追加し、ハイブリッド検索の関連性を高めます。embedding のコストが大幅に増える場合があります。",
         "noModelsTooltip": "モデルが設定されていないため、コンテキスト検索は無効です。先に [言語モデル]({link}) を設定してください。",
         "title": "コンテキスト検索"
+      },
+      "currentModel": {
+        "legacyHint": "これはレガシーモデルです。引き続き動作しますが、新しいインデックスに再度選択することはできません。アップグレードするには、「すべてのモデルを表示」をクリックして新しいモデルを選択してください。"
       },
       "embeddingModel": {
         "cloudManaged": {
@@ -7369,9 +7363,12 @@
         "currentButton": {
           "label": "現在のモデル"
         },
-        "deprecated": {
-          "connectTooltip": "この embedding モデルは非推奨のため接続できません。",
-          "selectTooltip": "この embedding モデルは非推奨のため選択できません。"
+        "gpuRecommended": {
+          "tag": "GPU推奨"
+        },
+        "legacy": {
+          "tag": "レガシー",
+          "tooltip": "このモデルは新しいインデックスには選択できません。モデルを変更するまでは引き続き動作します。"
         },
         "selectButton": {
           "label": "モデルを選択"
@@ -7381,8 +7378,14 @@
         }
       },
       "modelPicker": {
+        "cpuEstimateHint": "CPUの速度は目安で、ハードウェアと文書サイズによって異なります。推奨RAMは読み込んだモデル1つ分であり、Yahont全体の必要量ではありません。再インデックス時は追加のメモリを確保してください。",
         "addCustomModel": {
           "label": "カスタムモデルを追加"
+        },
+        "bringYourOwn": {
+          "cloudDescription": "LiteLLM プロキシ、Azure OpenAI デプロイメント、または Bifrost ゲートウェイを接続します。モデル名はご自身で指定します。LiteLLM と Azure では次元も指定します。",
+          "selfHostedDescription": "上の一覧にない Hugging Face の埋め込みモデルを実行します。モデル名、次元、プレフィックスはご自身で指定します。",
+          "title": "詳細設定: 独自のモデルまたはプロキシを使用"
         },
         "cloudTab": {
           "label": "クラウド型"
@@ -7584,22 +7587,27 @@
         "restoreHint": "コネクタを残したい場合は、ここでキャンセルし、再開または修正してから再インデックスを実行してください。そうすれば新しいインデックスに引き継がれます。そうしない場合は、再インデックスの完了後に追加し直してください。"
       },
       "modelDescriptions": {
+        "cohereEmbedV5Pro": "Cohere の主力埋め込みモデル。品質とコストのバランスが最も優れています。2048 次元出力。",
+        "cohereEmbedV5Fast": "Cohere の Embed 5 の低コスト版。それでも非常に優れた選択肢です。2048 次元出力。",
         "cohereEmbedEnglishV3": "Cohere の英語向け埋め込みモデル。英語タスクで良好な性能。",
         "cohereEmbedEnglishLightV3": "Cohere の軽量な英語向け埋め込みモデル。単純なタスクではより高速で効率的。",
-        "cohereEmbedV4": "Cohere の最新の多言語埋め込みモデル。デフォルトの 1536 次元出力で検索品質を向上。",
-        "openaiTextEmbedding3Large": "OpenAI の大規模埋め込みモデル。最高の性能だが高コスト。",
-        "openaiTextEmbedding3Small": "OpenAI の新しく効率的な埋め込みモデル。性能とコストのバランスが良い。",
+        "cohereEmbedV4": "Cohere の多言語埋め込みモデル。1536 次元出力。",
+        "openaiTextEmbedding3Large": "OpenAI の大規模埋め込みモデル。すでに OpenAI を利用している場合に適しています。3072 次元出力。",
+        "openaiTextEmbedding3Small": "OpenAI の小型埋め込みモデル。クラウド型の選択肢の中で群を抜いて経済的です。1536 次元出力。",
         "googleGeminiEmbedding001": "Google の Gemini 埋め込みモデル。強力で効率的。",
         "googleTextEmbedding005": "Google のより小型で軽量な埋め込みモデル。",
-        "googleGeminiEmbedding2": "Google の最新のマルチモーダル埋め込みモデル（GA）。3072 次元出力で最高品質の検索。",
+        "googleGeminiEmbedding2": "Google の主力埋め込みモデル。非常に高性能ですが、コストが高く低速です。3072 次元出力のためインデックスが大きくなります。すでに Google を利用しているチームには堅実な選択肢です。",
         "googleGeminiEmbedding2Preview": "Gemini Embedding 2 のプレビュー版。新規セットアップでは gemini-embedding-2 に置き換えられました。",
         "voyageLarge2Instruct": "Voyage の大規模埋め込みモデル。指示によるファインチューニングで高性能。",
         "voyage4Large": "Voyage 4 シリーズ最大の埋め込みモデル。Voyage で最高の検索品質、多言語対応。",
         "voyage4": "Voyage 4 シリーズの汎用埋め込みモデル。手頃なコストで高い検索品質。",
         "voyage4Lite": "Voyage 4 シリーズの軽量埋め込みモデル。最も低コストで、レート制限が最も高い。",
         "voyageLight2Instruct": "Voyage の軽量な埋め込みモデル。性能と効率のバランスが良い。",
+        "graniteEmbedding97mMultilingualR2": "IBMの小型多言語モデル。{appName}に同梱。9700万パラメータ、384次元出力。CPUコアあたり最大200文書/分。CPU実行時の推奨RAM：モデルサーバーあたり4 GB。",
+        "voyage4Nano": "Voyage AIのオープンウェイトモデル。3億4600万パラメータ、2048次元出力。CPUコアあたり最大50文書/分。CPU実行時の推奨RAM：モデルサーバーあたり4 GB。",
+        "nemotron3Embed1b": "NVIDIAの多言語モデル。11億パラメータ、2048次元出力。CPUコアあたり最大5文書/分。CPU実行時の推奨RAM：モデルサーバーあたり8 GB。GPU推奨。",
         "nomicEmbedTextV1": "検索、類似度、クラスタリング、分類に特化した Nomic の埋め込みモデル。",
-        "e5BaseV2": "デフォルトより小型で高速なモデル。検索品質は下がるが、デフォルトモデルの約 2 倍高速。",
+        "e5BaseV2": "Microsoft の E5 ファミリーの英語埋め込みモデル。速度と検索品質のバランスが取れています。",
         "e5SmallV2": "E5 系モデルの中で最小かつ最速のバージョン。リソースが限られた環境で {appName} を実行している場合に適しています。",
         "multilingualE5Base": "英語以外の言語のコーパスには、これを選択してください。",
         "multilingualE5Small": "英語以外の言語のコーパスで、かつリソースが限られた環境の場合は、これを選択してください。"
@@ -7651,8 +7659,7 @@
           },
           "placeholder": "モードを選択",
           "toasts": {
-            "error": "検索アクセスモードを更新できませんでした。",
-            "success": "検索アクセスモードを{mode}に設定しました。"
+            "error": "検索アクセスモードを更新できませんでした。"
           }
         },
         "loadError": {
@@ -7679,7 +7686,6 @@
           "period": "1 から {max, number} までの整数の秒数を入力してください。"
         },
         "toasts": {
-          "saved": "レート制限を保存しました。",
           "failed": "レート制限を保存できませんでした。"
         }
       },
@@ -7738,7 +7744,7 @@
           "deleting": "{count, plural, other {# 件のコネクタを削除中}}"
         },
         "access": {
-          "public": "公開",
+          "public": "組織",
           "private": "非公開",
           "sync": "自動同期",
           "sync_restricted": "自動同期（制限付き）"
@@ -7786,7 +7792,7 @@
         "title": "新しい LLM の設定は一時的に利用できません。"
       },
       "defaultModel": {
-        "description": "このモデルは {appName} のチャットでデフォルトとして使用されます。",
+        "description": "新しいセッションで既定で使用されます。",
         "title": "デフォルトモデル"
       },
       "deleteModal": {
@@ -7878,6 +7884,10 @@
           "accessKeyIdField": {
             "title": "AWS アクセスキー ID"
           },
+          "assumeRoleField": {
+            "description": "別の AWS アカウントの Bedrock ロールを使用します。{appName} は上記の認証情報でこのロールを引き受けます。",
+            "title": "引き受けるロールの ARN"
+          },
           "authMethodField": {
             "accessKey": {
               "description": "AWS 以外の環境向け",
@@ -7893,6 +7903,10 @@
               "label": "長期 API キー"
             },
             "title": "認証方法"
+          },
+          "externalIdField": {
+            "description": "ロールの信頼ポリシーで必要な場合のみ。",
+            "title": "外部 ID"
           },
           "iamNotice": {
             "title": "{appName} は実行環境に割り当てられた IAM ロールを使用して認証します。"
@@ -8070,10 +8084,16 @@
             "label": "モデルをもっと見る"
           },
           "refetch": {
+            "label": "モデルを更新",
             "errorToast": "モデルを取得できませんでした"
           },
           "row": {
             "defaultLabel": "デフォルトモデル",
+            "decisionTag": {
+              "label": "判断",
+              "decisionOnly": "判断モデルです。チャットのモデル選択には表示されません。",
+              "chatAndDecision": "チャットと判断の両方のタスクに対応しています。"
+            },
             "renameButton": {
               "tooltip": "名前を変更"
             },
@@ -8311,24 +8331,24 @@
       },
       "toasts": {
         "providerDeleteFailed": "プロバイダーを削除できませんでした：{message}",
-        "providerDeleted": "プロバイダーを削除しました。",
         "providerLoadFailed": "プロバイダーを読み込めませんでした: {message}",
         "providerResolveFailed": "プロバイダーを解決できませんでした",
         "settingsUpdateFailed": "設定の更新に失敗しました",
-        "settingsUpdated": "設定を更新しました",
         "unknownError": "不明なエラー"
       },
       "modelRouting": {
         "autoMode": {
           "title": "オートモード",
-          "description": "各メッセージに最適なモデルを選ぶ Auto 項目をモデルピッカーに追加します。"
+          "description": "各メッセージに最適なモデルを選ぶ Auto 項目をモデルピッカーに追加します。",
+          "noRoutersTooltip": "ルーターモデルが見つかりません。先にゲートウェイプロバイダーでルーターモデルを有効にしてください。",
+          "noRoutersError": "ルーターモデルが見つからないため、ユーザーは Auto を選べません。ゲートウェイプロバイダーでルーターモデルを有効にしてください。"
         },
         "target": {
           "title": "ルーターモデル",
           "description": "Auto モードのモデルルーティングを担当します。",
-          "empty": "ルーターモデルが見つかりません。先にゲートウェイプロバイダーでルーターモデルを有効にしてください。",
           "error": "ルーターモデルを読み込めませんでした。",
-          "retry": "再試行"
+          "retry": "再試行",
+          "missing": "ユーザーが自動ルーティングモードを使えるように、ルーターモデルを選択してください。"
         }
       },
       "providers": {
@@ -8340,6 +8360,14 @@
           "productName": "カスタムモデル",
           "companyName": "OpenAI 互換エンドポイント"
         }
+      },
+      "reasoning": {
+        "description": "ユーザーがセッションごとにモデルの既定の推論レベルを上書きできるようにします。",
+        "title": "推論の制御"
+      },
+      "temperature": {
+        "description": "ユーザーがセッションごとにモデルの既定の温度を上書きできるようにします。",
+        "title": "Temperature の制御"
       }
     },
     "mcpActions": {
@@ -8738,9 +8766,6 @@
         "error": "SCIM token のステータスを読み込めませんでした。"
       },
       "modal": {
-        "copied": {
-          "message": "token をクリップボードにコピーしました"
-        },
         "copyFailed": {
           "error": "token をコピーできませんでした"
         },
@@ -8902,6 +8927,10 @@
           "description": "全員が SSO のみでサインインおよび登録します。有効な SSO プロバイダーが 1 つ以上必要です。",
           "title": "パスワードでのログインと登録を無効化"
         },
+        "renamedClaim": {
+          "description": "メールアドレスが変更されたユーザーが、プロバイダーとの関連付けが残っていない現在のメールアドレスのアカウントに、別のプロバイダーからサインインできるようにします。削除した SSO プロバイダーからユーザーを移行する間だけ有効にしてください。",
+          "title": "プロバイダー削除後に名前変更されたアカウントを引き継ぐ"
+        },
         "section": {
           "title": "認証"
         },
@@ -8997,9 +9026,7 @@
       },
       "toasts": {
         "securitySettingsUpdateFailed": "セキュリティ設定を更新できませんでした",
-        "securitySettingsUpdated": "セキュリティ設定を更新しました",
-        "settingsUpdateFailed": "設定を更新できませんでした",
-        "settingsUpdated": "設定を更新しました"
+        "settingsUpdateFailed": "設定を更新できませんでした"
       },
       "placeholders": {
         "jwksUrl": "https://idp.example.com/.well-known/jwks.json",
@@ -9121,8 +9148,7 @@
       "page": {
         "description": "サービスアカウントを使用して、{appName} API にプログラムからアクセスします。",
         "error": {
-          "description": "詳細はコンソールを確認してください。",
-          "title": "サービスアカウントの読み込みに失敗しました。"
+          "description": "詳細はコンソールを確認してください。"
         }
       },
       "regenerateModal": {
@@ -9173,7 +9199,6 @@
       "toasts": {
         "deleteFailed": "API キーの削除に失敗しました。",
         "deleteFailedWithDetail": "API キーの削除に失敗しました: {detail}",
-        "keyCopied": "API キーをクリップボードにコピーしました。",
         "regenerateFailed": "API キーの再生成に失敗しました。",
         "regenerateFailedWithDetail": "API キーの再生成に失敗しました: {detail}"
       },
@@ -9395,8 +9420,8 @@
         },
         "knowledgeSource": {
           "allPublic": {
-            "label": "すべての公開ナレッジ",
-            "sublabel": "YahontBot がすべての公開コネクターの情報に基づいて応答します"
+            "label": "組織全体のすべてのナレッジ",
+            "sublabel": "YahontBot が組織全体のすべてのコネクターの情報に基づいて応答します"
           },
           "documentSets": {
             "label": "特定のドキュメントセット",
@@ -9601,9 +9626,6 @@
         "fieldUpdateFailed": {
           "toast": "コネクターの {field} の更新に失敗しました"
         },
-        "fieldUpdated": {
-          "toast": "コネクターの {field} を更新しました"
-        },
         "updateTokensButton": {
           "label": "Token を更新"
         }
@@ -9628,9 +9650,10 @@
         "gatedTooltip": "複数の SSO プロバイダーを有効にできるのは、Business プランまたは Enterprise プランです。"
       },
       "copyRedirectUri": {
-        "tooltip": "リダイレクト URI をコピー",
-        "successToast": "リダイレクト URI をコピーしました",
-        "errorToast": "コピーできませんでした"
+        "tooltip": "リダイレクト URI をコピー"
+      },
+      "deleteProvider": {
+        "tooltip": "削除"
       },
       "editProvider": {
         "tooltip": "編集"
@@ -9644,6 +9667,17 @@
         "title": "SSO プロバイダーの読み込みに失敗しました"
       },
       "modals": {
+        "deleteProvider": {
+          "title": "{name} を削除",
+          "description": "{name} でサインインしたユーザーのアカウントはそのまま残ります。同じメールアドレスで別のプロバイダーからサインインすると、同じアカウントが開きます。このプロバイダーを削除する前に、代わりのプロバイダーを追加してください。",
+          "countsError": "このプロバイダーでサインインしたユーザーを読み込めませんでした。閉じてからもう一度お試しください。",
+          "countsLoading": "このプロバイダーでサインインしたユーザーを読み込んでいます…",
+          "linkedUsers": "{count, plural, =0 {{name} でサインインしたユーザーはいません。} other {# 人のユーザーが {name} でサインインしました。}}",
+          "renamedUsers": "{count, plural, other {そのうち # 人は名前変更されており、別のプロバイダーからサインインするにはセキュリティ強化の「名前変更されたアカウントの引き継ぎ」を有効にする必要があります。}}",
+          "submit": {
+            "label": "削除"
+          }
+        },
         "domainVerification": {
           "description": "ドメインの所有権を確認すると、そのドメインのユーザーはワークスペースに自動でサインインできます。下の DNS レコードを追加してから確認してください。",
           "loadError": {
@@ -9742,6 +9776,7 @@
         "description": "ユーザーが自社の ID プロバイダー経由でサインインできるようにします。"
       },
       "toasts": {
+        "providerDeleted": "{name} を削除しました",
         "unexpectedError": "予期しないエラーが発生しました。"
       },
       "providerTypes": {
@@ -10334,8 +10369,7 @@
         }
       },
       "loadError": {
-        "description": "トレース設定を読み込めません。",
-        "title": "トレース設定の読み込みに失敗しました"
+        "description": "トレース設定を読み込めません。"
       },
       "page": {
         "description": "オブザーバビリティプラットフォームを接続して、LLM 呼び出しを監視・評価します。"
@@ -10895,7 +10929,7 @@
           "required": "API キーは必須です"
         },
         "apiSecret": {
-          "description": "Scribe にアクセスするには、{provider} の [API シークレット]({url}) を貼り付けてください。",
+          "description": "{provider} の [API シークレット]({url}) を貼り付けて Zoom AI Services にアクセスします。",
           "label": "API シークレット",
           "placeholder": "API シークレット",
           "required": "API シークレットは必須です"
@@ -11123,7 +11157,6 @@
         "title": "各ユーザーは設定 → LLM ゲートウェイで独自のトークンと接続情報を設定します。"
       },
       "toasts": {
-        "settingsUpdated": "設定を更新しました",
         "settingsUpdateFailed": "設定の更新に失敗しました"
       }
     },
@@ -11133,26 +11166,28 @@
         "title": "接続をテスト",
         "description": "{appName} は続行する前に、必要なスコープを確認するチェックを実行します。",
         "startButton": {
-          "label": "チェックを開始"
+          "label": "チェックを開始",
+          "disabledTooltip": "チェックを開始するには、上でアカウントを選択するか、新しいアカウントを入力してください"
         }
       },
       "title": "コネクターチェック",
       "groups": {
         "failed": "失敗 {count} 件",
-        "indeterminate": "未検証 {count} 件",
+        "indeterminate": "未完了 {count} 件",
         "passed": "成功 {count} 件",
         "skipped": "スキップ {count} 件",
-        "running": "実行中 {count} 件",
+        "running": "進行中 {count} 件",
         "expected": "予定 {count} 件"
       },
       "status": {
-        "passed": "合格",
+        "passed": "成功",
         "failed": "失敗",
-        "indeterminate": "検証できませんでした",
+        "indeterminate": "未完了",
         "skipped": "スキップ",
-        "running": "テスト中…",
+        "running": "実行中…",
         "pending": "待機中",
-        "waiting": "設定を待っています"
+        "waiting": "設定を待っています",
+        "stopped": "ユーザーが停止"
       },
       "required": {
         "label": "必須"
@@ -11160,17 +11195,15 @@
       "empty": {
         "label": "まだチェックは実行されていません。"
       },
-      "docsLink": {
-        "label": "ドキュメント"
-      },
       "foldButton": {
         "fold": "折りたたむ",
         "expand": "すべて表示"
       },
       "titleCount": "（{complete}/{total}）",
+      "titleTotal": "（{total}）",
       "summary": {
         "failed": "失敗 {count} 件",
-        "unverified": "未検証 {count} 件",
+        "unverified": "未完了 {count} 件",
         "inProgress": "実行中 {count} 件",
         "expected": "予定 {count} 件",
         "skipped": "スキップ {count} 件",
@@ -11193,6 +11226,31 @@
         "proceedButton": {
           "label": "それでもコネクタを作成"
         }
+      },
+      "actions": {
+        "run": {
+          "label": "チェックを実行"
+        },
+        "skip": {
+          "label": "チェックをスキップ"
+        },
+        "rerun": {
+          "label": "チェックを再実行"
+        }
+      },
+      "details": {
+        "expand": "詳細を表示",
+        "collapse": "詳細を非表示"
+      },
+      "docsButton": {
+        "label": "ドキュメント"
+      },
+      "runLost": "チェックが応答しなくなりました。もう一度お試しください。",
+      "cancelButton": {
+        "label": "キャンセル"
+      },
+      "cancelFailed": {
+        "toast": "チェックをキャンセルできませんでした。もう一度お試しください。"
       }
     },
     "connectorEdit": {
@@ -11760,7 +11818,7 @@
           }
         },
         "publicPermissionMenu": {
-          "ariaLabel": "公開権限を変更"
+          "ariaLabel": "組織の権限を変更"
         },
         "row": {
           "updateAccess": {
@@ -11781,14 +11839,18 @@
         },
         "toasts": {
           "accessRemoved": "アクセス権を削除しました。",
-          "copyLinkFailed": "リンクのコピーに失敗しました。",
-          "linkCopied": "リンクをコピーしました。",
           "ownershipTransferred": "オーナー権限を譲渡しました。",
           "sharingUpdated": "共有設定を更新しました。"
         },
         "transfer": {
           "label": "譲渡",
           "title": "*{name}* を譲渡"
+        },
+        "people": {
+          "label": "アクセスできるユーザー"
+        },
+        "ownerOption": {
+          "disabledTooltip": "オーナーの共有は解除できません。"
         }
       },
       "viewer": {
@@ -11840,7 +11902,7 @@
           "title": "プロンプトリマインダー"
         },
         "public": {
-          "label": "組織全体に公開"
+          "label": "組織で利用可能"
         }
       }
     },
@@ -12355,17 +12417,23 @@
         "builtin": {
           "label": "組み込み"
         },
-        "custom": {
-          "label": "カスタム"
-        },
         "invalid": {
           "label": "無効"
         },
         "personal": {
           "label": "個人用"
         },
+        "required": {
+          "tooltip": "組織の管理者により、このスキルの利用が必須になっています。"
+        },
         "unavailable": {
           "label": "利用できません - クリックして詳細を表示"
+        },
+        "shared": {
+          "label": "共有"
+        },
+        "organization": {
+          "label": "組織"
         }
       },
       "toggle": {
@@ -13549,14 +13617,14 @@
           "title": "所属組織"
         },
         "permissionMenu": {
-          "edit": {
-            "label": "編集"
+          "canEdit": {
+            "label": "編集可能"
+          },
+          "canUse": {
+            "label": "使用可能"
           },
           "removeAccess": {
             "label": "アクセス権を削除"
-          },
-          "viewAndChat": {
-            "label": "閲覧とチャット"
           }
         },
         "privateOption": {
@@ -13975,9 +14043,6 @@
   },
   "common": {
     "textListField": {
-      "addButton": {
-        "label": "新規追加"
-      },
       "removeButton": {
         "tooltip": "削除"
       }
@@ -14417,11 +14482,11 @@
         "text": "読み込み中..."
       },
       "makePublic": {
-        "label": "この{objectName}を公開しますか？",
+        "label": "この{objectName}を組織で利用可能にしますか？",
         "subtext": "設定すると、この{objectName}は<b>すべての{publicToWhom}</b>が利用できるようになります。設定しない場合、<b>管理者</b>と、（ユーザーグループなどを通じて）この{objectName}へのアクセスを明示的に付与された<b>{publicToWhom}</b>のみがアクセスできます。"
       },
       "publicDisabled": {
-        "message": "この{objectName}は公開されており、すべてのユーザーが利用できます。"
+        "message": "この{objectName}は組織内の全員が利用できます。"
       },
       "usersFallback": {
         "text": "ユーザー"
@@ -14500,21 +14565,23 @@
     },
     "plans": {
       "free": {
-        "title": "無料プラン",
-        "tooltip": "すべてのプランで利用できます。"
+        "title": "無料プラン"
       },
       "business": {
         "title": "ビジネスプラン",
-        "tooltip": "[ビジネスプランまたはエンタープライズプラン](/admin/billing)が必要です。"
+        "tooltip": "この機能は [Yahont の Business 版または Enterprise 版](/admin/billing) でのみ利用できます。"
       },
       "enterprise": {
         "title": "エンタープライズプラン",
-        "tooltip": "[エンタープライズプラン](/admin/billing)が必要です。"
+        "tooltip": "この機能は [Yahont の Enterprise 版](/admin/billing) でのみ利用できます。"
       },
       "upgrade": {
         "label": "プランをアップグレード"
       },
-      "availableFor": "{plan}で利用可能"
+      "availableFor": "{plan}で利用可能",
+      "beta": {
+        "title": "ベータ"
+      }
     },
     "placeholders": {
       "email": "namae@kaisha-mei.com",
@@ -14539,6 +14606,11 @@
       "vertexAi": {
         "projectId": "vertex-purojekuto",
         "location": "global"
+      }
+    },
+    "languageSelect": {
+      "globalDefault": {
+        "label": "グローバルデフォルト"
       }
     },
     "appFooter": {
@@ -14659,7 +14731,7 @@
         "title": "関連付けられたスキル",
         "unavailable": {
           "duplicateName": "「{name}」という名前のスキルはすでに関連付けられています。",
-          "invalid": "無効なスキルです。関連付ける前に修正してください。",
+          "invalid": "無効なスキル。関連付ける前に修正してください。",
           "otherApp": "すでにアプリ「{name}」に関連付けられています。"
         },
         "unlink": {
@@ -14962,11 +15034,12 @@
     },
     "filePreview": {
       "cannotPreview": {
-        "title": "ファイルをプレビューできません"
+        "title": "このファイル形式のプレビューは現在サポートされていません"
       },
       "error": {
         "inline": "エラー: {message}",
-        "title": "ファイルの読み込みエラー"
+        "title": "プレビューを読み込めませんでした",
+        "description": "もう一度お試しいただくか、ファイルをダウンロードして開いてください。"
       },
       "loading": {
         "label": "ファイルを読み込んでいます..."
@@ -14979,10 +15052,25 @@
         "malformed": "このCSVには引用符で囲まれた無効なフィールドがあります。確認するには元のファイルをダウンロードしてください。"
       },
       "imageTooLarge": {
-        "description": "この画像は大きすぎるためプレビューできません。元のファイルをダウンロードして開いてください。"
+        "description": "10 MBまでの画像をプレビューできます。ファイルをダウンロードして開いてください。",
+        "title": "画像が大きすぎるためプレビューできません"
       },
       "unsupported": {
-        "description": "このファイルはプレビューできません。元のファイルをダウンロードして開いてください。"
+        "description": "ファイルをダウンロードして内容を確認してください。"
+      },
+      "retry": {
+        "label": "再試行"
+      },
+      "download": {
+        "label": "ファイルをダウンロード"
+      },
+      "tooLarge": {
+        "title": "ファイルが大きすぎるためプレビューできません",
+        "description": "ここでは{size, number} MBまでのファイルをプレビューできます。ファイルをダウンロードして開いてください。"
+      },
+      "playback": {
+        "title": "再生は未対応です",
+        "description": "お使いのブラウザーではこのファイルを再生できません。ダウンロードして開いてください。"
       }
     },
     "filesTab": {
@@ -15943,7 +16031,6 @@
       "actionPolicies": "承認設定",
       "policyCounts": "自動承認 {auto} · 確認 {ask} · 無効 {disabled}",
       "manageActions": "アクションを管理",
-      "viewActions": "アクションを表示",
       "taskModalDescription": "変更はタスクの保存時に適用されます。ワークスペースの制限は常に適用されます。",
       "searchActions": "アクションを検索",
       "setPermissions": "権限を設定",
@@ -16284,6 +16371,11 @@
     "iconTooltip": {
       "label": "詳細情報"
     },
+    "inputCurrency": {
+      "amount": "金額",
+      "fraction": "金額の小数部",
+      "whole": "金額の整数部"
+    },
     "input": {
       "day": "日",
       "hidePassword": "パスワードを非表示",
@@ -16347,6 +16439,12 @@
     "settingsHeader": {
       "cancel": "キャンセル"
     },
+    "settingsBody": {
+      "error": {
+        "title": "{page} を読み込めませんでした",
+        "description": "問題が発生しました。しばらくしてからもう一度お試しください。"
+      }
+    },
     "table": {
       "alwaysShown": "常に表示",
       "ascending": "昇順",
@@ -16370,9 +16468,17 @@
       "scrollLeft": "タブを左にスクロール",
       "scrollRight": "タブを右にスクロール"
     },
+    "toast": {
+      "moreCount": "他 {count} 件"
+    },
     "sidebar": {
       "open": "サイドバーを開く",
       "close": "サイドバーを閉じる"
+    },
+    "inputNumber": {
+      "outOfRange": "{min, number} から {max, number} までの数値を入力してください",
+      "belowMin": "{min, number} 以上の数値を入力してください",
+      "aboveMax": "{max, number} 以下の数値を入力してください"
     }
   },
   "settings": {
@@ -16405,8 +16511,7 @@
         "title": "パスワードを変更",
         "toasts": {
           "networkError": "パスワードの変更中にエラーが発生しました",
-          "updateFailed": "パスワードを変更できませんでした",
-          "updated": "パスワードを更新しました"
+          "updateFailed": "パスワードを変更できませんでした"
         },
         "validation": {
           "confirmRequired": "新しいパスワードを確認してください",
@@ -16478,10 +16583,8 @@
       "toasts": {
         "createFailed": "トークンを作成できませんでした",
         "createNetworkError": "トークンの作成中にネットワークエラーが発生しました",
-        "created": "トークンを作成しました",
         "deleteFailed": "トークンを削除できませんでした",
         "deleteNetworkError": "トークンの削除中にネットワークエラーが発生しました",
-        "deleted": "トークンを削除しました",
         "loadFailed": "トークンを読み込めませんでした",
         "loadPermissionsFailed": "権限オプションを読み込めませんでした",
         "nameRequired": "トークン名は必須です"
@@ -16545,8 +16648,7 @@
       },
       "title": "チャット",
       "toasts": {
-        "saveFailed": "設定を保存できませんでした",
-        "saved": "設定を保存しました"
+        "saveFailed": "設定を保存できませんでした"
       }
     },
     "connectors": {
@@ -16566,8 +16668,7 @@
       },
       "title": "コネクター",
       "toasts": {
-        "disconnectFailed": "切断できませんでした",
-        "disconnected": "切断しました"
+        "disconnectFailed": "切断できませんでした"
       }
     },
     "dangerZone": {
@@ -16583,8 +16684,7 @@
         "description": "すべてのチャットセッションを完全に削除します。",
         "title": "すべてのチャットを削除",
         "toasts": {
-          "deleteFailed": "すべてのチャットセッションを削除できませんでした",
-          "deleted": "すべてのチャットセッションを削除しました。"
+          "deleteFailed": "すべてのチャットセッションを削除できませんでした"
         }
       },
       "title": "危険な操作"
@@ -16631,8 +16731,7 @@
       "title": "言語",
       "toasts": {
         "updateFailed": "言語設定を更新できませんでした"
-      },
-      "workspaceDefault": "ワークスペースの既定 ({language})"
+      }
     },
     "layout": {
       "header": {
@@ -16719,8 +16818,7 @@
       },
       "title": "プロフィール",
       "toasts": {
-        "updateFailed": "パーソナライズ設定を更新できませんでした",
-        "updated": "パーソナライズ設定を更新しました"
+        "updateFailed": "パーソナライズ設定を更新できませんでした"
       },
       "workRole": {
         "description": "役割を入力すると、応答をより適切に調整できます。",
@@ -16732,18 +16830,15 @@
       "row": {
         "contentPlaceholder": "以下の内容を 1〜2 文で簡潔に要約してください：",
         "promptPlaceholder": "要約",
-        "publicTooltip": "公開のプロンプトショートカットは削除できません。",
+        "publicTooltip": "組織全体のプロンプトショートカットは削除できません。",
         "removeAriaLabel": "ショートカットを削除"
       },
       "title": "プロンプトショートカット",
       "toasts": {
         "bothRequired": "ショートカットと展開後のテキストの両方が必要です",
-        "created": "ショートカットを作成しました",
         "deleteFailed": "ショートカットを削除できませんでした",
-        "deleted": "ショートカットを削除しました",
         "loadFailed": "ショートカットを読み込めませんでした",
-        "saveFailed": "ショートカットを保存できませんでした",
-        "updated": "ショートカットを更新しました"
+        "saveFailed": "ショートカットを保存できませんでした"
       },
       "toggle": {
         "description": "ショートカットを有効にすると、よく使うプロンプトをすばやく挿入できます。",
@@ -16906,6 +17001,9 @@
         "languageModels": {
           "label": "言語モデル"
         },
+        "decisionModels": {
+          "label": "判断モデル"
+        },
         "llmGateway": {
           "label": "LLM ゲートウェイ"
         },
@@ -16959,6 +17057,9 @@
         },
         "webSearch": {
           "label": "Web 検索"
+        },
+        "skills": {
+          "label": "スキル"
         }
       },
       "sections": {
@@ -16986,12 +17087,6 @@
       }
     },
     "adminSidebar": {
-      "businessOrEnterpriseOnly": {
-        "tooltip": "この機能は [Yahont の Business 版または Enterprise 版](/admin/billing) でのみ利用できます。"
-      },
-      "enterpriseOnly": {
-        "tooltip": "この機能は [Yahont の Enterprise 版](/admin/billing) でのみ利用できます。"
-      },
       "exitAdminPanel": {
         "label": "管理パネルを終了"
       },
@@ -17010,8 +17105,7 @@
         "title": "エージェント"
       },
       "craft": {
-        "label": "Craft",
-        "businessTag": "Business"
+        "label": "Craft"
       },
       "exploreAgents": {
         "label": "エージェントを探す"
@@ -17252,21 +17346,11 @@
         "title": "スキルを利用できません"
       },
       "management": {
-        "description": "このスキルを使用できるユーザーを管理します。",
-        "externalApp": {
-          "manage": {
-            "label": "アプリ設定で管理"
-          },
-          "readyDescription": "このスキルはアプリ「{appName}」を使用します。",
-          "title": "外部アプリ"
-        },
         "sharing": {
           "edit": {
             "label": "共有を編集"
-          },
-          "title": "共有"
-        },
-        "title": "管理"
+          }
+        }
       },
       "saveTooltip": {
         "missingDescription": "保存する前に説明を追加してください。",
@@ -17276,21 +17360,6 @@
         "noPermission": "このスキルの詳細を編集する権限がありません。",
         "savingChanges": "変更を保存中...",
         "savingSkill": "スキルを保存中..."
-      },
-      "sharing": {
-        "organization": {
-          "editorDescription": "組織内の全員がこのスキルを使用および編集できます。",
-          "title": "組織",
-          "viewerDescription": "組織内の全員がこのスキルを使用できます。"
-        },
-        "personal": {
-          "description": "このスキルを使用できるのはあなただけです。",
-          "title": "個人"
-        },
-        "shares": {
-          "description": "選択したユーザーとグループのみがこのスキルを使用できます。",
-          "title": "{count, plural, one {# 件の共有} other {# 件の共有}}"
-        }
       },
       "toasts": {
         "created": "「{name}」を作成しました",
@@ -17304,6 +17373,9 @@
         "inspectFailed": "スキルバンドルの検査に失敗しました",
         "saveFailed": "スキルの保存に失敗しました",
         "saved": "「{name}」を保存しました"
+      },
+      "creationAccess": {
+        "title": "アクセス権"
       }
     },
     "modals": {
@@ -17342,6 +17414,13 @@
           "singleSkill": "スキルは一度に 1 つずつアップロードしてください。",
           "title": "ファイルの要件",
           "zip": "ZIP ファイルには SKILL.md ファイルを含める必要があります。"
+        },
+        "batch": {
+          "title": "アップロードするスキルのアクセス権",
+          "selected": "{count, plural, one {# 件のスキルバンドルを選択中} other {# 件のスキルバンドルを選択中}}",
+          "result": "{imported, plural, one {# 件のスキルをインポートしました} other {# 件のスキルをインポートしました}}。{failed, plural, one {# 件が失敗しました} other {# 件が失敗しました}}。",
+          "failure": "{name}: {reason}",
+          "requirement": "複数の ZIP ファイルを選択すると、スキルをまとめてインポートできます。各 ZIP にはスキルを 1 件含めてください。"
         }
       },
       "importGithub": {
@@ -17418,6 +17497,11 @@
         "unavailableFallback": "このスキルはインポートできません。",
         "unavailableTag": {
           "label": "インポート不可"
+        },
+        "sharing": {
+          "title": "インポートするスキルのアクセス権",
+          "configureButton": "アクセス権を設定",
+          "description": "これらのアクセス設定は、選択した{count, plural, one {# 件のスキル} other {# 件のスキル}}すべてに適用されます。"
         }
       },
       "nameConflict": {
@@ -17471,7 +17555,6 @@
         },
         "externalAppNotice": "このスキルがアプリ「{appName}」に関連付けられている間は、組織全体への閲覧者アクセスが必要です。",
         "header": {
-          "title": "*{name}* を共有",
           "transferTitle": "*{name}* を譲渡"
         },
         "loading": {
@@ -17505,15 +17588,35 @@
         },
         "transferredToast": {
           "message": "所有権を譲渡しました。"
-        }
+        },
+        "installation": {
+          "title": "インストール",
+          "available": "インストール可能",
+          "default": "デフォルトでインストール",
+          "required": "必須",
+          "availableDescription": "ユーザーはいつでもインストールまたはアンインストールできます。",
+          "defaultDescription": "自動でインストールされます。ユーザーはいつでも無効化またはアンインストールできます。",
+          "requiredDescription": "自動でインストールされます。ユーザーは無効化またはアンインストールできません。",
+          "description": "アクセス権を持つ全員に対するスキルのインストール方法を選択します。"
+        },
+        "description": "このスキルを使用できるユーザーとインストール方法を選択します。",
+        "accessTitle": "アクセス範囲",
+        "peopleTitle": "アクセスできるユーザー",
+        "manageIndividualAccess": "個別のアクセスを管理",
+        "individualAccessTitle": "個別のアクセス",
+        "ownershipTitle": "所有権"
       },
       "placeholders": {
         "githubRepository": "ona/ripojitori または https://github.com/ona/ripojitori"
+      },
+      "tabs": {
+        "details": "詳細",
+        "sharing": "共有"
       }
     },
     "page": {
       "browse": {
-        "title": "スキルを閲覧"
+        "title": "スキルを選択"
       },
       "countSeparator": {
         "label": "{count, plural, one {スキル} other {スキル}}"
@@ -17541,8 +17644,8 @@
           "title": "一致するスキルがありません"
         },
         "noSkills": {
-          "description": "まだ共有されたカスタムスキルはなく、組み込みスキルも設定されていません。",
-          "title": "利用可能なスキルがありません"
+          "title": "カスタムスキルはまだありません",
+          "description": "スキルを作成またはインポートしてライブラリに追加してください。"
         }
       },
       "focusedApp": {
@@ -17579,6 +17682,9 @@
         "disableFailed": "{name}を無効にできませんでした",
         "enableFailed": "{name}を有効にできませんでした",
         "refreshFailed": "{name}は更新されましたが、スキル一覧を更新できませんでした。"
+      },
+      "builtins": {
+        "title": "組み込みスキル（{count, number}）"
       }
     },
     "sections": {
@@ -17634,6 +17740,34 @@
           "readFailed": "アップロードされたファイルを読み込めませんでした。"
         }
       }
+    },
+    "sharingSummary": {
+      "organization": "{count, plural, one {組織内の全員がこのスキルにアクセスできます。} other {組織内の全員がこれらのスキルにアクセスできます。}}",
+      "selected": "{users, plural, one {# 人のユーザー} other {# 人のユーザー}}と{groups, plural, one {# 個のグループ} other {# 個のグループ}}に共有されています。",
+      "private": "{count, plural, one {このスキルにアクセスできるのは自分だけです。} other {これらのスキルにアクセスできるのは自分だけです。}}"
+    },
+    "bulk": {
+      "adminDescription": "組織全体のスキルとアクセス権を管理します。",
+      "selectAll": "表示中のカスタムスキルをすべて選択",
+      "selected": "{count, plural, one {# 件選択中} other {# 件選択中}}",
+      "share": "共有",
+      "enable": "自分用に有効化",
+      "disable": "自分用に無効化",
+      "delete": "削除",
+      "selectSkill": "{name} を選択",
+      "updated": "{count, plural, one {# 件のスキルを更新しました} other {# 件のスキルを更新しました}}",
+      "failed": "スキルを更新できませんでした。もう一度お試しください。",
+      "partialFailure": "{count, plural, one {# 件のスキルを更新できませんでした} other {# 件のスキルを更新できませんでした}}",
+      "deleteTitle": "{count, plural, one {# 件のスキルを削除しますか？} other {# 件のスキルを削除しますか？}}",
+      "deleteDescription": "{count, plural, one {アクセス権を持つすべてのユーザーに対して、選択したスキルを削除します。この操作は元に戻せません。} other {アクセス権を持つすべてのユーザーに対して、選択した # 件のスキルをすべて削除します。この操作は元に戻せません。}}",
+      "shareTitle": "{count, plural, one {# 件のスキルのアクセス権を更新} other {# 件のスキルのアクセス権を更新}}",
+      "shareDescription": "選択したすべてのスキルに変更を適用します。変更しない設定は現在の値を維持します。",
+      "unchanged": "変更しない",
+      "everyone": "組織内の全員",
+      "invitedOnly": "招待されたユーザーとグループ",
+      "addAccessDescription": "選択したすべてのスキルに、これらのユーザーとグループを追加します。指定したユーザーとグループには選択した権限が設定されます。それ以外のユーザーの現在のアクセス権は変わりません。",
+      "apply": "{count, plural, one {# 件のスキルに適用} other {# 件のスキルに適用}}",
+      "moreActions": "その他の操作"
     }
   },
   "opensearchHealth": {

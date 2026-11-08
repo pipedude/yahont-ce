@@ -96,7 +96,6 @@ export default function ManagePlanPage() {
       void invalidateBillingTree();
     });
     // Runs once per mount: the transit params are read before the replace.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -7,11 +7,11 @@ import {
   Button,
   Card,
   Dropdown,
-  FilterButton,
+  SelectButton,
   InputTypeIn,
   MessageCard,
   Pagination,
-  Tag,
+  Chip,
 } from "@opal/components";
 import { useDebouncedValue } from "@opal/hooks";
 import { Content, IllustrationContent, Section } from "@opal/layouts";
@@ -180,13 +180,16 @@ export default function ConnectorList({
         >
           <Dropdown>
             <Dropdown.Trigger asChild>
-              <FilterButton
+              <SelectButton
+                variant="select-filter"
+                chevron
+                labelFont="main-ui-action"
                 icon={SvgActivity}
-                active={status !== null}
+                state={status !== null ? "selected" : "empty"}
                 onClear={() => pickStatus(null)}
               >
                 {status === null ? t("statusFilter.all") : tBadges(status)}
-              </FilterButton>
+              </SelectButton>
             </Dropdown.Trigger>
             <Dropdown.Data
               label={t("statusFilter.label")}
@@ -227,14 +230,12 @@ export default function ConnectorList({
             }))
               .filter(({ count }) => count > 0)
               .map(({ counted, count, tag }) => (
-                <Tag
+                <Chip
                   key={counted}
                   icon={tag.icon}
                   title={format.number(count)}
                   tooltip={t(`counts.${counted}`, { count })}
-                  color={tag.color}
-                  variant="status"
-                  size="md"
+                  iconColor={tag.color}
                   aria-label={t(`counts.${counted}`, { count })}
                   aria-pressed={status === counted}
                   onClick={() =>

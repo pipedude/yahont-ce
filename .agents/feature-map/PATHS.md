@@ -18,6 +18,12 @@ here. Read the component that documents the setting in its env table.
 
 ---
 
+## Deployment proxy
+
+| Path | Component(s) |
+|---|---|
+| `deployment/data/nginx/`, `cli/internal/deploy/deployfiles/embedded/data/nginx/` | auth-and-identity |
+
 ## Terraform: custom tools
 
 | Path | Component(s) |
@@ -66,6 +72,7 @@ here. Read the component that documents the setting in its env table.
 | `backend/onyx/natural_language_processing/` | document-index, internal-search |
 | `backend/onyx/db/search_settings.py`, `db/swap_index.py` | document-index |
 | `backend/onyx/server/manage/search_settings.py`, `server/manage/embedding/` | document-index |
+| `backend/shared_configs/embedding_models.py`, `backend/model_server/embedding_model_loader.py`, `backend/model_server/voyage_nano.py` | document-index |
 | `backend/onyx/server/features/search/`, `server/query_and_chat/query_backend.py`, `backend/ee/onyx/server/query_and_chat/search_backend.py`, `backend/ee/onyx/search/` | internal-search |
 | `backend/ee/onyx/server/query_and_chat/token_limit.py` | rate-and-usage-limits |
 | `backend/onyx/access/`, `backend/ee/onyx/access/`, `backend/onyx/db/document_access.py`, `db/permissions.py`, `db/scoped_permissions.py` | access-control |
@@ -164,6 +171,7 @@ so verify the callers rather than a single component.
 | `backend/onyx/voice/`, `server/manage/voice/`, `db/voice.py` | voice |
 | `backend/onyx/image_gen/`, `server/features/image_generation/`, `server/manage/image_generation/`, `db/image_generation.py` | image-generation |
 | `backend/onyx/db/code_interpreter.py`, `server/manage/code_interpreter/` | code-execution |
+| `backend/onyx/agents/execution_records.py` | llm-providers |
 | `backend/onyx/llm/`, `server/manage/llm/`, `db/llm.py` | llm-providers |
 
 ## Backend: Craft
@@ -171,6 +179,10 @@ so verify the callers rather than a single component.
 | Path | Component(s) |
 |---|---|
 | `backend/onyx/server/features/build/` | craft-sessions |
+| `backend/onyx/server/features/build/sandbox/` | craft-sandboxes |
+| `backend/onyx/server/features/build/session/resource_cleanup.py` | craft-sandboxes |
+| `backend/onyx/background/celery/tasks/build/tasks.py` | craft-sandboxes |
+| `backend/onyx/server/features/build/static_preview.py` | craft-webapp-proxy |
 | `backend/onyx/server/features/build/session/output_cards.py` | craft-sessions, craft-scheduled-tasks |
 | `backend/onyx/server/features/build/sandbox/image/sandbox_daemon/models.py` | craft-sandboxes, craft-sessions |
 | `backend/onyx/sandbox_proxy/` | craft-external-apps |
@@ -192,7 +204,10 @@ so verify the callers rather than a single component.
 | `web/tools/prepare-pdf-assets.cjs` | craft-webapp-proxy |
 | `web/src/app/craft/` | craft-sessions, craft-streaming |
 | `web/src/app/craft/v1/tasks/` | craft-scheduled-tasks |
+| `web/src/lib/readSpreadsheetPreview.ts`, `web/src/lib/spreadsheetPreview.worker.ts` | craft-webapp-proxy |
 | `web/src/app/craft/components/output-panel/`, `web/src/app/craft/components/OutputPanel.tsx` | craft-webapp-proxy |
+| `web/src/lib/docx/` | chat-frontend, craft-webapp-proxy |
+| `web/src/lib/spreadsheetPreview.ts`, `web/src/app/craft/services/filePreview.ts` | craft-webapp-proxy |
 | `web/src/lib/csv.ts` | craft-streaming, chat-frontend |
 | `web/src/lib/build/hooks.ts`, `web/src/lib/build/types.ts` | craft-webapp-proxy |
 | `web/src/app/craft/services/workspaceDirectorySnapshots.ts` | craft-webapp-proxy |
@@ -204,7 +219,11 @@ so verify the callers rather than a single component.
 | `web/src/views/admin/ChatPreferencesPage.tsx` | chat-preferences |
 | `web/src/app/admin/language-models/` | llm-providers |
 | `web/src/views/admin/LanguageModelsPage.tsx` | llm-providers |
+| `web/src/views/admin/VoicePage/`, `web/src/lib/voice/` | voice |
+| `web/src/app/admin/decision-models/`, `web/src/views/admin/DecisionModelsPage.tsx`, `web/src/sections/modals/languageModels/ZoomDecisionModal.tsx` | llm-providers |
 | `web/src/views/admin/ChatPreferencesPage.tsx`, `web/src/views/admin/ChatTaskModelSettings.tsx` | chat-preferences, llm-providers |
+| `web/src/views/admin/DecisionModelSetting.tsx`, `backend/onyx/llm/decisions/` | llm-providers |
+| `web/src/sections/modals/languageModels/DecisionProviderModal.tsx` | llm-providers |
 | `web/src/app/admin/plugins/`, `web/src/app/admin/mcp-actions/`, `admin/openapi-actions/` | mcp-and-custom-tools |
 | `web/src/sections/plugins/`, `web/src/lib/plugins/`, `web/src/sections/actions/modals/MCPPluginSetupModal.tsx` | mcp-and-custom-tools |
 | `web/src/sections/actions/`, `web/src/lib/mcp/`, `web/src/app/mcp/oauth/` | mcp-and-custom-tools |
@@ -232,7 +251,10 @@ so verify the callers rather than a single component.
 | `deployment/` | the deployed component. For Craft, also `docs/craft/infra/`. |
 | `deployment/fleet-telemetry.md` | observability |
 | `.github/workflows/` | CI. Not a product component; verify by reading the workflow. |
+| `deployment/helm/dev/` | craft-sandboxes (local Kubernetes configuration, launch, and readiness) |
+| `.zed/run-all-k8s.sh`, `.zed/process-compose.k8s.yaml` | craft-sandboxes |
 | `cli/`, `tools/`, `scripts/` | developer tooling. Not a product component. |
+| `tools/loadtest/mock_llm/` | internal-search (synthetic load-test helper responses) |
 
 ---
 

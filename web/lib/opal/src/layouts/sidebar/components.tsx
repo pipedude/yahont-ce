@@ -20,6 +20,7 @@ import {
   Tooltip,
 } from "@opal/components";
 import { iconWrapper } from "@opal/components/buttons/icon-wrapper";
+import { Tag, type TagProps } from "@opal/components";
 import { Disabled, Hoverable, Interactive } from "@opal/core";
 import { SvgSidebar } from "@opal/icons";
 import type { IconFunctionComponent, RichStr } from "@opal/types";
@@ -338,6 +339,8 @@ function SidebarFooter({ children }: SidebarFooterProps) {
 
 interface SidebarSectionProps {
   title?: string | RichStr;
+  /** Optional tag at the end of the header, in line with tab `rightChildren`. */
+  tag?: TagProps;
   /** Optional action shown on hover, e.g. a "+" button. */
   action?: React.ReactNode;
   /** When true, dims the section header to indicate it is unavailable. */
@@ -348,6 +351,7 @@ interface SidebarSectionProps {
 
 function SidebarSection({
   title,
+  tag,
   action,
   disabled,
   children,
@@ -363,6 +367,11 @@ function SidebarSection({
                   {title}
                 </Text>
               </div>
+              {tag && (
+                <div className="opal-sidebar-section__tag">
+                  <Tag {...tag} />
+                </div>
+              )}
               {action && (
                 <Hoverable.Item group="sidebar-section">
                   {action}

@@ -112,6 +112,7 @@ from onyx.db.enums import (
     ScheduledTaskTriggerSource,
     SessionOrigin,
     SharingScope,
+    SkillInstallationPolicy,
     SkillSharePermission,
     SSOProviderType,
     SwitchoverType,
@@ -139,6 +140,7 @@ from onyx.utils.headers import HeaderItemDict
 from onyx.utils.logger import setup_logger
 from onyx.utils.sensitive import SensitiveValue
 from onyx.utils.special_types import JSON_ro
+from shared_configs.configs import MULTI_TENANT, POSTGRES_DEFAULT_SCHEMA
 from shared_configs.enums import EmbeddingProvider
 
 # TODO: After anonymous user migration has been deployed, make user_id columns NOT NULL
@@ -320,22 +322,19 @@ class NullFilteredString(TypeDecorator):
         return value
 
 
-# Migration b3f1c9a27d84 sized search_settings.reclaim_status from IndexReclaimStatus
-# when it ran. Databases migrated before RECLAIMED existed got VARCHAR(8), and release
-# branches have no migration that widens it. "RECLAIMED" has 9 characters, so
-# RECLAIMED is stored as this shorter value.
-_RECLAIMED_DB_VALUE = "RECLAIMD"
-# Databases created after RECLAIMED existed got VARCHAR(9) and can hold this value.
-_LEGACY_RECLAIMED_DB_VALUE = "RECLAIMED"
+# Releases without migration ca7cc9a98a6b write RECLAIMED as this value on every
+# database. The migration rewrites it to "RECLAIMED", but those releases can still
+# write it beside this version during a rolling deploy, or after a rollback; the
+# migration does not run again on the next upgrade.
+_SHORT_RECLAIMED_DB_VALUE = "RECLAIMD"
 
 
 class IndexReclaimStatusType(TypeDecorator):
-    """Stores an IndexReclaimStatus by member name, except RECLAIMED, which is stored
-    as _RECLAIMED_DB_VALUE so that it fits every database. Reads accept both stored
-    forms of RECLAIMED.
+    """Stores an IndexReclaimStatus by member name, as a non-native Enum does, and
+    also reads _SHORT_RECLAIMED_DB_VALUE as RECLAIMED.
 
-    A SQL comparison with RECLAIMED binds only _RECLAIMED_DB_VALUE, so it misses rows
-    that hold the legacy value. Compare with the other statuses instead."""
+    A SQL comparison with RECLAIMED misses rows that hold the short value. Compare
+    with the other statuses instead."""
 
     impl = String
     cache_ok = True
@@ -347,8 +346,6 @@ class IndexReclaimStatusType(TypeDecorator):
     ) -> str | None:
         if value is None:
             return None
-        if value == IndexReclaimStatus.RECLAIMED:
-            return _RECLAIMED_DB_VALUE
         return value.name
 
     def process_result_value(
@@ -358,7 +355,7 @@ class IndexReclaimStatusType(TypeDecorator):
     ) -> IndexReclaimStatus | None:
         if value is None:
             return None
-        if value in (_RECLAIMED_DB_VALUE, _LEGACY_RECLAIMED_DB_VALUE):
+        if value == _SHORT_RECLAIMED_DB_VALUE:
             return IndexReclaimStatus.RECLAIMED
         return IndexReclaimStatus[value]
 
@@ -862,6 +859,10 @@ class UserSkillPreference(Base):
     # Denormalized for name uniqueness; the composite FK keeps it exact.
     name: Mapped[str] = mapped_column(String(64), nullable=False)
 
+    enabled: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, server_default=text("true")
+    )
+
     __table_args__ = (
         ForeignKeyConstraint(
             ["name", "skill_id"],
@@ -875,6 +876,7 @@ class UserSkillPreference(Base):
             "user_id",
             "name",
             unique=True,
+            postgresql_where=text("enabled"),
         ),
     )
 
@@ -2199,6 +2201,11 @@ class CredentialCapabilityReportRow(Base):
     run_started_at: Mapped[datetime.datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    # When the RUNNING mark expires; the worker renews it as checks finish.
+    # Read only while RUNNING, where NULL (a pre-migration mark) is expired.
+    run_deadline_at: Mapped[datetime.datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     # The run attempt owning the lifecycle mark; the task's terminal writes are
     # fenced on it. NULL: no attempt owns the row (recorder writes, legacy
     # rows), which no fenced write can match. Never searched on, so no index.
@@ -2395,9 +2402,9 @@ class SearchSettings(Base):
 
     # Old-index reclamation (see reclaim helpers in db/search_settings.py).
     # NULL = not reclaim-tracked; set to PENDING at reindex submit on the current
-    # PRESENT (the future PAST).
+    # PRESENT (the future PAST). The length matches migration ca7cc9a98a6b.
     reclaim_status: Mapped[IndexReclaimStatus | None] = mapped_column(
-        IndexReclaimStatusType(), nullable=True
+        IndexReclaimStatusType(64), nullable=True
     )
     # Soak anchor: when the index stopped being read (port drained), NOT swap time —
     # so INSTANT backfills (which read PAST post-swap) anchor correctly.
@@ -3783,6 +3790,12 @@ class LLMProvider(Base):
     )
     api_base: Mapped[str | None] = mapped_column(String, nullable=True)
     api_version: Mapped[str | None] = mapped_column(String, nullable=True)
+    zoom_voice_provider_id: Mapped[int | None] = mapped_column(
+        ForeignKey("voice_provider.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
+        unique=True,
+    )
     # custom configs that should be passed to the LLM provider at inference time
     # (e.g. `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, etc. for bedrock)
     custom_config: Mapped[dict[str, str] | None] = mapped_column(
@@ -3836,7 +3849,7 @@ class ModelConfiguration(Base):
     # This field is primarily used for "Well Known LLM Providers", since for them,
     # we have a pre-defined list of LLM models that we allow them to choose from.
     # For example, for OpenAI, we allow the end-user to choose multiple models from
-    # `["gpt-4", "gpt-4o", etc.]`. Once they make their selections, we set each
+    # `["gpt-4", "gpt-6-sol", etc.]`. Once they make their selections, we set each
     # selected model to `is_visible = True`.
     #
     # For "Custom LLM Providers", we don't provide a comprehensive list of models
@@ -5133,6 +5146,13 @@ class Skill(Base):
         Enum(SkillSharePermission, native_enum=False),
         nullable=True,
     )
+    installation_policy: Mapped[SkillInstallationPolicy] = mapped_column(
+        Enum(SkillInstallationPolicy, native_enum=False),
+        nullable=False,
+        default=SkillInstallationPolicy.AVAILABLE,
+        server_default=SkillInstallationPolicy.AVAILABLE.value,
+    )
+
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -5172,10 +5192,20 @@ class Skill(Base):
     )
 
     __table_args__ = (
+        Index(
+            "uq_skill_automatic_name",
+            "name",
+            unique=True,
+            postgresql_where=text("installation_policy <> 'AVAILABLE'"),
+        ),
         UniqueConstraint("name", "id", name="uq_skill_name_id"),
         CheckConstraint(
             "(built_in_skill_id IS NULL) <> (bundle_file_id IS NULL)",
             name="ck_skill_definition_source",
+        ),
+        CheckConstraint(
+            "built_in_skill_id IS NOT NULL OR public_permission IS NOT NULL OR author_user_id IS NOT NULL",
+            name="ck_private_skill_has_owner",
         ),
     )
 
@@ -5896,6 +5926,8 @@ class PublicBase(DeclarativeBase):
     Access these only through `get_catalog_session()`. A tenant-scoped session lands on
     whichever database that tenant lives on — the same one today, but the wrong one
     once the tenant has been moved to another shard.
+
+    OAuthProviderClient uses POSTGRES_DEFAULT_SCHEMA on single-tenant installations.
     """
 
     __abstract__ = True
@@ -5903,7 +5935,9 @@ class PublicBase(DeclarativeBase):
 
 class OAuthProviderClient(PublicBase):
     __tablename__ = "oauth_provider_client"
-    __table_args__ = ({"schema": "public"},)
+    __table_args__ = (
+        {"schema": "public" if MULTI_TENANT else POSTGRES_DEFAULT_SCHEMA},
+    )
 
     client_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     client_metadata: Mapped[dict[str, Any]] = mapped_column(
@@ -6618,12 +6652,10 @@ class ModelCostOverride(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    # litellm-style model name (e.g. "gpt-4o").
-    model: Mapped[str] = mapped_column(String, nullable=False)
-    # Empty string (not NULL) for a provider-agnostic override, so the unique key
-    # below works on every Postgres version without NULLS NOT DISTINCT (PG15+).
-    provider: Mapped[str] = mapped_column(
-        String, nullable=False, default="", server_default=""
+    # One override per model configuration; it goes away with its model.
+    model_configuration_id: Mapped[int] = mapped_column(
+        ForeignKey("model_configuration.id", ondelete="CASCADE"),
+        nullable=False,
     )
 
     # Rates in USD per million tokens.
@@ -6648,10 +6680,14 @@ class ModelCostOverride(Base):
         nullable=False,
     )
 
+    model_configuration: Mapped["ModelConfiguration"] = relationship(
+        "ModelConfiguration"
+    )
+
     __table_args__ = (
-        # provider+model so the same model can be priced per provider.
         UniqueConstraint(
-            "provider", "model", name="uq_model_cost_override_provider_model"
+            "model_configuration_id",
+            name="uq_model_cost_override_model_configuration_id",
         ),
     )
 
@@ -6798,6 +6834,9 @@ class Sandbox(Base):
     # attempt number), not here.
     provisioning_started_at: Mapped[datetime.datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
+    )
+    cleanup_checkpoint: Mapped[dict[str, int | str | None] | None] = mapped_column(
+        PGJSONB, nullable=True
     )
 
     # Relationships

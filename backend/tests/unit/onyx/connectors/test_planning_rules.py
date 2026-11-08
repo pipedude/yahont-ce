@@ -25,6 +25,7 @@ _S3_COMPATIBLE_BUCKET = {
     "bucket_name": "b",
     "endpoint_url": "https://s3.example.ru",
 }
+_NOTION_PAGE_ID = "17ab3186873d418fb899c3f6a43f68de"
 
 
 def _classify(
@@ -293,8 +294,8 @@ def test_every_rule_reads_the_config_class_of_its_source() -> None:
         # Notion: a root page is always followed recursively.
         (
             DocumentSource.NOTION,
-            {"root_page_id": "r", "recursive_index_enabled": False},
-            {"root_page_id": "r", "recursive_index_enabled": True},
+            {"root_page_id": _NOTION_PAGE_ID, "recursive_index_enabled": False},
+            {"root_page_id": _NOTION_PAGE_ID, "recursive_index_enabled": True},
             {},
         ),
         (
