@@ -341,6 +341,17 @@ def _provider_scope(
         ) from error
 
 
+def _describe_llm_error(error: Exception) -> str:
+    """Name an LLM error, with the provider error a stream failure wraps."""
+    from litellm.exceptions import MidStreamFallbackError
+
+    description = f"{type(error).__name__}: {str(error)[:300]}"
+    if isinstance(error, MidStreamFallbackError) and error.original_exception:
+        original = error.original_exception
+        description += f" (original {type(original).__name__}: {str(original)[:500]})"
+    return description
+
+
 def _as_onyx_llm_error(error: Exception) -> Exception:
     """Translate a litellm exception into the Onyx one callers catch.
 
@@ -528,6 +539,92 @@ def _fix_tool_user_message_ordering(
             result.append({"role": "assistant", "content": "Noted. Continuing."})
         result.append(msg)
     return result
+
+
+def _merge_user_messages_into_tool_results(
+    messages: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Fold text-only user messages that follow a tool result into that result.
+
+    GigaChat rejects a user message right after a tool message ("Unexpected
+    user message or missing tool result"). A bridge assistant message, as
+    for Mistral, makes it answer the reminder instead of the question, so the
+    text rides in the tool result. A user message with an image stays as is.
+    """
+    result: list[dict[str, Any]] = []
+    for msg in messages:
+        previous = result[-1] if result else None
+        content = msg.get("content")
+        if (
+            msg.get("role") == "user"
+            and previous is not None
+            and previous.get("role") == "tool"
+            and _is_text_only_content(content)
+        ):
+            extra = _normalize_content(content)
+            if extra:
+                joined = f"{_normalize_content(previous.get('content'))}\n\n{extra}"
+                result[-1] = {**previous, "content": joined}
+            continue
+        result.append(msg)
+    return result
+
+
+def _is_text_only_content(content: Any) -> bool:
+    return isinstance(content, str) or (
+        isinstance(content, list)
+        and all(isinstance(b, dict) and b.get("type") == "text" for b in content)
+    )
+
+
+def _merge_consecutive_user_messages(
+    messages: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Join text-only user messages that follow each other into one.
+
+    GigaChat rejects two user messages in a row with an empty 400. A failed
+    turn leaves its question without an answer, and a history turned into text
+    ends with the tool result and the reminder, both user messages. A message
+    with an image stays as is.
+    """
+    result: list[dict[str, Any]] = []
+    for msg in messages:
+        previous = result[-1] if result else None
+        if (
+            msg.get("role") == "user"
+            and previous is not None
+            and previous.get("role") == "user"
+            and _is_text_only_content(msg.get("content"))
+            and _is_text_only_content(previous.get("content"))
+        ):
+            joined = (
+                f"{_normalize_content(previous.get('content'))}"
+                f"\n\n{_normalize_content(msg.get('content'))}"
+            )
+            result[-1] = {**previous, "content": joined}
+            continue
+        result.append(msg)
+    return result
+
+
+def _history_calls_undeclared_tool(
+    messages: list[dict[str, Any]], tools: list[dict] | None
+) -> bool:
+    """Whether an assistant message in the history calls a function that the
+    current request does not declare in `tools`."""
+    declared = {(tool.get("function") or {}).get("name") for tool in tools or []}
+    return any(
+        (call.get("function") or {}).get("name") not in declared
+        for msg in messages
+        if msg.get("role") == "assistant"
+        for call in msg.get("tool_calls") or []
+    )
+
+
+def _is_gigachat_family_name(identity_names: list[str]) -> bool:
+    """Whether any model/deployment identity name looks like a GigaChat model
+    (`sber/gigachat-3-pro` through RouterAI, `GigaChat3.5-…` on Cloud.ru)."""
+    return any("gigachat" in name.lower() for name in identity_names)
 
 
 _MISTRAL_FAMILY_MARKERS: frozenset[str] = frozenset(
@@ -1336,6 +1433,16 @@ class LitellmLLM(LLM):
             if is_mistral_model:
                 messages = _fix_tool_user_message_ordering(messages)
 
+            if _is_gigachat_family_name(model_identity_names):
+                # GigaChat rejects a history that calls a function the request
+                # does not declare ("Tool call refers to an undeclared
+                # function"): a forced tool is the only one declared, and the
+                # last cycle declares none.
+                if _history_calls_undeclared_tool(messages, tools):
+                    messages = _strip_tool_content_from_messages(messages)
+                messages = _merge_user_messages_into_tool_results(messages)
+                messages = _merge_consecutive_user_messages(messages)
+
             # Only pass tool_choice when tools are present — some providers (e.g. Fireworks)
             # reject requests where tool_choice is explicitly null.
             if tools and tool_choice is not None:
@@ -1765,7 +1872,7 @@ class LitellmLLM(LLM):
                 logger.warning(
                     "Retrying pre-chunk stream for model %s after %s on attempt %d/%d",
                     self.config.model_name,
-                    type(e).__name__,
+                    _describe_llm_error(e),
                     attempt + 1,
                     max_attempts,
                 )

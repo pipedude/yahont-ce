@@ -37,7 +37,7 @@ refer to by using matching keywords to other parts of the prompt and reminders.
 import time
 from collections.abc import Callable
 from functools import cached_property
-from typing import Any, cast
+from typing import Any
 
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -148,6 +148,28 @@ from shared_configs.contextvars import get_current_tenant_id
 logger = setup_logger()
 
 QUERIES_FIELD = "queries"
+
+_QUERIES_FORMAT_HINT = (
+    f"The internal_search tool requires a '{QUERIES_FIELD}' parameter "
+    f"containing an array of search queries. Please provide the queries "
+    f'like: {{"queries": ["your search query here"]}}'
+)
+
+
+def _coerce_llm_queries(raw: Any) -> list[str]:
+    """Return the model's `queries` argument as a list of strings.
+
+    Some models send a bare string instead of an array. Any other malformed
+    shape raises, so the model sees the format hint and retries.
+    """
+    if isinstance(raw, str) and raw.strip():
+        return [raw]
+    if isinstance(raw, list) and all(isinstance(q, str) for q in raw):
+        return raw
+    raise ToolCallException(
+        message=f"Invalid '{QUERIES_FIELD}' parameter in internal_search tool call: got {type(raw).__name__}",
+        llm_facing_message=_QUERIES_FORMAT_HINT,
+    )
 
 
 class QueryExpansionAndScope(BaseModel):
@@ -723,12 +745,9 @@ class SearchTool(Tool[SearchToolOverrideKwargs]):
         if QUERIES_FIELD not in llm_kwargs:
             raise ToolCallException(
                 message=f"Missing required '{QUERIES_FIELD}' parameter in internal_search tool call",
-                llm_facing_message=(
-                    f"The internal_search tool requires a '{QUERIES_FIELD}' parameter "
-                    f"containing an array of search queries. Please provide the queries "
-                    f'like: {{"queries": ["your search query here"]}}'
-                ),
+                llm_facing_message=_QUERIES_FORMAT_HINT,
             )
+        llm_queries = _coerce_llm_queries(llm_kwargs[QUERIES_FIELD])
 
         # An explicitly empty source selection is a statement, not an absent
         # filter: the tool still runs (it may be forced), and it honestly
@@ -844,8 +863,6 @@ class SearchTool(Tool[SearchToolOverrideKwargs]):
                     {},
                 )
         # Session is closed here — all parallel work uses plain Python objects only
-
-        llm_queries = cast(list[str], llm_kwargs[QUERIES_FIELD])
 
         # Run semantic and keyword query expansion in parallel (unless skipped)
         # Use message history, memories, and user info from override_kwargs

@@ -270,10 +270,11 @@ export const preprocessLaTeX = (content: string) => {
   );
 
   // Escape currency mentions
-  const currencyEscaped = processedForLatex.replace(
-    /\$(\d+(?:\.\d*)?)/g,
-    (_, p1) => `\\$${p1}`
-  );
+  const currencyEscaped = processedForLatex
+    .replace(/\$(\d+(?:\.\d*)?)/g, (_, p1) => `\\$${p1}`)
+    // Amount first, sign after (`18 400 $`): the space before and the space,
+    // punctuation or end after tell it from the delimiters of inline math.
+    .replace(/(\d\s+)\$(?=\s|$|[.,;:!?)»])/g, "$1\\$");
 
   // Replace block-level LaTeX delimiters \[ \] with $$ $$
   const blockProcessed = currencyEscaped.replace(

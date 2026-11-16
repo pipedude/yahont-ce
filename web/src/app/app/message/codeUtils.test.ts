@@ -28,6 +28,30 @@ describe("preprocessLaTeX", () => {
       expect(processed).toContain("\\$1,200");
       expect(processed).toContain("\\$800");
     });
+
+    it("should escape a dollar sign written after the amount", () => {
+      const input =
+        "Сумма 20 900 $, а «итого к оплате» указано 18 400 $ по договору.";
+      const processed = preprocessLaTeX(input);
+
+      expect(processed).toContain("20 900 \\$,");
+      expect(processed).toContain("18 400 \\$ по");
+    });
+
+    it("should escape a trailing dollar sign before punctuation or the end", () => {
+      expect(preprocessLaTeX("Итого 18 400 $.")).toBe("Итого 18 400 \\$.");
+      expect(preprocessLaTeX("Цена (1 200 $) и 300 $; всё")).toBe(
+        "Цена (1 200 \\$) и 300 \\$; всё"
+      );
+      expect(preprocessLaTeX("Курс 1 200 $")).toBe("Курс 1 200 \\$");
+    });
+
+    it("should keep inline math whose delimiters touch digits", () => {
+      const input = "Формула $x + 3$ и $y = 5$ верна, умножить 5 $x$ раз.";
+      const processed = preprocessLaTeX(input);
+
+      expect(processed).toBe(input);
+    });
   });
 
   describe("code block handling", () => {

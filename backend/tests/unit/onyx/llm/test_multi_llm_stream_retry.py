@@ -62,6 +62,45 @@ def test_stream_retries_timeout_before_first_chunk() -> None:
     mock_logger.warning.assert_called_once()
 
 
+def test_stream_retry_warning_names_the_wrapped_provider_error() -> None:
+    """litellm hides the real cause of a pre-chunk failure inside
+    MidStreamFallbackError; the retry warning has to carry it."""
+    fake_llm = _make_fake_llm()
+    translated_chunk = _make_stream_response("hello")
+    attempt_count = 0
+
+    def completion_side_effect(**_kwargs: object) -> list[object]:
+        nonlocal attempt_count
+        attempt_count += 1
+        if attempt_count == 1:
+            raise MidStreamFallbackError(
+                message="stream failed",
+                model="gpt-test",
+                llm_provider="openai",
+                original_exception=ValueError("gateway rejected the request"),
+            )
+        return [object()]
+
+    fake_llm._completion = MagicMock(side_effect=completion_side_effect)
+
+    with (
+        patch("onyx.llm.multi_llm.LLM_FIRST_CHUNK_MAX_RETRIES", 1),
+        patch("onyx.llm.multi_llm.is_true_openai_model", return_value=False),
+        patch(
+            "onyx.llm.model_response.from_litellm_model_response_stream",
+            return_value=translated_chunk,
+        ),
+        patch("onyx.llm.multi_llm.logger") as mock_logger,
+    ):
+        list(LitellmLLM.stream_raw(fake_llm, prompt=_make_prompt()))
+
+    mock_logger.warning.assert_called_once()
+    template, *args = mock_logger.warning.call_args.args
+    message = template % tuple(args)
+    assert "MidStreamFallbackError" in message
+    assert "ValueError: gateway rejected the request" in message
+
+
 def test_stream_does_not_retry_after_first_chunk() -> None:
     fake_llm = _make_fake_llm()
     translated_chunk = _make_stream_response("partial")

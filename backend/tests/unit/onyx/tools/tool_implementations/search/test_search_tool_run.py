@@ -56,6 +56,7 @@ def _run(
     decide_mock: MagicMock | None = None,
     skip_query_expansion: bool = False,
     sections: list[InferenceSection] | None = None,
+    queries: Any = None,
 ) -> MagicMock:
     """Run tool.run() with all DB/LLM deps mocked; returns the search_pipeline mock.
 
@@ -102,7 +103,7 @@ def _run(
                 ],
                 skip_query_expansion=skip_query_expansion,
             ),
-            queries=["ticket"],
+            queries=["ticket"] if queries is None else queries,
         )
     return mock_search_pipeline
 
@@ -206,6 +207,17 @@ def _emitted_filter_sources(tool: SearchTool) -> list[list[str]]:
     emit_mock = cast(MagicMock, tool.emitter.emit)
     emitted = [call.args[0].obj for call in emit_mock.call_args_list]
     return [obj.sources for obj in emitted if isinstance(obj, SearchToolFilterDelta)]
+
+
+def test_bare_string_queries_run_as_one_query() -> None:
+    """A model that sends `queries` as a bare string gets a normal search."""
+    mock_search_pipeline = _run(
+        _make_tool(),
+        connected_sources=[DocumentSource.GITHUB],
+        queries="resolve the ticket",
+    )
+
+    assert "resolve the ticket" in _queries_sent(mock_search_pipeline)
 
 
 def test_decided_scope_is_passed_to_search() -> None:

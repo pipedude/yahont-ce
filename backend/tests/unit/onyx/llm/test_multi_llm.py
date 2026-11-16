@@ -3463,6 +3463,224 @@ def test_tool_user_bridge_not_inserted_for_other_models() -> None:
     assert roles[tool_idx + 1 :] == ["user"]
 
 
+def _tool_definition(name: str) -> dict[str, Any]:
+    return {
+        "type": "function",
+        "function": {
+            "name": name,
+            "description": name,
+            "parameters": {"type": "object", "properties": {}},
+        },
+    }
+
+
+def _completion_messages(
+    llm: LitellmLLM,
+    tools: list[dict[str, Any]] | None = None,
+    prompt: list[ChatCompletionMessage] | None = None,
+) -> list[dict[str, Any]]:
+    with (
+        patch("litellm.completion") as mock_completion,
+        patch("onyx.llm.multi_llm.is_true_openai_model", return_value=False),
+    ):
+        mock_completion.return_value = []
+        list(llm.stream_raw(prompt or _tool_cycle_prompt(), tools=tools))
+        return mock_completion.call_args.kwargs["messages"]
+
+
+@pytest.mark.parametrize(
+    "model_name",
+    ["sber/gigachat-3-pro", "ai-sage/GigaChat3.5-432B-A28B-Reasoning"],
+)
+def test_user_text_after_tool_result_joins_the_result_for_gigachat(
+    model_name: str,
+) -> None:
+    """GigaChat rejects a user message right after a tool result ("Unexpected
+    user message or missing tool result"). A bridge assistant message makes it
+    answer the reminder instead of the question, so the text joins the result."""
+    messages = _completion_messages(
+        _openai_compatible_llm(model_name), tools=[_tool_definition("get_weather")]
+    )
+    assert [m["role"] for m in messages][-2:] == ["assistant", "tool"]
+    assert messages[-1]["content"] == "Sunny, 21C\n\nRemember to cite your sources."
+
+
+def test_gigachat_name_is_checked_despite_deployment_alias() -> None:
+    messages = _completion_messages(
+        _openai_compatible_llm("sber/gigachat-3-pro", deployment_name="prod-chat"),
+        tools=[_tool_definition("get_weather")],
+    )
+    assert messages[-1]["role"] == "tool"
+
+
+def test_user_text_after_tool_result_stays_separate_for_other_models() -> None:
+    messages = _completion_messages(
+        _openai_compatible_llm("glm-4.7"), tools=[_tool_definition("get_weather")]
+    )
+    assert [m["role"] for m in messages][-2:] == ["tool", "user"]
+    assert messages[-2]["content"] == "Sunny, 21C"
+
+
+@pytest.mark.parametrize(
+    "tools",
+    [None, [], [_tool_definition("internal_search")]],
+    ids=["no tools", "empty tools", "other tool only"],
+)
+def test_gigachat_history_calling_an_undeclared_tool_becomes_text(
+    tools: list[dict[str, Any]] | None,
+) -> None:
+    """GigaChat rejects a request whose history calls a function the request
+    does not declare ("Tool call refers to an undeclared function"). That
+    happens when a forced tool is the only one declared, and on the last cycle,
+    which sends no tools. The history goes to the model as plain text."""
+    messages = _completion_messages(
+        _openai_compatible_llm("sber/gigachat-3-pro"), tools=tools
+    )
+
+    assert all("tool_calls" not in m for m in messages)
+    assert "tool" not in [m["role"] for m in messages]
+    flattened = "\n".join(str(m["content"]) for m in messages)
+    assert "[Tool Call] name=get_weather" in flattened
+    assert "Sunny, 21C" in flattened
+    assert "Remember to cite your sources." in flattened
+
+
+def _two_user_messages_prompt() -> list[ChatCompletionMessage]:
+    return [
+        UserMessage(content="Weather in Paris?"),
+        UserMessage(content="Check the contracts in storage."),
+    ]
+
+
+def test_gigachat_joins_user_messages_that_follow_each_other() -> None:
+    """GigaChat rejects two user messages in a row with an empty 400, e.g. when
+    a failed turn left its question without an answer."""
+    messages = _completion_messages(
+        _openai_compatible_llm("sber/gigachat-3-pro"),
+        prompt=_two_user_messages_prompt(),
+    )
+
+    assert [m["role"] for m in messages] == ["user"]
+    assert messages[0]["content"] == (
+        "Weather in Paris?\n\nCheck the contracts in storage."
+    )
+
+
+def test_other_models_keep_user_messages_that_follow_each_other() -> None:
+    messages = _completion_messages(
+        _openai_compatible_llm("glm-4.7"), prompt=_two_user_messages_prompt()
+    )
+
+    assert [m["role"] for m in messages] == ["user", "user"]
+
+
+def test_gigachat_flattened_history_ends_in_one_user_message() -> None:
+    """After the history becomes text, the tool result and the reminder are
+    both user messages; they must reach the model as one."""
+    messages = _completion_messages(
+        _openai_compatible_llm("sber/gigachat-3-pro"), tools=None
+    )
+
+    roles = [m["role"] for m in messages]
+    assert roles == ["user", "assistant", "user"]
+    assert messages[-1]["content"].endswith("Remember to cite your sources.")
+
+
+def test_merge_consecutive_user_messages_keeps_images_apart() -> None:
+    from onyx.llm.multi_llm import _merge_consecutive_user_messages
+
+    image_message: dict[str, Any] = {
+        "role": "user",
+        "content": [{"type": "image_url", "image_url": {"url": "data:image/png;x"}}],
+    }
+    messages: list[dict[str, Any]] = [
+        {"role": "system", "content": "s"},
+        {"role": "user", "content": "a"},
+        {"role": "user", "content": [{"type": "text", "text": "b"}]},
+        {"role": "assistant", "content": "r"},
+        image_message,
+        {"role": "user", "content": "c"},
+    ]
+
+    merged = _merge_consecutive_user_messages(messages)
+
+    assert [m["role"] for m in merged] == [
+        "system",
+        "user",
+        "assistant",
+        "user",
+        "user",
+    ]
+    assert merged[1]["content"] == "a\n\nb"
+    assert merged[3] is image_message
+    assert merged[4]["content"] == "c"
+    assert messages[1]["content"] == "a"
+
+
+def test_other_models_keep_history_calling_an_undeclared_tool() -> None:
+    messages = _completion_messages(
+        _openai_compatible_llm("glm-4.7"), tools=[_tool_definition("internal_search")]
+    )
+    assert "tool" in [m["role"] for m in messages]
+    assert any("tool_calls" in m for m in messages)
+
+
+def test_history_calls_undeclared_tool_matches_by_function_name() -> None:
+    from onyx.llm.multi_llm import _history_calls_undeclared_tool
+
+    messages: list[dict[str, Any]] = [
+        {"role": "user", "content": "q"},
+        {
+            "role": "assistant",
+            "content": None,
+            "tool_calls": [
+                {"id": "1", "function": {"name": "web_search", "arguments": "{}"}},
+                {"id": "2", "function": {"name": "internal_search", "arguments": "{}"}},
+            ],
+        },
+        {"role": "tool", "tool_call_id": "1", "content": "r"},
+    ]
+    both = [_tool_definition("web_search"), _tool_definition("internal_search")]
+
+    assert _history_calls_undeclared_tool(messages, both) is False
+    assert _history_calls_undeclared_tool(messages, both[:1]) is True
+    assert _history_calls_undeclared_tool(messages, None) is True
+    assert _history_calls_undeclared_tool(messages[:1], None) is False
+
+
+def test_merge_user_messages_into_tool_results_keeps_other_messages() -> None:
+    from onyx.llm.multi_llm import _merge_user_messages_into_tool_results
+
+    image_message: dict[str, Any] = {
+        "role": "user",
+        "content": [{"type": "image_url", "image_url": {"url": "data:image/png;x"}}],
+    }
+    messages: list[dict[str, Any]] = [
+        {"role": "user", "content": "q"},
+        {"role": "assistant", "content": None, "tool_calls": [{"id": "1"}]},
+        {"role": "tool", "tool_call_id": "1", "content": "result"},
+        {"role": "user", "content": "notice"},
+        {"role": "user", "content": [{"type": "text", "text": "reminder"}]},
+        {"role": "assistant", "content": "answer"},
+        {"role": "tool", "tool_call_id": "2", "content": "late"},
+        image_message,
+    ]
+
+    merged = _merge_user_messages_into_tool_results(messages)
+
+    assert [m["role"] for m in merged] == [
+        "user",
+        "assistant",
+        "tool",
+        "assistant",
+        "tool",
+        "user",
+    ]
+    assert merged[2]["content"] == "result\n\nnotice\n\nreminder"
+    assert merged[-1] is image_message
+    assert messages[2]["content"] == "result"
+
+
 class _PingStream:
     """A stream that emits an empty keepalive 'ping' forever, like a stalled LLM call."""
 
